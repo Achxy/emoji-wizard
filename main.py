@@ -34,6 +34,7 @@ with open("config.json", "r") as preference:
 
 bot_prefix = preference["default_prefix"]
 
+initial_ext = list()
 bot = commands.Bot(command_prefix=bot_prefix)
 
 
@@ -41,5 +42,18 @@ bot = commands.Bot(command_prefix=bot_prefix)
 async def on_ready():
     print(f"Sucessfully logged in as {bot.user}")
 
+
+print("            -           ")
+for filename in os.listdir("./cogs"):
+    # Accessing cogs folder
+    if filename.endswith(".py"):
+        # loading all python files from cogs folder
+        print(f"Adding {filename} from cogs...")
+        # initalizing all python files inside cogs.
+        initial_ext.append(f"cogs.{filename[:-3]}")
+
+if __name__ == "__main__":
+    for ext in initial_ext:
+        bot.load_extension(ext)
 
 bot.run(os.getenv("DISCORD_TOKEN"))
