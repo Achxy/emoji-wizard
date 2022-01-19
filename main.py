@@ -35,7 +35,7 @@ with open("config.json", "r") as preference:
 bot_prefix = preference["default_prefix"]
 
 initial_ext = list()
-bot = commands.Bot(command_prefix=bot_prefix)
+bot = commands.Bot(command_prefix=bot_prefix, help_command=None)
 
 
 @bot.event
