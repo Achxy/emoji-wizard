@@ -7,7 +7,7 @@ class help_(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def help(ctx):
+    async def help(self, ctx):
         return
 
 
