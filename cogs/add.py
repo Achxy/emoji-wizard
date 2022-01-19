@@ -16,7 +16,11 @@ class add_(commands.Cog):
                 image=await each_emoji.read(),
                 reason=f"This emoji was added by {ctx.author} ({ctx.author.id})",
             )
-            await ctx.send(f"Successfully added {added_emoji.name}")
+            embed = discord.Embed(
+                title=f"Successfully added {added_emoji.name}",
+                description=f"Successfully added {added_emoji} to the guild.",
+            )
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
