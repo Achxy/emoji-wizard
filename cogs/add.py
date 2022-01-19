@@ -11,11 +11,16 @@ class add_(commands.Cog):
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: discord.PartialEmoji):
         for each_emoji in emojis:
-            await ctx.guild.create_custom_emoji(
+            added_emoji = await ctx.guild.create_custom_emoji(
                 name=each_emoji.name,
                 image=await each_emoji.read(),
                 reason=f"This emoji was added by {ctx.author} ({ctx.author.id})",
             )
+            embed = discord.Embed(
+                title=f"Successfully added {added_emoji.name}",
+                description=f"Successfully added {added_emoji} to the guild.",
+            )
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
