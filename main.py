@@ -43,17 +43,17 @@ async def on_ready():
     print(f"Sucessfully logged in as {bot.user}")
 
 
+# To get all the .py files form the cogs folder
 print("            -           ")
 for filename in os.listdir("./cogs"):
-    # Accessing cogs folder
     if filename.endswith(".py"):
-        # loading all python files from cogs folder
         print(f"Adding {filename} from cogs...")
-        # initalizing all python files inside cogs.
         initial_ext.append(f"cogs.{filename[:-3]}")
+
 
 if __name__ == "__main__":
     for ext in initial_ext:
         bot.load_extension(ext)
+
 
 bot.run(os.getenv("DISCORD_TOKEN"))
