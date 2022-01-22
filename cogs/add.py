@@ -12,13 +12,16 @@ class add_(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
-        for each_emoji in emojis:
+        for index, each_emoji in enumerate(emojis):
 
             if isinstance(each_emoji, str):
                 # To not process anything further if the user has given us an non-custom emoji.
                 embed = discord.Embed(
                     title="That is not a custom emote",
                     description=f"{each_emoji} is not an custom emote and thus cannot be added to your guild",
+                )
+                embed.set_footer(
+                    text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
                 )
                 await ctx.send(embed=embed)
                 continue
@@ -33,6 +36,9 @@ class add_(commands.Cog):
             embed = discord.Embed(
                 title=f"Successfully added {added_emoji.name}",
                 description=f"Successfully added {added_emoji} to the guild.",
+            )
+            embed.set_footer(
+                text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
             )
             await ctx.send(embed=embed)
 
