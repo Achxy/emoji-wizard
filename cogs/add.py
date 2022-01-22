@@ -8,12 +8,14 @@ class add_(commands.Cog):
         self.bot = bot
 
     # TODO: Add more features and error handling to this.
+    # TODO: Check for guild vacancy for additonal emotes
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
         for each_emoji in emojis:
 
             if isinstance(each_emoji, str):
+                # To not process anything further if the user has given us an non-custom emoji.
                 embed = discord.Embed(
                     title="That is not a custom emote",
                     description=f"{each_emoji} is not an custom emote and thus cannot be added to your guild",
@@ -21,11 +23,13 @@ class add_(commands.Cog):
                 await ctx.send(embed=embed)
                 continue
 
+            # All working, add the emoji to the guild.
             added_emoji = await ctx.guild.create_custom_emoji(
                 name=each_emoji.name,
                 image=await each_emoji.read(),
                 reason=f"This emoji was added by {ctx.author} ({ctx.author.id})",
             )
+            # Display the success message.
             embed = discord.Embed(
                 title=f"Successfully added {added_emoji.name}",
                 description=f"Successfully added {added_emoji} to the guild.",
