@@ -26,3 +26,5 @@ def word_to_object(word: str):
 
     elif word == "dnd" or word == "do_not_disturb":
         return discord.Status.do_not_disturb
+        
+    raise Exception("Not found")

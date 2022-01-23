@@ -2,6 +2,7 @@ import discord
 import os
 import json
 from discord.ext import commands
+from bot_tools import word_to_object
 
 
 try:
@@ -27,14 +28,15 @@ except Exception as err:
 
 # Parsing out the user preferences stored in config.json
 # TODO: Make complete use of the json file, for now it only works with prefix
-
+# TODO: Better yet move out of a json file, since it doesn't hold as much as I initially anticipated
 with open("config.json", "r") as preference:
     preference = json.load(preference)
 
 bot_prefix = preference["default_prefix"]
+bot_status = word_to_object(preference["status"])
 
 initial_ext = list()
-bot = commands.Bot(command_prefix=bot_prefix, help_command=None)
+bot = commands.Bot(command_prefix=bot_prefix, status=bot_status, help_command=None)
 
 
 @bot.event
