@@ -17,9 +17,15 @@ class meta(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, new_prefix):
+
+        query = "SELECT prefix FROM guilds WHERE guild_id = $1"
+        old_prefix = await self.bot.db.fetch(query, ctx.guild.id)
+        old_prefix = old_prefix[0].get("prefix")
+
         query = "UPDATE guilds SET prefix = $1 WHERE guild_id = $2"
         await self.bot.db.execute(query, new_prefix, ctx.guild.id)
-        await ctx.send("Successfully set prefix")
+        embed=discord.Embed(title="Successfully changed prefix", description=f"The old prefix used to be **{old_prefix}** now its **{new_prefix}**")
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
