@@ -1,7 +1,5 @@
 
 {
     "default_prefix": "?",
-    "status": "idle",
-    "rpc_type": "playing",
-    "rpc_text": "with Emojis!"
+    "status": "idle"
 }

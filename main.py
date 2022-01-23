@@ -15,10 +15,9 @@ except Exception as err:
 
     default_json_config = """{
     "default_prefix": "?",
-    "status": "idle",
-    "rpc_type": "playing",
-    "rpc_text": "with Emojis!"
-}"""
+    "status": "idle"
+}
+"""
 
     with open("config.json", "w+") as w:
         w.write(default_json_config)
