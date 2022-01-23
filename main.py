@@ -1,41 +1,12 @@
 import discord
 import os
-import json
+import asyncpg
 from discord.ext import commands
 
-
-try:
-    with open("config.json", "r") as r:
-        # This is to check if an config.json file exists
-        # And the user has not entered anything weird onto the json file.
-        _ = json.load(r)
-        # If the doesn't raise any exceptions then that means the json file is valid
-except Exception as err:
-    # Invalid json or config.json doesn't exist
-
-    default_json_config = """{
-    "default_prefix": "?",
-    "status": "idle",
-    "rpc_type": "playing",
-    "rpc_text": "with Emojis!"
-}"""
-
-    with open("config.json", "w+") as w:
-        w.write(default_json_config)
-
-    print(f"Caught {err} with json file, it has been reset to default")
-
-
-# Parsing out the user preferences stored in config.json
-# TODO: Make complete use of the json file, for now it only works with prefix
-
-with open("config.json", "r") as preference:
-    preference = json.load(preference)
-
-bot_prefix = preference["default_prefix"]
+DEFAULT_PREFIX = "?"
 
 initial_ext = list()
-bot = commands.Bot(command_prefix=bot_prefix, help_command=None)
+bot = commands.Bot(command_prefix=DEFAULT_PREFIX, help_command=None)
 
 
 @bot.event
