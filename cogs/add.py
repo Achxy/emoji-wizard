@@ -8,7 +8,6 @@ class add_(commands.Cog):
         self.bot = bot
 
     # TODO: Add more features and error handling to this.
-    # TODO: Reduce the number of function calls by getting the emote count first then decrementing them according to success
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
