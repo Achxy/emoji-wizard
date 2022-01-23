@@ -25,7 +25,7 @@ async def get_prefix(bot, message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 initial_ext = list()
-bot = commands.Bot(command_prefix=DEFAULT_PREFIX, help_command=None)
+bot = commands.Bot(command_prefix=get_prefix, help_command=None)
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
