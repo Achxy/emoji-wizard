@@ -1,42 +1,35 @@
 import discord
 import os
-import json
+import asyncpg
 from discord.ext import commands
 
+DEFAULT_PREFIX = "?"
 
-try:
-    with open("config.json", "r") as r:
-        # This is to check if an config.json file exists
-        # And the user has not entered anything weird onto the json file.
-        _ = json.load(r)
-        # If the doesn't raise any exceptions then that means the json file is valid
-except Exception as err:
-    # Invalid json or config.json doesn't exist
+# Get custom prefix for the guild
+# Handle if not used in guild
+async def get_prefix(bot, message):
+    if not message.guild:
+        return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
-    default_json_config = """{
-    "default_prefix": "?",
-    "status": "idle",
-    "rpc_type": "playing",
-    "rpc_text": "with Emojis!"
-}"""
+    # Actually in a guild
+    query = "SELECT prefix FROM guilds WHERE guild_id = $1"
+    prefix = await bot.db.fetch(query, message.guild.id)
 
-    with open("config.json", "w+") as w:
-        w.write(default_json_config)
+    if len(prefix) == 0:
+        query = "INSERT INTO guilds (guild_id, prefix) VALUES ($1, $2)"
+        await bot.db.execute(query, message.guild.id, DEFAULT_PREFIX)
+        prefix = DEFAULT_PREFIX
 
-    print(f"Caught {err} with json file, it has been reset to default")
-
-
-# Parsing out the user preferences stored in config.json
-# TODO: Make complete use of the json file, for now it only works with prefix
-
-with open("config.json", "r") as preference:
-    preference = json.load(preference)
-
-bot_prefix = preference["default_prefix"]
+    else:
+        prefix = prefix[0].get("prefix")
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 initial_ext = list()
-bot = commands.Bot(command_prefix=bot_prefix, help_command=None)
+bot = commands.Bot(command_prefix=get_prefix, help_command=None)
 
+async def create_db_pool():
+    bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
+    print("Successfully connected to the database")
 
 @bot.event
 async def on_ready():
@@ -56,4 +49,5 @@ if __name__ == "__main__":
         bot.load_extension(ext)
 
 
+bot.loop.run_until_complete(create_db_pool())
 bot.run(os.getenv("DISCORD_TOKEN"))
