@@ -101,7 +101,7 @@ class add_(commands.Cog):
                 """
 
         count = await self.bot.db.fetch(query, ctx.guild.id, ctx.channel.id, ctx.author.id, cmd_type)
-        print(count)
+
         if not count:
             # Row didn't use to exist
             # Create it
