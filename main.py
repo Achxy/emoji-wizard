@@ -2,8 +2,11 @@ import discord
 import os
 import asyncpg
 from discord.ext import commands
+from database_tools import confirm_tables
+
 
 DEFAULT_PREFIX = "?"
+
 
 # Get custom prefix for the guild
 # Handle if not used in guild
@@ -24,12 +27,18 @@ async def get_prefix(bot, message):
         prefix = prefix[0].get("prefix")
     return commands.when_mentioned_or(prefix)(bot, message)
 
+
+
 initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None)
+
+
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
+    await confirm_tables(bot.db)
+
 
 @bot.event
 async def on_ready():
@@ -47,6 +56,7 @@ for filename in os.listdir("./cogs"):
 if __name__ == "__main__":
     for ext in initial_ext:
         bot.load_extension(ext)
+
 
 
 bot.loop.run_until_complete(create_db_pool())

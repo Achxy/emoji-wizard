@@ -3,6 +3,8 @@ import typing
 from discord.ext import commands
 from bot_tools import static_vacancy, animated_vacancy
 
+cmd_type = "cmd_add"
+
 class add_(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -11,6 +13,12 @@ class add_(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
+
+        # We want to log how many emotes were successfully added to the guild
+        # We make an success count and increment it on success
+
+        successful_additions = 0
+
         for index, each_emoji in enumerate(emojis):
 
             if static_vacancy(ctx.guild) == 0 and animated_vacancy(ctx.guild) == 0:
@@ -53,20 +61,101 @@ class add_(commands.Cog):
             
 
             # All working, add the emoji to the guild.
-            added_emoji = await ctx.guild.create_custom_emoji(
-                name=each_emoji.name,
-                image=await each_emoji.read(),
-                reason=f"This emoji was added by {ctx.author} ({ctx.author.id})",
+            try:
+                added_emoji = await ctx.guild.create_custom_emoji(
+                    name=each_emoji.name,
+                    image=await each_emoji.read(),
+                    reason=f"This emoji was added by {ctx.author} ({ctx.author.id})",
+                )
+            except:
+                # TODO: Make an better error handling in this case,
+                # For now we'll continue in the loop
+                continue
+            else:
+                # Success
+                # Display the success message.
+                embed = discord.Embed(
+                    title=f"Successfully added {added_emoji.name}",
+                    description=f"Successfully added {added_emoji} to the guild.",
+                )
+                embed.set_footer(
+                    text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
+                )
+                await ctx.send(embed=embed)
+
+                # Increment success counter 
+                successful_additions += 1
+        
+        # There is no need to log anything to db if there were no success
+        if successful_additions == 0:
+            return
+
+        # See if the record of user exist in database
+        query = """SELECT usage_count FROM usage
+                    WHERE (
+                        guild_id = $1 AND
+                        channel_id = $2 AND
+                        user_id = $3 AND
+                        cmd_type = $4
+                    );
+                """
+
+        count = await self.bot.db.fetch(query, ctx.guild.id, ctx.channel.id, ctx.author.id, cmd_type)
+
+        if not count:
+            # Row didn't use to exist
+            # Create it
+            query = """INSERT INTO usage (
+                        guild_id,
+                        channel_id,
+                        user_id,
+                        cmd_type,
+                        usage_count
+                        )
+                        VALUES (
+                            $1,
+                            $2,
+                            $3,
+                            $4,
+                            $5
+                        );
+                    """
+            await self.bot.db.execute(
+                query,
+                ctx.guild.id,
+                ctx.channel.id,
+                ctx.author.id,
+                cmd_type,
+                successful_additions
             )
-            # Display the success message.
-            embed = discord.Embed(
-                title=f"Successfully added {added_emoji.name}",
-                description=f"Successfully added {added_emoji} to the guild.",
+        else:
+            # The row does exist
+            # Which means a same user has previously used the comamnd on the same guild on the same channel
+            # Increment the existing count with that of the successful additions
+            
+            # Get the integer value of usage_count from the response object 
+            count = int(count[0].get("usage_count"))
+            
+            # Update the existing value of usage_count to be count + successful additions
+            query = """UPDATE usage
+                        SET usage_count = $1
+                        WHERE (
+                            guild_id = $2 AND
+                            channel_id = $3 AND
+                            user_id = $4 AND
+                            cmd_type = $5
+                        );
+                    """
+
+            await self.bot.db.execute(
+                query,
+                count + successful_additions,
+                ctx.guild.id,
+                ctx.channel.id,
+                ctx.author.id,
+                cmd_type
             )
-            embed.set_footer(
-                text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
-            )
-            await ctx.send(embed=embed)
+
 
 
 def setup(bot):
