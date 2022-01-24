@@ -2,8 +2,10 @@ import discord
 import typing
 from discord.ext import commands
 from bot_tools import static_vacancy, animated_vacancy
+from database_tools import increment_usage
 
 cmd_type = "cmd_add"
+
 
 class add_(commands.Cog):
     def __init__(self, bot):
@@ -24,7 +26,10 @@ class add_(commands.Cog):
             if static_vacancy(ctx.guild) == 0 and animated_vacancy(ctx.guild) == 0:
                 # Send a message indicating that the guild cannot accept any more emotes
                 # If this condition is hit then we want to terminate the function definition
-                embed=discord.Embed(title="The guild is absolutely full", description="Your guild is full of emotes, it cannot accept any more of either static or animated emotes, please remove some emotes before trying again")
+                embed = discord.Embed(
+                    title="The guild is absolutely full",
+                    description="Your guild is full of emotes, it cannot accept any more of either static or animated emotes, please remove some emotes before trying again",
+                )
                 await ctx.send(embed=embed)
                 # End the function definiton
                 return
@@ -40,10 +45,13 @@ class add_(commands.Cog):
                 )
                 await ctx.send(embed=embed)
                 continue
-            
+
             if not each_emoji.animated and static_vacancy(ctx.guild) == 0:
                 # Send a message indicating that the guild cannot accept any more static emotes
-                embed=discord.Embed(title="Guild cannot accept any more of that", description=f"The guild cannot accept any more static emotes (perhaps add some animated emotes now) as such **{each_emoji.name}** was not added to the guild")
+                embed = discord.Embed(
+                    title="Guild cannot accept any more of that",
+                    description=f"The guild cannot accept any more static emotes (perhaps add some animated emotes now) as such **{each_emoji.name}** was not added to the guild",
+                )
                 embed.set_footer(
                     text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
                 )
@@ -52,13 +60,15 @@ class add_(commands.Cog):
 
             if each_emoji.animated and animated_vacancy(ctx.guild) == 0:
                 # Send a message indicating that the guild cannot accept any more animated emotes
-                embed=discord.Embed(title="Guild cannot accept any more of that", description=f"The guild cannot accept any more animated emotes (perhaps add some static emotes now) as such **{each_emoji.name}** was not added to the guild")
+                embed = discord.Embed(
+                    title="Guild cannot accept any more of that",
+                    description=f"The guild cannot accept any more animated emotes (perhaps add some static emotes now) as such **{each_emoji.name}** was not added to the guild",
+                )
                 embed.set_footer(
                     text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
                 )
                 await ctx.send(embed=embed)
                 continue
-            
 
             # All working, add the emoji to the guild.
             try:
@@ -83,79 +93,10 @@ class add_(commands.Cog):
                 )
                 await ctx.send(embed=embed)
 
-                # Increment success counter 
+                # Increment success counter
                 successful_additions += 1
-        
-        # There is no need to log anything to db if there were no success
-        if successful_additions == 0:
-            return
 
-        # See if the record of user exist in database
-        query = """SELECT usage_count FROM usage
-                    WHERE (
-                        guild_id = $1 AND
-                        channel_id = $2 AND
-                        user_id = $3 AND
-                        cmd_type = $4
-                    );
-                """
-
-        count = await self.bot.db.fetch(query, ctx.guild.id, ctx.channel.id, ctx.author.id, cmd_type)
-
-        if not count:
-            # Row didn't use to exist
-            # Create it
-            query = """INSERT INTO usage (
-                        guild_id,
-                        channel_id,
-                        user_id,
-                        cmd_type,
-                        usage_count
-                        )
-                        VALUES (
-                            $1,
-                            $2,
-                            $3,
-                            $4,
-                            $5
-                        );
-                    """
-            await self.bot.db.execute(
-                query,
-                ctx.guild.id,
-                ctx.channel.id,
-                ctx.author.id,
-                cmd_type,
-                successful_additions
-            )
-        else:
-            # The row does exist
-            # Which means a same user has previously used the comamnd on the same guild on the same channel
-            # Increment the existing count with that of the successful additions
-            
-            # Get the integer value of usage_count from the response object 
-            count = int(count[0].get("usage_count"))
-            
-            # Update the existing value of usage_count to be count + successful additions
-            query = """UPDATE usage
-                        SET usage_count = $1
-                        WHERE (
-                            guild_id = $2 AND
-                            channel_id = $3 AND
-                            user_id = $4 AND
-                            cmd_type = $5
-                        );
-                    """
-
-            await self.bot.db.execute(
-                query,
-                count + successful_additions,
-                ctx.guild.id,
-                ctx.channel.id,
-                ctx.author.id,
-                cmd_type
-            )
-
+        await increment_usage(self.bot.db, ctx, cmd_type, successful_additions)
 
 
 def setup(bot):
