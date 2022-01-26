@@ -1,6 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
+from database_tools import get_prefix_for_guild
 
 
 class rename_(commands.Cog):
@@ -17,19 +18,21 @@ class rename_(commands.Cog):
         Since bot only checks for manage_emojis perm in current guild but acts upon emojis in the bot's guild emoji pool
         we need to confirm that the emoji we are acting upon matches ctx.guild to prevent any attackers
         """
-        # FIXME: Replace placeholder "prefix" with actual prefix
+
         # Check if the argument count is 2 or not
         if len(emoji_and_name) > 2:
+            prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
-                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : `prefixrename <emoji> <name>`",
+                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : `{prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
         if len(emoji_and_name) < 2:
+            prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command at least takes 2 arguments",
-                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : `prefixrename <emoji> <name>`",
+                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : `{prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
