@@ -3,8 +3,6 @@ import typing
 from discord.ext import commands
 from database_tools import increment_usage
 
-cmd_type = "cmd_enlarge"
-
 
 class enlarge(commands.Cog):
     def __init__(self, bot):
@@ -13,6 +11,7 @@ class enlarge(commands.Cog):
     @commands.command()
     async def enlarge_(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
 
+        cmd_type = "cmd_enlarge"
         successful_additions = 0
 
         for index, i in enumerate(emotes):

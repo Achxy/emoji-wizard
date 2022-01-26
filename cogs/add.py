@@ -4,8 +4,6 @@ from discord.ext import commands
 from bot_tools import static_vacancy, animated_vacancy
 from database_tools import increment_usage
 
-cmd_type = "cmd_add"
-
 
 class add_(commands.Cog):
     def __init__(self, bot):
@@ -15,6 +13,8 @@ class add_(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
+
+        cmd_type = "cmd_add"
 
         # We want to log how many emotes were successfully added to the guild
         # We make an success count and increment it on success
