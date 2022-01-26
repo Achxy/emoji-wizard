@@ -9,11 +9,15 @@ class meta(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
+
+        cmd_type = "cmd_ping"
+
         embed = discord.Embed(
             title="Pong! 🏓",
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
         )
         await ctx.reply(embed=embed)
+        await increment_usage(self.bot.db, ctx, cmd_type, 1)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
