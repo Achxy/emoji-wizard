@@ -7,8 +7,7 @@ class rename_(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    commands.command()
-
+    @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def rename(self, ctx, *emoji_and_name: typing.Union[discord.Emoji, str]):
         """
@@ -39,7 +38,7 @@ class rename_(commands.Cog):
         name = None
 
         for i in emoji_and_name:
-            if isinstance(emoji_and_name, discord.Emoji):
+            if isinstance(i, discord.Emoji):
                 emoji = i
             else:
                 name = i
@@ -53,7 +52,7 @@ class rename_(commands.Cog):
 
         # For security reasons we need to check the orgin of the emoji (guild)
         # Matches that of context's guild
-        if not emoji.guild.id == ctx.guild.id:
+        if not emoji.guild_id == ctx.guild.id:
             embed = discord.Embed(
                 title="Gimme a emoji that is actually in your guild",
                 description="That emoji isn't actually in your guild.",
