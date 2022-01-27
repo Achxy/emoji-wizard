@@ -1,5 +1,6 @@
 import asyncpg
 import discord
+from bot_tools import get_default_prefix
 
 
 async def confirm_tables(pool: asyncpg.pool.Pool):
@@ -110,3 +111,17 @@ async def increment_usage(
             ctx.author.id,
             type_of_cmd,
         )
+
+
+async def get_prefix_for_guild(
+    pool: asyncpg.pool.Pool,
+    guild: discord.guild.Guild,
+    place_hold_with=get_default_prefix(),
+):
+    query = "SELECT prefix FROM guilds WHERE guild_id = $1"
+    prefix = await pool.fetch(query, guild.id)
+
+    if len(prefix) == 0:
+        return place_hold_with
+    else:
+        return prefix[0].get("prefix")
