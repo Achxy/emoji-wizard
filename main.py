@@ -7,8 +7,9 @@ from bot_tools import get_default_prefix
 
 
 DEFAULT_PREFIX = get_default_prefix()
-UPDATE_STATUS_EVERY = 20  # In seconds
+CHECK_DB_EVERY = 10  # Makes an request to database to see changes (also in seconds)
 
+prev = None
 
 # Get custom prefix for the guild
 # Handle if not used in guild
@@ -47,9 +48,17 @@ async def on_ready():
         update_presence.start()
 
 
-@tasks.loop(seconds=UPDATE_STATUS_EVERY)
+@tasks.loop(seconds=1.5)
 async def update_presence():
+    # Any database is able to handle 1 request per 1.5 second
+    # If you think this is too much then just bump it up
+    global prev
     stat_count = await get_usage_of(bot.db, "global")
+    if prev == stat_count:
+        return
+
+    prev = stat_count
+
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.competing,
