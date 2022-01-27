@@ -21,8 +21,7 @@ def animated_vacancy(guild: discord.guild.Guild) -> int:
 def reset_config_json(file="config.json"):
     with open(file, "w+") as fwp:
         default_json = '{"DEFAULT_PREFIX": "?"}'
-        j = json.load(default_json)
-        fwp.write(json.dumps(j, indent=2))
+        fwp.write(default_json)
 
 
 def get_default_prefix(file="config.json", key="DEFAULT_PREFIX"):
@@ -32,10 +31,10 @@ def get_default_prefix(file="config.json", key="DEFAULT_PREFIX"):
     """
     try:
         with open(file, "r") as fr:
-            j = json.loads(fr)
+            j = json.load(fr)
             return j[key]
-    except:
+    except Exception:
         reset_config_json(file=file)
         with open(file, "r") as fr:
-            j = json.loads(fr)
+            j = json.load(fr)
             return j[key]

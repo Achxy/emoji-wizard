@@ -5,6 +5,7 @@ from discord.ext import commands
 from database_tools import confirm_tables
 from bot_tools import get_default_prefix
 
+
 DEFAULT_PREFIX = get_default_prefix()
 
 
