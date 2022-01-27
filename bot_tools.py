@@ -33,11 +33,9 @@ def get_default_prefix(file="config.json", key="DEFAULT_PREFIX"):
     try:
         with open(file, "r") as fr:
             j = json.loads(fr)
-            DEFAULT_PREFIX = j[key]
+            return j[key]
     except:
         reset_config_json(file=file)
         with open(file, "r") as fr:
             j = json.loads(fr)
-            DEFAULT_PREFIX = j[key]
-    finally:
-        return DEFAULT_PREFIX
+            return j[key]
