@@ -24,7 +24,7 @@ class rename_(commands.Cog):
             prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
-                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : `{prefix}rename <emoji> <name>`",
+                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n`{prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
@@ -32,7 +32,7 @@ class rename_(commands.Cog):
             prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command at least takes 2 arguments",
-                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : `{prefix}rename <emoji> <name>`",
+                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n`{prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
