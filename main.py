@@ -48,10 +48,8 @@ async def on_ready():
         update_presence.start()
 
 
-@tasks.loop(seconds=1.5)
+@tasks.loop(seconds=10)
 async def update_presence():
-    # Any database is able to handle 1 request per 1.5 second
-    # If you think this is too much then just bump it up
     global prev
     stat_count = await get_usage_of(bot.db, "global")
     if prev == stat_count:
