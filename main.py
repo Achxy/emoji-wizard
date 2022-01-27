@@ -3,9 +3,9 @@ import os
 import asyncpg
 from discord.ext import commands
 from database_tools import confirm_tables
+from bot_tools import get_default_prefix
 
-
-DEFAULT_PREFIX = "?"
+DEFAULT_PREFIX = get_default_prefix()
 
 
 # Get custom prefix for the guild
@@ -28,10 +28,8 @@ async def get_prefix(bot, message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
-
 initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None)
-
 
 
 async def create_db_pool():
@@ -56,7 +54,6 @@ for filename in os.listdir("./cogs"):
 if __name__ == "__main__":
     for ext in initial_ext:
         bot.load_extension(ext)
-
 
 
 bot.loop.run_until_complete(create_db_pool())
