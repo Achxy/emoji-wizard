@@ -50,7 +50,7 @@ async def increment_usage(
                     guild_id = $1 AND
                     channel_id = $2 AND
                     user_id = $3 AND
-                    cmd_type = $4
+                    type_of_cmd = $4
                 );
             """
 
@@ -65,7 +65,7 @@ async def increment_usage(
                     guild_id,
                     channel_id,
                     user_id,
-                    cmd_type,
+                    type_of_cmd,
                     usage_count
                     )
                     VALUES (
@@ -99,7 +99,7 @@ async def increment_usage(
                         guild_id = $2 AND
                         channel_id = $3 AND
                         user_id = $4 AND
-                        cmd_type = $5
+                        type_of_cmd = $5
                     );
                 """
 
@@ -125,3 +125,18 @@ async def get_prefix_for_guild(
         return place_hold_with
     else:
         return prefix[0].get("prefix")
+
+
+async def get_usage_of(pool: asyncpg.pool.Pool, cmd: str = "global"):
+
+    if cmd.lower() == "global":
+        query = "SELECT SUM(usage_count) FROM usage"
+        r = await pool.fetch(query)
+        r = r[0].get("sum")
+        return int(r)
+
+    query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
+    r = await pool.fetch(query, cmd)
+    r = r[0].get("sum")
+    assert r is not None  # We do not want to return None value just interrupt execution
+    return int(r)
