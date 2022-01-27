@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from database_tools import get_prefix_for_guild
+from database_tools import get_prefix_for_guild, increment_usage
 
 
 class rename_(commands.Cog):
@@ -19,12 +19,14 @@ class rename_(commands.Cog):
         we need to confirm that the emoji we are acting upon matches ctx.guild to prevent any attackers
         """
 
+        cmd_type = "cmd_rename"
+
         # Check if the argument count is 2 or not
         if len(emoji_and_name) > 2:
             prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
-                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n`{prefix}rename <emoji> <name>`",
+                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
@@ -32,7 +34,7 @@ class rename_(commands.Cog):
             prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command at least takes 2 arguments",
-                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n`{prefix}rename <emoji> <name>`",
+                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
@@ -49,7 +51,7 @@ class rename_(commands.Cog):
         if emoji is None or name is None:
             embed = discord.Embed(
                 title="Bad arguments",
-                description="You need to give me exactly one emoji (that is actually in your guild) and exactly one name",
+                description="You need to give me exactly one emoji (__that is actually in your guild__) and exactly one name",
             )
             await ctx.send(embed=embed)
 
@@ -66,11 +68,21 @@ class rename_(commands.Cog):
         # TODO: Better error handling
         # Probably will fix it in an anothor PR
         try:
-            await emoji.edit(
+            before_name = emoji.name
+            new_emoji = await emoji.edit(
                 name=name, reason=f"Edited emoji by {ctx.author} ({ctx.author.id})"
             )
-        except:
+            after_name = new_emoji.name
+        except Exception:
             pass
+        else:
+            # Success
+            embed = discord.Embed(
+                title="Success!",
+                description=f"Successfully renamed {new_emoji} from **{before_name}** to **{after_name}**",
+            )
+            await ctx.send(embed=embed)
+            await increment_usage(self.bot.db, ctx, cmd_type, 1)
 
 
 def setup(bot):
