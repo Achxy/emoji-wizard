@@ -1,13 +1,15 @@
 import discord
 import os
 import asyncpg
-from discord.ext import commands
-from database_tools import confirm_tables
+from discord.ext import commands, tasks
+from database_tools import confirm_tables, get_usage_of
 from bot_tools import get_default_prefix
 
 
 DEFAULT_PREFIX = get_default_prefix()
+CHECK_DB_EVERY = 10  # Makes an request to database to see changes (also in seconds)
 
+prev = None
 
 # Get custom prefix for the guild
 # Handle if not used in guild
@@ -42,6 +44,25 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Sucessfully logged in as {bot.user}")
+    if not update_presence.is_running():
+        update_presence.start()
+
+
+@tasks.loop(seconds=10)
+async def update_presence():
+    global prev
+    stat_count = await get_usage_of(bot.db, "global")
+    if prev == stat_count:
+        return
+
+    prev = stat_count
+
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.competing,
+            name=f"worked with {stat_count}+ emotes",
+        )
+    )
 
 
 # To get all the .py files form the cogs folder

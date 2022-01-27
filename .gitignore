@@ -131,3 +131,6 @@ dmypy.json
 
 # Some tests I do
 testing.*
+
+# vscode preferences
+.vscode
