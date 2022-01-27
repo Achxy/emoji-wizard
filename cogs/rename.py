@@ -54,6 +54,7 @@ class rename_(commands.Cog):
                 description="You need to give me exactly one emoji (__that is actually in your guild__) and exactly one name",
             )
             await ctx.send(embed=embed)
+            return
 
         # For security reasons we need to check the orgin of the emoji (guild)
         # Matches that of context's guild
