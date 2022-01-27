@@ -38,3 +38,8 @@ def get_default_prefix(file="config.json", key="DEFAULT_PREFIX"):
         with open(file, "r") as fr:
             j = json.load(fr)
             return j[key]
+
+
+def seperate_chunks(l, into):
+    for i in range(0, len(l), into):
+        yield l[i : i + into]
