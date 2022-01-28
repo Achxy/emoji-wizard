@@ -29,7 +29,7 @@ async def get_prefix(bot, message):
 
 
 initial_ext = list()
-bot = commands.Bot(command_prefix=get_prefix, help_command=None)
+bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
 
 MIN_DELAY_OF_RPC = 25  # The use of this is mentioned under the docs of update_presence
 
