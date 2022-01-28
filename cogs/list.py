@@ -21,7 +21,7 @@ class list_(commands.Cog):
                 count += 1
                 msg += f"{count}. {each_emoji} -- `{each_emoji}`\n"
             await ctx.send(msg)
-        await increment_usage(self.bot.db, ctx, cmd_type, count)
+        await increment_usage(self.bot, ctx, cmd_type, count)
 
 
 def setup(bot):

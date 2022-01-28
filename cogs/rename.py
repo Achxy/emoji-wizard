@@ -83,7 +83,7 @@ class rename_(commands.Cog):
                 description=f"Successfully renamed {new_emoji} from **{before_name}** to **{after_name}**",
             )
             await ctx.send(embed=embed)
-            await increment_usage(self.bot.db, ctx, cmd_type, 1)
+            await increment_usage(self.bot, ctx, cmd_type, 1)
 
 
 def setup(bot):
