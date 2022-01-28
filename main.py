@@ -66,7 +66,11 @@ async def update_presence():
     Instead we will be caching this under bot.prev_cache and inheritents of commands.Cog will manipulate this value
     Such way requests to the database can be kept to an minimum and be performant
     """
-    _count += 1
+    # print(f"{_count = }, {_prev = }, {bot.usage_cache = }") # If you need to debug
+    if (
+        MIN_DELAY_OF_RPC > _count
+    ):  # We don't really need to increment _count if it's already higher than MIN_DELAY_OF_RPC
+        _count += 1
     if _prev == bot.usage_cache or MIN_DELAY_OF_RPC > _count:
         return
     _prev = bot.usage_cache
@@ -79,6 +83,7 @@ async def update_presence():
         )
     )
     """
+    # Uncomment the above code for the "competing in" status (and then comment the below code)
     await bot.change_presence(
         activity=discord.Game(name=f"worked with {bot.usage_cache}+ emotes")
     )
