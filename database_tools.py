@@ -34,15 +34,21 @@ async def confirm_tables(pool: asyncpg.pool.Pool):
 
 
 async def increment_usage(
-    pool: asyncpg.pool.Pool,
+    bot: discord.ext.commands.bot.Bot,
     ctx: discord.ext.commands.context.Context,
     type_of_cmd: str,
     value_to_increment: int,
+    with_caching=True,
 ):
 
-    # There is no need to log anything to db
+    pool: asyncpg.pool.Pool = bot.db
+
+    # There is no need to log anything to db or cache
     if value_to_increment == 0:
         return
+
+    if with_caching:
+        bot.usage_cache += value_to_increment
 
     # See if the record of user exist in database
     query = """SELECT usage_count FROM usage

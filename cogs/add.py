@@ -96,7 +96,7 @@ class add_(commands.Cog):
                 # Increment success counter
                 successful_additions += 1
 
-        await increment_usage(self.bot.db, ctx, cmd_type, successful_additions)
+        await increment_usage(self.bot, ctx, cmd_type, successful_additions)
 
 
 def setup(bot):
