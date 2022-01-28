@@ -17,7 +17,7 @@ class meta(commands.Cog):
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
         )
         await ctx.reply(embed=embed)
-        await increment_usage(self.bot.db, ctx, cmd_type, 1)
+        await increment_usage(self.bot, ctx, cmd_type, 1)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
