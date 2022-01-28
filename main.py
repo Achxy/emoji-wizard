@@ -47,6 +47,7 @@ async def on_ready():
     print(f"Successfully logged in as {bot.user}")
     bot.usage_cache = await get_usage_of(bot.db, "global")
     if not update_presence.is_running():
+        await bot.wait_until_ready()
         update_presence.start()
 
 
