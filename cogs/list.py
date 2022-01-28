@@ -22,7 +22,7 @@ class list_(commands.Cog):
                 if each_emoji.available:
                     msg += f"{count}. {each_emoji} -- `{each_emoji}`\n"
                 else:
-                    msg += f"~~{count}. {each_emoji}~~ -- `{each_emoji}`\n **(unavailable)**"
+                    msg += f"~~{count}. {each_emoji}~~ -- `{each_emoji}` **(unavailable)**\n"
             await ctx.send(msg)
         await increment_usage(self.bot, ctx, cmd_type, count)
 
