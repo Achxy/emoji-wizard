@@ -32,10 +32,8 @@ initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
 
 MIN_DELAY_OF_RPC = 25  # The use of this is mentioned under the docs of update_presence
-
-
-_prev = None
-_count = MIN_DELAY_OF_RPC
+bot._prev = None
+bot._count = MIN_DELAY_OF_RPC
 
 
 async def create_db_pool():
@@ -54,7 +52,6 @@ async def on_ready():
 
 @tasks.loop(seconds=1)
 async def update_presence():
-    global _prev, _count
     """
     We are interested in having overall command usage as the bot's rpc
     And this value being reflected in the rpc instantaneously after command usage is satisfactory
@@ -66,15 +63,15 @@ async def update_presence():
     Instead we will be caching this under bot.prev_cache and inheritents of commands.Cog will manipulate this value
     Such way requests to the database can be kept to an minimum and be performant
     """
-    # print(f"{_count = }, {_prev = }, {bot.usage_cache = }") # If you need to debug
+    print(f"{bot._count = }, {bot._prev = }, {bot.usage_cache = }") # If you need to debug
     if (
-        MIN_DELAY_OF_RPC > _count
+        MIN_DELAY_OF_RPC > bot._count
     ):  # We don't really need to increment _count if it's already higher than MIN_DELAY_OF_RPC
-        _count += 1
-    if _prev == bot.usage_cache or MIN_DELAY_OF_RPC > _count:
+        bot._count += 1
+    if bot._prev == bot.usage_cache or MIN_DELAY_OF_RPC > bot._count:
         return
-    _prev = bot.usage_cache
-    _count = 0
+    bot._prev = bot.usage_cache
+    bot._count = 0
     """
     await bot.change_presence(
         activity=discord.Activity(
