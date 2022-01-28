@@ -19,7 +19,10 @@ class list_(commands.Cog):
             msg = ""
             for each_emoji in each_chunk:
                 count += 1
-                msg += f"{count}. {each_emoji} -- `{each_emoji}`\n"
+                if each_emoji.available:
+                    msg += f"{count}. {each_emoji} -- `{each_emoji}`\n"
+                else:
+                    msg += f"~~{count}. {each_emoji}~~ -- `{each_emoji}`\n **(unavailable)**"
             await ctx.send(msg)
         await increment_usage(self.bot, ctx, cmd_type, count)
 
