@@ -7,9 +7,6 @@ from bot_tools import get_default_prefix
 
 
 DEFAULT_PREFIX = get_default_prefix()
-CHECK_DB_EVERY = 10  # Makes an request to database to see changes (also in seconds)
-
-prev = None
 
 # Get custom prefix for the guild
 # Handle if not used in guild
@@ -34,6 +31,11 @@ async def get_prefix(bot, message):
 initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None)
 
+CHECK_DB_EVERY = 60  # Makes an request to database to see changes (also in seconds)
+MIN_DELAY_OF_RPC = 25  # The use of this is mentioned under the docs of update_presence
+
+bot.prev_cache = 0
+
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
@@ -48,21 +50,21 @@ async def on_ready():
         update_presence.start()
 
 
+# FIXME: Optimise this
 @tasks.loop(seconds=10)
 async def update_presence():
-    global prev
-    stat_count = await get_usage_of(bot.db, "global")
-    if prev == stat_count:
-        return
+    """
+    We are interested in having overall command usage as the bot's rpc
+    And this value being reflected in the rpc instantaneously after command usage is satisfactory
+    If there are multiple changes in minimal duration of time then the rpc should not spam requests to the discord api
+    here we will enforce our own limit to prevent such an occurence. This limit (in seconds) is dictated by MIN_DELAY_OF_RPC
 
-    prev = stat_count
-
-    await bot.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.competing,
-            name=f"worked with {stat_count}+ emotes",
-        )
-    )
+    Albeit the database can handle multiple requests in a second (in terms of resources)
+    We will not be checking the db every seconds because it is bad from a design perspective
+    Instead we will be caching this under bot.prev_cache and inheritents of commands.Cog will manipulate this value
+    Such way requests to the database can be kept to an minimum and be performant
+    """
+    ...
 
 
 # To get all the .py files form the cogs folder
