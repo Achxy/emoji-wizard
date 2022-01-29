@@ -1,4 +1,7 @@
 import discord
+import ast
+import inspect
+import re
 import json
 
 
@@ -63,10 +66,7 @@ def get_mobile():
     the mobile indicator is not triggered by the mobile client.
     The specific values for the $os, $browser, and $device fields are can change from time to time.
     """
-    import ast
-    import inspect
-    import re
-    import discord
+
 
     def source(o):
         s = inspect.getsource(o).split("\n")
