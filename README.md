@@ -24,6 +24,7 @@ An high performance discord emoji bot\
 <li>Remove-duplicate-command command</li>
 <li>Stats command</li>
 <li>Set-status command (dev only)</li>
+<li>Source command</li>
 <br> --
 <li>Better error handling</li>
 </ol>
