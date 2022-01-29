@@ -77,7 +77,7 @@ class add_(commands.Cog):
                     image=await each_emoji.read(),
                     reason=f"This emoji was added by {ctx.author} ({ctx.author.id})",
                 )
-            except:
+            except Exception:
                 # TODO: Make an better error handling in this case,
                 # For now we'll continue in the loop
                 continue
