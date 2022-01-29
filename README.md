@@ -25,6 +25,9 @@ An high performance discord emoji bot\
 <li>Stats command</li>
 <li>Set-status command (dev only)</li>
 <li>Source command</li>
+<li>Enable command</li>
+<li>Disable command</li>
+<li>Ignore command (to ignore a said channel)</li>
 <br> --
 <li>Better error handling</li>
 </ol>
