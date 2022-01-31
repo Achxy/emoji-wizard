@@ -47,36 +47,42 @@ async def confirm_tables(pool: asyncpg.pool.Pool):
 async def increment_usage(
     pool: asyncpg.pool.Pool,
     ctx: discord.ext.commands.context.Context,
-    type_of_cmd: str,
+    type_of_cmd_or_rubric: str,
     value_to_increment: int,
+    in_the_table="usage_count",
 ):
 
-    # There is no need to log anything to db or cache
+    # There is no need to log anything to db
     if value_to_increment == 0:
         return
 
+    if in_the_table == "usage_count":
+        of_type = "type_of_cmd"
+    else:
+        of_type = "type_of_rubric"
+
     # See if the record of user exist in database
-    query = """SELECT usage_count FROM usage
+    query = f"""SELECT usage_count FROM {in_the_table}
                 WHERE (
                     guild_id = $1 AND
                     channel_id = $2 AND
                     user_id = $3 AND
-                    type_of_cmd = $4
+                    {of_type} = $4
                 );
             """
 
     count = await pool.fetch(
-        query, ctx.guild.id, ctx.channel.id, ctx.author.id, type_of_cmd
+        query, ctx.guild.id, ctx.channel.id, ctx.author.id, type_of_cmd_or_rubric
     )
 
     if not count:
         # Row didn't use to exist
         # Create it
-        query = """INSERT INTO usage (
+        query = f"""INSERT INTO {in_the_table} (
                     guild_id,
                     channel_id,
                     user_id,
-                    type_of_cmd,
+                    {of_type},
                     usage_count
                     )
                     VALUES (
@@ -92,7 +98,7 @@ async def increment_usage(
             ctx.guild.id,
             ctx.channel.id,
             ctx.author.id,
-            type_of_cmd,
+            type_of_cmd_or_rubric,
             value_to_increment,
         )
     else:
@@ -104,13 +110,13 @@ async def increment_usage(
         count = int(count[0].get("usage_count"))
 
         # Update the existing value of usage_count to be count + successful additions
-        query = """UPDATE usage
+        query = f"""UPDATE {in_the_table}
                     SET usage_count = $1
                     WHERE (
                         guild_id = $2 AND
                         channel_id = $3 AND
                         user_id = $4 AND
-                        type_of_cmd = $5
+                        {of_type} = $5
                     );
                 """
 
@@ -120,7 +126,7 @@ async def increment_usage(
             ctx.guild.id,
             ctx.channel.id,
             ctx.author.id,
-            type_of_cmd,
+            type_of_cmd_or_rubric,
         )
 
 
