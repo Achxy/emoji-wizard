@@ -15,6 +15,7 @@ class meta(commands.Cog):
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
         )
         await ctx.reply(embed=embed)
+        await self.bot.cache.command(ctx, CommandType.ping)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -31,6 +32,7 @@ class meta(commands.Cog):
             description=f"The old prefix used to be **{old_prefix}** now its **{new_prefix}**",
         )
         await ctx.send(embed=embed)
+        await self.bot.cache.command(ctx, CommandType.setprefix)
 
 
 def setup(bot):

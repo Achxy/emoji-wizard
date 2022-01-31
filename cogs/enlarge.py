@@ -31,6 +31,7 @@ class enlarge(commands.Cog):
 
             successful_additions += 1
             await ctx.send(embed=embed)
+        await self.bot.cache.command(ctx, CommandType.enlarge)
 
 
 def setup(bot):

@@ -24,6 +24,7 @@ class list(commands.Cog):
                 else:
                     msg += f"{count}. ~~{each_emoji}~~ -- `{each_emoji}` **(unavailable)**\n"
             await ctx.send(msg)
+        await self.bot.cache.command(ctx, CommandType.list)
 
 
 def setup(bot):
