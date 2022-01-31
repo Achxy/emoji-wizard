@@ -4,6 +4,7 @@ from bot_tools import get_default_prefix
 
 
 async def confirm_tables(pool: asyncpg.pool.Pool):
+    # TODO: Create confirmation tables for emoji rubrics
     """
     Takes an asyncpg.pool.Pool object as sole argument
     returns None
@@ -34,21 +35,15 @@ async def confirm_tables(pool: asyncpg.pool.Pool):
 
 
 async def increment_usage(
-    bot: discord.ext.commands.bot.Bot,
+    pool: asyncpg.pool.Pool,
     ctx: discord.ext.commands.context.Context,
     type_of_cmd: str,
     value_to_increment: int,
-    with_caching=True,
 ):
-
-    pool: asyncpg.pool.Pool = bot.db
 
     # There is no need to log anything to db or cache
     if value_to_increment == 0:
         return
-
-    if with_caching:
-        bot.usage_cache += value_to_increment
 
     # See if the record of user exist in database
     query = """SELECT usage_count FROM usage
