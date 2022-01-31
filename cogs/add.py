@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from bot_tools import static_vacancy, animated_vacancy
+from tools.bot_tools import static_vacancy, animated_vacancy
 
 
 class add_(commands.Cog):

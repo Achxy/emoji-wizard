@@ -1,6 +1,6 @@
 import asyncpg
 import discord
-from database_tools import increment_usage
+from tools.database_tools import increment_usage
 
 
 class Cache:

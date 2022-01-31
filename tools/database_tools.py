@@ -1,6 +1,6 @@
 import asyncpg
 import discord
-from bot_tools import get_default_prefix
+from tools.bot_tools import get_default_prefix
 
 
 async def confirm_tables(pool: asyncpg.pool.Pool):
