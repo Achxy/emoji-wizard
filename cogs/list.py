@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from tools.bot_tools import seperate_chunks
+from tools.enum_tools import CommandType
 
 
 class list(commands.Cog):

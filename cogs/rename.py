@@ -2,6 +2,7 @@ import discord
 import typing
 from discord.ext import commands
 from tools.database_tools import get_prefix_for_guild
+from tools.enum_tools import CommandType
 
 
 class rename(commands.Cog):

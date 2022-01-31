@@ -35,4 +35,4 @@ class Cache:
         Internally references increment_usage from database_tools
         """
         self.command_usage += 1
-        await increment_usage(self.pool, ctx, type_of_command, 1)
+        await increment_usage(self.pool, ctx, type_of_command.value, 1)

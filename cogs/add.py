@@ -2,6 +2,7 @@ import discord
 import typing
 from discord.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy
+from tools.enum_tools import CommandType
 
 
 class add(commands.Cog):
@@ -92,6 +93,7 @@ class add(commands.Cog):
 
                 # Increment success counter
                 successful_additions += 1
+        await self.cache.command(ctx, CommandType.add)
 
 
 def setup(bot):

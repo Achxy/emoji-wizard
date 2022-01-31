@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from tools.enum_tools import CommandType
 
 
 class meta(commands.Cog):
