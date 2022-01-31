@@ -28,8 +28,18 @@ async def confirm_tables(pool: asyncpg.pool.Pool):
                 user_id BIGINT,
                 type_of_cmd TEXT,
                 usage_count INT
+                );
+            """
+    await pool.execute(query)
 
-            );
+    # Table for storing emoji rubric stats
+    query = """CREATE TABLE IF NOT EXISTS emoji_rubric(
+                guild_id BIGINT,
+                channel_id BIGINT,
+                user_id BIGINT,
+                type_of_rubric TEXT,
+                usage_count BIGINT
+                );
             """
     await pool.execute(query)
 
