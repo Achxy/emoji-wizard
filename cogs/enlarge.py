@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.enum_tools import CommandType
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class enlarge(commands.Cog):
@@ -32,6 +32,9 @@ class enlarge(commands.Cog):
             successful_additions += 1
             await ctx.send(embed=embed)
         await self.bot.cache.command(ctx, CommandType.enlarge)
+        await self.bot.cache.emoji_rubric(
+            ctx, EmojiRubric.enlargement, successful_additions
+        )
 
 
 def setup(bot):

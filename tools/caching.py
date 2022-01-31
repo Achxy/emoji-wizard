@@ -1,7 +1,7 @@
 import asyncpg
 import discord
 from tools.database_tools import increment_usage
-from tools.enum_tools import CommandType
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class Cache:
@@ -24,7 +24,29 @@ class Cache:
         self.emoji_rubric = 0
 
     async def overwrite_cache(self) -> None:
-        return  # Implement later
+        return  # Implement later FIXME:
+
+    async def emoji_rubric(
+        self,
+        ctx: discord.ext.commands.context.Context,
+        type_of_rubric: EmojiRubric,
+        value_to_increment,
+    ):
+        """
+        Accepts 2 positional arguments, command context and type of rubric respectively
+        returns None
+        Internally references increment_usage from database_tools
+        """
+        print(
+            f"im called, {type_of_rubric = }, {type_of_rubric.value = }"
+        )  # for debugging, remove afterwards, FIXME:
+        await increment_usage(
+            self.pool,
+            ctx,
+            type_of_rubric.value,
+            value_to_increment,
+            in_the_table="emoji_rubric",
+        )
 
     async def command(
         self, ctx: discord.ext.commands.context.Context, type_of_command: CommandType

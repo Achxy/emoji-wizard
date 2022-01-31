@@ -49,14 +49,14 @@ async def increment_usage(
     ctx: discord.ext.commands.context.Context,
     type_of_cmd_or_rubric: str,
     value_to_increment: int,
-    in_the_table="usage_count",
+    in_the_table="usage",
 ):
 
     # There is no need to log anything to db
     if value_to_increment == 0:
         return
 
-    if in_the_table == "usage_count":
+    if in_the_table == "usage":
         of_type = "type_of_cmd"
     else:
         of_type = "type_of_rubric"
@@ -70,7 +70,7 @@ async def increment_usage(
                     {of_type} = $4
                 );
             """
-
+    print(query)
     count = await pool.fetch(
         query, ctx.guild.id, ctx.channel.id, ctx.author.id, type_of_cmd_or_rubric
     )
