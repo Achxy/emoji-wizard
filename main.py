@@ -4,6 +4,7 @@ import asyncpg
 from discord.ext import commands
 from tools.database_tools import confirm_tables
 from tools.bot_tools import get_default_prefix, get_mobile
+from tools.caching import Cache
 
 
 discord.gateway.DiscordWebSocket.identify = (
@@ -39,6 +40,9 @@ async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
     await confirm_tables(bot.db)
+    bot.cache = Cache(bot.db)
+    await bot.cache.overwrite_cache()
+    print("Cache is ready.")
 
 
 @bot.event

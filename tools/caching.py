@@ -19,6 +19,11 @@ class Cache:
 
     def __init__(self, pool: asyncpg.pool.Pool) -> None:
         self.pool = pool
+        self.command_usage = 0
+        self.emoji_rubric = 0
+
+    async def overwrite_cache() -> None:
+        return  # Implement later
 
     async def command(
         self, ctx: discord.ext.commands.context.Context, type_of_command: str
@@ -28,4 +33,5 @@ class Cache:
         returns None
         Internally references increment_usage from database_tools
         """
+        self.command_usage += 1
         await increment_usage(self.pool, ctx, type_of_command, 1)

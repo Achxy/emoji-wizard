@@ -3,7 +3,7 @@ from discord.ext import commands
 from tools.bot_tools import seperate_chunks
 
 
-class list_(commands.Cog):
+class list(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -26,4 +26,4 @@ class list_(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(list_(bot))
+    bot.add_cog(list(bot))
