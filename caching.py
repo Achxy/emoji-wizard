@@ -1,5 +1,7 @@
 import asyncpg
 import discord
+import functools
+from database_tools import increment_usage
 
 
 class Cache:
@@ -26,8 +28,11 @@ class Cache:
         self.pool: asyncpg.pool.Pool = self.bot.db
 
     def command(self, type_of_command: str):
+        # Preserve function signature
         def wrapper(function):
+            @functools.wraps(function)
             def inner_wrapper(*args, **kwargs):
+                increment_usage(self.bot, args[0], type_of_command, 1)
                 return function(*args, **kwargs)
 
             return inner_wrapper
