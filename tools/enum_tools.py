@@ -16,3 +16,15 @@ class CommandType(Enum):
     inspect.currentframe().f_back.f_code.co_name isn't an option either, it isn't stable with decorated functions
     Current implementation is the fastest way
     """
+
+
+class EmojiRubric(Enum):
+    """
+    LHS contains the readable format
+    RHS will logged into the database
+    """
+
+    addition = "add"
+    enlargement = "enlarge"
+    listed = "list"
+    renamed = "rename"
