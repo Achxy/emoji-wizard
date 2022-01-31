@@ -2,7 +2,6 @@ import discord
 import typing
 from discord.ext import commands
 from bot_tools import static_vacancy, animated_vacancy
-from database_tools import increment_usage
 
 
 class add_(commands.Cog):
@@ -95,8 +94,6 @@ class add_(commands.Cog):
 
                 # Increment success counter
                 successful_additions += 1
-
-        await increment_usage(self.bot, ctx, cmd_type, successful_additions)
 
 
 def setup(bot):
