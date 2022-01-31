@@ -7,9 +7,7 @@ class meta(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def ping(self, ctx):
-
-        cmd_type = "cmd_ping"
+    async def cmd_ping(self, ctx):
 
         embed = discord.Embed(
             title="Pong! 🏓",
@@ -19,9 +17,7 @@ class meta(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def setprefix(self, ctx, new_prefix):
-
-        cmd_type = "cmd_setprefix"
+    async def cmd_setprefix(self, ctx, new_prefix):
 
         query = "SELECT prefix FROM guilds WHERE guild_id = $1"
         old_prefix = await self.bot.db.fetch(query, ctx.guild.id)

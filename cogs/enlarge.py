@@ -8,9 +8,8 @@ class enlarge(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def enlarge_(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
+    async def cmd_enlarge(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
 
-        cmd_type = "cmd_enlarge"
         successful_additions = 0
 
         for index, i in enumerate(emotes):

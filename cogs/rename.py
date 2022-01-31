@@ -4,13 +4,13 @@ from discord.ext import commands
 from tools.database_tools import get_prefix_for_guild
 
 
-class rename_(commands.Cog):
+class rename(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def rename(self, ctx, *emoji_and_name: typing.Union[discord.Emoji, str]):
+    async def cmd_rename(self, ctx, *emoji_and_name: typing.Union[discord.Emoji, str]):
         """
         Albeit variadic accepts many, we only accept 2 and raise issues if there are more than 2 args
         The two args can be in any order, one of which is discord.Emoji and the one is a str instance
@@ -18,8 +18,6 @@ class rename_(commands.Cog):
         Since bot only checks for manage_emojis perm in current guild but acts upon emojis in the bot's guild emoji pool
         we need to confirm that the emoji we are acting upon matches ctx.guild to prevent any attackers
         """
-
-        cmd_type = "cmd_rename"
 
         # Check if the argument count is 2 or not
         if len(emoji_and_name) > 2:
@@ -86,4 +84,4 @@ class rename_(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(rename_(bot))
+    bot.add_cog(rename(bot))

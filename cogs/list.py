@@ -8,11 +8,11 @@ class list_(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def list(self, ctx):
+    async def cmd_list(self, ctx):
         """
         Send each emoji in the guild as a chunk of 10
         """
-        cmd_type = "cmd_list"
+
         count = 0
         for each_chunk in seperate_chunks(ctx.guild.emojis, 10):
             msg = ""
