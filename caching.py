@@ -1,3 +1,6 @@
+import asyncpg
+
+
 class Cache:
     """
     IMPORTANT NOTE : Incrementing values in cache can write those values to the database
@@ -13,3 +16,18 @@ class Cache:
     with command type as sole argument to register command usage
 
     """
+
+    def __init__(self, pool: asyncpg.pool.Pool) -> None:
+        """
+        To work with the database, we need to accept asyncpg.pool.Pool object
+        """
+        self.pool = pool
+
+    def command(self, type_of_command: str):
+        def wrapper(function):
+            def inner_wrapper(*args, **kwargs):
+                return function(*args, **kwargs)
+
+            return inner_wrapper
+
+        return wrapper
