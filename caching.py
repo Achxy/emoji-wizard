@@ -1,4 +1,5 @@
 import asyncpg
+import discord
 
 
 class Cache:
@@ -17,11 +18,12 @@ class Cache:
 
     """
 
-    def __init__(self, pool: asyncpg.pool.Pool) -> None:
+    def __init__(self, bot: discord.ext.commands.bot.Bot) -> None:
         """
         To work with the database, we need to accept asyncpg.pool.Pool object
         """
-        self.pool = pool
+        self.bot = bot
+        self.pool: asyncpg.pool.Pool = self.bot.db
 
     def command(self, type_of_command: str):
         def wrapper(function):
