@@ -93,7 +93,7 @@ class add(commands.Cog):
 
                 # Increment success counter
                 successful_additions += 1
-        await self.cache.command(ctx, CommandType.add)
+        await self.bot.cache.command(ctx, CommandType.add)
 
 
 def setup(bot):

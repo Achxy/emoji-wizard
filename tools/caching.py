@@ -1,7 +1,7 @@
 import asyncpg
 import discord
 from tools.database_tools import increment_usage
-from enum_tools import CommandType
+from tools.enum_tools import CommandType
 
 
 class Cache:
@@ -23,7 +23,7 @@ class Cache:
         self.command_usage = 0
         self.emoji_rubric = 0
 
-    async def overwrite_cache() -> None:
+    async def overwrite_cache(self) -> None:
         return  # Implement later
 
     async def command(
@@ -34,5 +34,6 @@ class Cache:
         returns None
         Internally references increment_usage from database_tools
         """
+        print("im called")  # for debugging, remove afterwards, FIXME:
         self.command_usage += 1
         await increment_usage(self.pool, ctx, type_of_command.value, 1)
