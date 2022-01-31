@@ -1,6 +1,7 @@
 import asyncpg
 import discord
 from tools.database_tools import increment_usage
+from enum_tools import CommandType
 
 
 class Cache:
@@ -26,10 +27,10 @@ class Cache:
         return  # Implement later
 
     async def command(
-        self, ctx: discord.ext.commands.context.Context, type_of_command: str
+        self, ctx: discord.ext.commands.context.Context, type_of_command: CommandType
     ):
         """
-        Accepts 2 positional arguments, command context and type of command (str) respectively
+        Accepts 2 positional arguments, command context and type of command respectively
         returns None
         Internally references increment_usage from database_tools
         """
