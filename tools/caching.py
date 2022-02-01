@@ -21,7 +21,7 @@ class Cache:
     def __init__(self, pool: asyncpg.pool.Pool) -> None:
         self.pool = pool
         self.command_usage = 0
-        self.emoji_rubric = 0
+        self.emoji_rubric_usage = 0
 
     async def overwrite_cache(self) -> None:
         return  # Implement later FIXME:
