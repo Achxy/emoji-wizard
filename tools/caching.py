@@ -163,3 +163,30 @@ class Cache:
             1,
             in_the_table=DatabaseTables.command.value,
         )
+
+    async def retrieve_rows(
+        self,
+        table: DatabaseTables,
+        guild_id: Optional[int] = None,
+        channel_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        type_of_cmd_or_rubric: Optional[str] = None,
+        usage_count: Optional[int] = None,
+    ) -> List[List[Any]]:
+        ...
+        """
+        Calls the retrieve_rows method from Tables class
+        self.command_usage and self.emoji_rubric_usage instances will be used depending on the table
+        Rest of the arguments are passed to the retrieve_rows method
+        Functionality is similar to the retrieve_rows method in Tables class
+        We did not inherit from Tables class because we want to keep this check"""
+        if table == DatabaseTables.command:
+            return self.command_usage.retrieve_rows(
+                guild_id, channel_id, user_id, type_of_cmd_or_rubric, usage_count
+            )
+        elif table == DatabaseTables.rubric:
+            return self.emoji_rubric_usage.retrieve_rows(
+                guild_id, channel_id, user_id, type_of_cmd_or_rubric, usage_count
+            )
+        else:
+            raise ValueError(f"{table} is not a valid argument for retrieve_rows")
