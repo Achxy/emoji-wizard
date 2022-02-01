@@ -3,6 +3,7 @@ import ast
 import inspect
 import re
 import json
+from collections.abc import Iterable
 
 
 def static_vacancy(guild: discord.guild.Guild) -> int:
@@ -38,7 +39,7 @@ def get_default_prefix(file="config.json", key="DEFAULT_PREFIX"):
     to fix this, I used to store default prefix in an file that is outside
 
     To make it as easy as possible for someone to host this bot and set the default prefix they desire
-    I have decided to store it in a json file 
+    I have decided to store it in a json file
     Custom prefixes are of course stored in the database
     """
     try:
@@ -51,13 +52,14 @@ def get_default_prefix(file="config.json", key="DEFAULT_PREFIX"):
             j = json.load(fr)
             return j[key]
 
+
 def get_mobile():
     """
     This is unstable and may break your bot, but it is fun :D
 
     Takes no argument, returns function object
     Overwrite in place for discord.gateway.DiscordWebSocket.identify
-    
+
     The Gateway's IDENTIFY packet contains a properties field, containing $os, $browser and $device fields.
     Discord uses that information to know when your phone client and only your phone client has connected to Discord,
     from there they send the extended presence object.
@@ -66,7 +68,6 @@ def get_mobile():
     the mobile indicator is not triggered by the mobile client.
     The specific values for the $os, $browser, and $device fields are can change from time to time.
     """
-
 
     def source(o):
         s = inspect.getsource(o).split("\n")
@@ -87,5 +88,19 @@ def get_mobile():
 
 
 def seperate_chunks(l, into):
+    """
+    Seperate the list into chunks of size into
+    """
     for i in range(0, len(l), into):
         yield l[i : i + into]
+
+
+def flatten(iterable_object):
+    """
+    Flatten the iterable object
+    """
+    for element in iterable_object:
+        if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
+            yield from flatten(element)
+        else:
+            yield element

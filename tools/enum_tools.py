@@ -28,3 +28,8 @@ class EmojiRubric(Enum):
     enlargement = "enlarge"
     listed = "list"
     renamed = "rename"
+
+
+class DatabaseTables(Enum):
+    rubric = "emoji_rubric"
+    command = "usage"
