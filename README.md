@@ -5,7 +5,7 @@
 An high performance discord emoji bot\
 (I forgot this project exists, time to work on it again :P)
 
-Invite me to your server : **https://dsc.gg/emoji-wizard**\
+Invite me to your server : **https://dsc.gg/emoji-wizard** <br>
 Have any bugs, issues or suggestions? Let me know in the **https://github.com/Achxy/emoji-wizard/issues** tab. 
 
 ### TODO List
