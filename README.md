@@ -18,8 +18,8 @@ An high performance discord emoji bot\
 <li>Backup command</li>
 <li>Invite command</li>
 <li>Uptime command</li>
-<li>Remove command</li>
-<li>Remove-all command</li>
+<li>Remove command ✅</li>
+<li>Remove-all command ✅</li>
 <li>Snipe-emoji-by-id command</li>
 <li>Remove-duplicate-command command</li>
 <li>Stats command</li>
