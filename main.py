@@ -1,10 +1,11 @@
 import discord
 import os
 import asyncpg
-from discord.ext import commands
+from discord.ext import commands, tasks
 from tools.database_tools import confirm_tables
 from tools.bot_tools import get_default_prefix, get_mobile
 from tools.caching import Cache
+from tools.enum_tools import DatabaseTables
 
 
 discord.gateway.DiscordWebSocket.identify = (
@@ -48,6 +49,14 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
+    if not show_cache.is_running():
+        show_cache.start()
+
+
+@tasks.loop(seconds=10)  # FIXME: For debugging, remove this later
+async def show_cache():
+    t = await bot.cache.retrieve_rows(DatabaseTables.rubric)
+    print(f"\n\n{t}, {len(t)     = }\n\n")
 
 
 # To get all the .py files form the cogs folder

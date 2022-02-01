@@ -75,6 +75,8 @@ class Tables:
 
     async def overwrite_rows(self, table: DatabaseTables) -> None:
         query = """SELECT * FROM {};""".format(table.value)
+        # To prevent the same values from being incremented, we reset the rows first
+        self.reset_rows()
         for each_row in await self.pool.fetch(query):
             self.add_row([r for r in each_row])
 
