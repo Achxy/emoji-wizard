@@ -37,9 +37,7 @@ class Cache:
         returns None
         Internally references increment_usage from database_tools
         """
-        print(
-            f"im called, {type_of_rubric = }, {type_of_rubric.value = }"
-        )  # for debugging, remove afterwards, FIXME:
+
         await increment_usage(
             self.pool,
             ctx,
@@ -56,8 +54,5 @@ class Cache:
         returns None
         Internally references increment_usage from database_tools
         """
-        print(
-            f"im called, {type_of_command = }, {type_of_command.value = }"
-        )  # for debugging, remove afterwards, FIXME:
         self.command_usage += 1
         await increment_usage(self.pool, ctx, type_of_command.value, 1)

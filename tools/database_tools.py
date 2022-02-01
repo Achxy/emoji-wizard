@@ -70,7 +70,7 @@ async def increment_usage(
                     {of_type} = $4
                 );
             """
-    print(query)
+
     count = await pool.fetch(
         query, ctx.guild.id, ctx.channel.id, ctx.author.id, type_of_cmd_or_rubric
     )
