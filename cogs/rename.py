@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from database_tools import get_prefix_for_guild, increment_usage
+from tools.database_tools import get_prefix_for_guild, increment_usage
 
 
 class rename_(commands.Cog):

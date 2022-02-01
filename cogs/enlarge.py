@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from database_tools import increment_usage
+from tools.database_tools import increment_usage
 
 
 class enlarge(commands.Cog):

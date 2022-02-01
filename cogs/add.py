@@ -1,8 +1,8 @@
 import discord
 import typing
 from discord.ext import commands
-from bot_tools import static_vacancy, animated_vacancy
-from database_tools import increment_usage
+from tools.bot_tools import static_vacancy, animated_vacancy
+from tools.database_tools import increment_usage
 
 
 class add_(commands.Cog):

@@ -2,11 +2,13 @@ import discord
 import os
 import asyncpg
 from discord.ext import commands, tasks
-from database_tools import confirm_tables, get_usage_of
-from bot_tools import get_default_prefix, get_mobile
+from tools.database_tools import confirm_tables, get_usage_of
+from tools.bot_tools import get_default_prefix, get_mobile
 
 
-discord.gateway.DiscordWebSocket.identify = get_mobile() # Remove this line if bot isn't working, experimental thing
+discord.gateway.DiscordWebSocket.identify = (
+    get_mobile()
+)  # Remove this line if bot isn't working, experimental thing
 DEFAULT_PREFIX = get_default_prefix()
 
 # Get custom prefix for the guild
@@ -65,7 +67,7 @@ async def update_presence():
     Instead we will be caching this under bot.prev_cache and inheritents of commands.Cog will manipulate this value
     Such way requests to the database can be kept to an minimum and be performant
     """
-    #print(f"{bot._count = }, {bot._prev = }, {bot.usage_cache = }") # If you need to debug
+    # print(f"{bot._count = }, {bot._prev = }, {bot.usage_cache = }") # If you need to debug
     if (
         MIN_DELAY_OF_RPC > bot._count
     ):  # We don't really need to increment _count if it's already higher than MIN_DELAY_OF_RPC

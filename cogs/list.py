@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from bot_tools import seperate_chunks
-from database_tools import increment_usage
+from tools.bot_tools import seperate_chunks
+from tools.database_tools import increment_usage
 
 
 class list_(commands.Cog):
