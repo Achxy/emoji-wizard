@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from tools.bot_tools import seperate_chunks
-from tools.enum_tools import CommandType
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class list(commands.Cog):
@@ -25,6 +25,7 @@ class list(commands.Cog):
                     msg += f"{count}. ~~{each_emoji}~~ -- `{each_emoji}` **(unavailable)**\n"
             await ctx.send(msg)
         await self.bot.cache.command(ctx, CommandType.list)
+        await self.bot.cache.emoji_rubric(ctx, EmojiRubric.enlargement, count)
 
 
 def setup(bot):

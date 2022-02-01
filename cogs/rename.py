@@ -2,7 +2,7 @@ import discord
 import typing
 from discord.ext import commands
 from tools.database_tools import get_prefix_for_guild
-from tools.enum_tools import CommandType
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class rename(commands.Cog):
@@ -83,6 +83,7 @@ class rename(commands.Cog):
             )
             await ctx.send(embed=embed)
         await self.bot.cache.command(ctx, CommandType.rename)
+        await self.bot.cache.emoji_rubric(ctx, EmojiRubric.rename, 1)
 
 
 def setup(bot):
