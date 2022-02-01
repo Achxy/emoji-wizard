@@ -1,6 +1,7 @@
 import asyncpg
 import discord
-from typing import Union, List, Any, Optional
+import asyncio
+from typing import List, Any, Optional
 from tools.bot_tools import flatten
 from tools.database_tools import increment_usage
 from tools.enum_tools import CommandType, EmojiRubric, DatabaseTables
@@ -14,10 +15,13 @@ class Tables:
     Index 2: user_id
     Index 3: type_of_cmd_or_rubric
     Index 4: usage_count
+
+    This class does not write to the database
     """
 
-    def __init__(self) -> None:
+    def __init__(self, pool: asyncpg.pool.Pool) -> None:
         self.rows = []
+        self.pool = pool
 
     def retrieve_rows(
         self,
@@ -62,7 +66,6 @@ class Tables:
                 each_row[4] += new_row[4]
                 return
         self.rows.append(new_row)
-        print(self.retrieve_rows())  # FIXME: This is for debugging, remove it later
 
     def reset_rows(self):
         """
@@ -70,8 +73,10 @@ class Tables:
         """
         self.rows = []
 
-    def overwrite_rows(self):
-        return  # FIXME: Yet to be implemented
+    async def overwrite_rows(self, table: DatabaseTables) -> None:
+        query = """SELECT * FROM {};""".format(table.value)
+        for each_row in await self.pool.fetch(query):
+            self.add_row([r for r in each_row])
 
 
 class Cache:
@@ -90,13 +95,21 @@ class Cache:
 
     def __init__(self, pool: asyncpg.pool.Pool) -> None:
         self.pool: asyncpg.pool.Pool = pool
-        self.command_usage: Tables = Tables()
-        self.emoji_rubric_usage: Tables = Tables()
+        self.command_usage: Tables = Tables(self.pool)
+        self.emoji_rubric_usage: Tables = Tables(self.pool)
+        # Run self.overwrite_cache parallel to avoid blocking the bot
+        asyncio.ensure_future(self.overwrite_cache())
 
-    async def overwrite_cache(self) -> None:
-        # Overwrite cache with database
-        # Get values from database
-        ...  # FIXME:
+    async def overwrite_cache(self, of_cache: Optional[DatabaseTables] = None) -> None:
+        if of_cache is None:
+            await self.command_usage.overwrite_rows(DatabaseTables.command)
+            await self.emoji_rubric_usage.overwrite_rows(DatabaseTables.rubric)
+        elif of_cache == DatabaseTables.command:
+            await self.command_usage.overwrite_rows(DatabaseTables.command)
+        elif of_cache == DatabaseTables.rubric:
+            await self.emoji_rubric_usage.overwrite_rows(DatabaseTables.rubric)
+        else:
+            raise ValueError(f"{of_cache} is not a valid argument for overwrite_cache")
 
     async def emoji_rubric(
         self,

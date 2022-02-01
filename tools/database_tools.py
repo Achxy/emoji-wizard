@@ -144,7 +144,9 @@ async def get_prefix_for_guild(
         return prefix[0].get("prefix")
 
 
-async def get_usage_of(pool: asyncpg.pool.Pool, cmd: str = "global"):
+async def get_usage_of(
+    pool: asyncpg.pool.Pool, cmd: str = "global"
+):  # not sure if this is still used, will check later and delete TODO:
 
     if cmd.lower() == "global":
         query = "SELECT SUM(usage_count) FROM usage"
