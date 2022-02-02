@@ -1,6 +1,8 @@
 import asyncpg
 import discord
 from tools.bot_tools import get_default_prefix
+from tools.enum_tools import CommandType, EmojiRubric
+from typing import Union
 
 
 async def confirm_tables(pool: asyncpg.pool.Pool):
@@ -36,27 +38,82 @@ async def confirm_tables(pool: asyncpg.pool.Pool):
 async def increment_usage(
     bot: discord.ext.commands.bot.Bot,
     ctx: discord.ext.commands.context.Context,
-    type_of_cmd: str,
+    type_of_cmd_or_rubric: Union[CommandType, EmojiRubric],
     value_to_increment: int,
     with_caching=True,
 ):
-
-    pool: asyncpg.pool.Pool = bot.db
+    """
+    Takes a bot object, a context object, a type of command or a rubric and a value to increment
+    raises TypeError if the type of command or rubric is not of type CommandType or EmojiRubric
+    returns None
+    """
 
     # There is no need to log anything to db or cache
     if value_to_increment == 0:
         return
 
+    pool: asyncpg.pool.Pool = bot.db
+
+    if isinstance(type_of_cmd_or_rubric, CommandType):
+        type_of_cmd = type_of_cmd_or_rubric.value
+    elif isinstance(type_of_cmd_or_rubric, EmojiRubric):
+        type_of_cmd = type_of_cmd_or_rubric.value
+    else:
+        raise TypeError(
+            "type_of_cmd_or_rubric must be either CommandType or EmojiRubric"
+        )
+
     if with_caching:
-        bot.usage_cache += value_to_increment
+        # We want to cache the usage count or rubric count
+        # Check what we are trying to increment is a command or a rubric
+        if isinstance(type_of_cmd_or_rubric, CommandType):
+            # We are incrementing a command
+            # Check if the command is already in cache
+            if type_of_cmd in bot.cache.cmd_cache.keys():
+                # We already have the command in cache
+                # Increment the usage count
+                bot.cache.cmd_cache[type_of_cmd] += value_to_increment
+            else:
+                # We don't have the command in cache
+                # Fetch the sum of usage count from db where type_of_cmd = type_of_cmd
+                query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
+                r = await pool.fetch(query, type_of_cmd)
+                r = r[0].get("sum")
+                if r is None:
+                    r = 0
+                bot.cache.cmd_cache[type_of_cmd] = int(r) + value_to_increment
+        else:
+            # We are incrementing a rubric
+            # Check if the rubric is already in cache
+            if type_of_cmd in bot.cache.cmd_cache.keys():
+                # We already have the rubric in cache
+                # Increment the usage count
+                bot.cache.rubric_cache[type_of_cmd] += value_to_increment
+            else:
+                # We don't have the rubric in cache
+                # Fetch the sum of usage count from db where type_of_cmd = type_of_cmd
+                query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
+                r = await pool.fetch(query, type_of_cmd)
+                r = r[0].get("sum")
+                if r is None:
+                    r = 0
+                bot.cache.rubric_cache[type_of_cmd] = int(r) + value_to_increment
+
+    # Table that we are acting upon depends on the type of command or rubric
+    if isinstance(type_of_cmd_or_rubric, CommandType):
+        table = "usage"
+        type_column = "type_of_cmd"
+    else:
+        table = "emoji_rubric"
+        type_column = "type_of_rubric"
 
     # See if the record of user exist in database
-    query = """SELECT usage_count FROM usage
+    query = f"""SELECT usage_count FROM {table}
                 WHERE (
                     guild_id = $1 AND
                     channel_id = $2 AND
                     user_id = $3 AND
-                    type_of_cmd = $4
+                    {type_column} = $4
                 );
             """
 
@@ -67,11 +124,11 @@ async def increment_usage(
     if not count:
         # Row didn't use to exist
         # Create it
-        query = """INSERT INTO usage (
+        query = f"""INSERT INTO {table} (
                     guild_id,
                     channel_id,
                     user_id,
-                    type_of_cmd,
+                    {type_column},
                     usage_count
                     )
                     VALUES (
@@ -99,13 +156,13 @@ async def increment_usage(
         count = int(count[0].get("usage_count"))
 
         # Update the existing value of usage_count to be count + successful additions
-        query = """UPDATE usage
+        query = f"""UPDATE {table}
                     SET usage_count = $1
                     WHERE (
                         guild_id = $2 AND
                         channel_id = $3 AND
                         user_id = $4 AND
-                        type_of_cmd = $5
+                        {type_column} = $5
                     );
                 """
 
