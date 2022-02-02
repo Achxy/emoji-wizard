@@ -35,28 +35,6 @@ async def confirm_tables(pool: asyncpg.pool.Pool):
     await pool.execute(query)
 
 
-async def populate_cache(bot: discord.ext.commands.bot.Bot):
-    """
-    Takes an discord.ext.commands.bot.Bot object as sole argument
-    returns None
-
-    The purpose of this is to populate the cache with the data from the database
-    """
-    pool = bot.db
-    # Populate the cache with the data from the database
-    # In command usage table, each command will be the key of the dict
-    # and the value will be the sum of number of times the command was used
-    query = """SELECT type_of_cmd, SUM(usage_count) FROM usage GROUP BY type_of_cmd"""
-    r = await pool.fetch(query)
-    bot.cmd_cache = {i.get("type_of_cmd"): i.get("sum") for i in r}
-    # In rubric usage table, each rubric will be the key of the dict
-    # and the value will be the sum of number of times the rubric was used
-    query = """SELECT type_of_rubric, SUM(usage_count) FROM emoji_rubric GROUP BY type_of_rubric"""
-    r = await pool.fetch(query)
-    bot.rubric_cache = {i.get("rubric"): i.get("sum") for i in r}
-    print("Cache populated")
-
-
 async def increment_usage(
     bot: discord.ext.commands.bot.Bot,
     ctx: discord.ext.commands.context.Context,
@@ -73,13 +51,6 @@ async def increment_usage(
     # There is no need to log anything to db or cache
     if value_to_increment == 0:
         return
-
-    # check if either bot.cmd_cache or bot.rubric_cache is None
-    # if it is then reassign an empty dict it
-    if bot.cmd_cache is None:
-        bot.cmd_cache = {}
-    if bot.rubric_cache is None:
-        bot.rubric_cache = {}
 
     pool: asyncpg.pool.Pool = bot.db
 
@@ -112,37 +83,21 @@ async def increment_usage(
         # We want to cache the usage count or rubric count
         # Check what we are trying to increment is a command or a rubric
         if isinstance(type_of_cmd_or_rubric, CommandType):
-            # We are incrementing a command
-            # Check if the command is already in cache
-            if type_of_cmd in bot.cmd_cache.keys():
-                # We already have the command in cache
-                # Increment the usage count
-                bot.cmd_cache[type_of_cmd] += value_to_increment
-            else:
-                # We don't have the command in cache
-                # Fetch the sum of usage count from db where type_of_cmd = type_of_cmd
-                query = f"SELECT SUM(usage_count) FROM {table} WHERE {type_column}= $1"
-                r = await pool.fetch(query, type_of_cmd)
-                r = r[0].get("sum")
-                if r is None:
-                    r = 0
-                bot.cmd_cache[type_of_cmd] = int(r) + value_to_increment
+            bot.cmd_cache.append(
+                ctx.guild.id,
+                ctx.channel.id,
+                ctx.author.id,
+                type_of_cmd,
+                value_to_increment,
+            )
         else:
-            # We are incrementing a rubric
-            # Check if the rubric is already in cache
-            if type_of_cmd in bot.cmd_cache.keys():
-                # We already have the rubric in cache
-                # Increment the usage count
-                bot.rubric_cache[type_of_cmd] += value_to_increment
-            else:
-                # We don't have the rubric in cache
-                # Fetch the sum of usage count from db where type_of_cmd = type_of_cmd
-                query = f"SELECT SUM(usage_count) FROM {table} WHERE {type_column} = $1"
-                r = await pool.fetch(query, type_of_cmd)
-                r = r[0].get("sum")
-                if r is None:
-                    r = 0
-                bot.rubric_cache[type_of_cmd] = int(r) + value_to_increment
+            bot.rubric_cache.append(
+                ctx.guild.id,
+                ctx.channel.id,
+                ctx.author.id,
+                type_of_cmd,
+                value_to_increment,
+            )
 
     # See if the record of user exist in database
     query = f"""SELECT usage_count FROM {table}

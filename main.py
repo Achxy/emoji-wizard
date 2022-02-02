@@ -2,8 +2,10 @@ import discord
 import os
 import asyncpg
 from discord.ext import commands, tasks
-from tools.database_tools import confirm_tables, populate_cache
+from tools.database_tools import confirm_tables
 from tools.bot_tools import get_default_prefix, get_mobile
+from tools.enum_tools import TableType
+from tools.caching_table_tools import Tables
 
 
 discord.gateway.DiscordWebSocket.identify = (
@@ -34,20 +36,20 @@ async def get_prefix(bot, message):
 initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
 
-bot.cmd_cache = None
-bot.rubric_cache = None
-
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
     await confirm_tables(bot.db)
+    bot.cmd_cache = Tables(bot, TableType.command)
+    bot.rubric_cache = Tables(bot, TableType.rubric)
 
 
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
-    await populate_cache(bot)
+    await bot.cmd_cache.populate()
+    await bot.rubric_cache.populate()
 
 
 @bot.command()
@@ -56,8 +58,10 @@ async def check(ctx):
     This is used for debugging, this prints the cache into the console.
     FIXME: Remove this before merging with production branch"""
 
-    print(bot.cmd_cache)
-    print(bot.rubric_cache)
+    print("cmd :")
+    print(bot.cmd_cache.get_row)
+    print("rubric :")
+    print(bot.rubric_cache.get_row)
 
 
 # To get all the .py files form the cogs folder

@@ -1,6 +1,6 @@
 import asyncpg
 import discord
-from enum_tools import TableType
+from tools.enum_tools import TableType
 
 
 class Tables:
@@ -14,9 +14,10 @@ class Tables:
         """
         Get all the rows from the table and assign it to self.rows
         """
+        print(f"Populating {self.table}")
         self.rows = []
         for each_row in await self.pool.fetch(f"SELECT * FROM {self.table}"):
-            self.rows.append(each_row)
+            self.rows.append([i for i in each_row.values()])
 
     async def append(self, new_list):
         """
@@ -34,7 +35,7 @@ class Tables:
                 return
         self.rows.append(new_list)
 
-    async def reset(self):
+    def reset(self):
         self.rows = []
 
     @property
