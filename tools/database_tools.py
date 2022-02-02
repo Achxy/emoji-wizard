@@ -71,6 +71,14 @@ async def increment_usage(
             "type_of_cmd_or_rubric must be either CommandType or EmojiRubric"
         )
 
+    # Table that we are acting upon depends on the type of command or rubric
+    if isinstance(type_of_cmd_or_rubric, CommandType):
+        table = "usage"
+        type_column = "type_of_cmd"
+    else:
+        table = "emoji_rubric"
+        type_column = "type_of_rubric"
+
     if with_caching:
         # We want to cache the usage count or rubric count
         # Check what we are trying to increment is a command or a rubric
@@ -106,14 +114,6 @@ async def increment_usage(
                 if r is None:
                     r = 0
                 bot.cache.rubric_cache[type_of_cmd] = int(r) + value_to_increment
-
-    # Table that we are acting upon depends on the type of command or rubric
-    if isinstance(type_of_cmd_or_rubric, CommandType):
-        table = "usage"
-        type_column = "type_of_cmd"
-    else:
-        table = "emoji_rubric"
-        type_column = "type_of_rubric"
 
     # See if the record of user exist in database
     query = f"""SELECT usage_count FROM {table}
