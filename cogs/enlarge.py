@@ -2,6 +2,7 @@ import discord
 import typing
 from discord.ext import commands
 from tools.database_tools import increment_usage
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class enlarge(commands.Cog):

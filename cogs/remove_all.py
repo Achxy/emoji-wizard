@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from tools.database_tools import increment_usage
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class remove_all(commands.Cog):

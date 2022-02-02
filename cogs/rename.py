@@ -2,6 +2,7 @@ import discord
 import typing
 from discord.ext import commands
 from tools.database_tools import get_prefix_for_guild, increment_usage
+from tools.enum_tools import CommandType, EmojiRubric
 
 
 class rename_(commands.Cog):
