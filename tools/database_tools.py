@@ -2,7 +2,7 @@ import asyncpg
 import discord
 from tools.bot_tools import get_default_prefix
 from tools.enum_tools import CommandType, EmojiRubric
-from typing import Union
+from typing import Union, Optional
 
 
 async def confirm_tables(pool: asyncpg.pool.Pool):
@@ -39,7 +39,7 @@ async def increment_usage(
     bot: discord.ext.commands.bot.Bot,
     ctx: discord.ext.commands.context.Context,
     type_of_cmd_or_rubric: Union[CommandType, EmojiRubric],
-    value_to_increment: int,
+    value_to_increment: Optional[int] = None,
     with_caching=True,
 ):
     """
@@ -54,10 +54,18 @@ async def increment_usage(
 
     pool: asyncpg.pool.Pool = bot.db
 
+    # It is to be noted that value_to_increment is optional when it is command type
+    # This is because we want to increment usage of a command by 1
+    # But we want to increment usage of a rubric by a value
+    # Therefore if value_to_increment is None and type_of_cmd_or_rubric is EmojiRubric we will raise TypeError
     if isinstance(type_of_cmd_or_rubric, CommandType):
         type_of_cmd = type_of_cmd_or_rubric.value
+        if value_to_increment is None:
+            value_to_increment = 1
     elif isinstance(type_of_cmd_or_rubric, EmojiRubric):
         type_of_cmd = type_of_cmd_or_rubric.value
+        if value_to_increment is None:
+            raise TypeError("Value to increment is not provided for EmojiRubric")
     else:
         raise TypeError(
             "type_of_cmd_or_rubric must be either CommandType or EmojiRubric"
