@@ -30,3 +30,8 @@ class EmojiRubric(Enum):
     list = "rubric_list"
     removal = "rubric_remove"
     rename = "rubric_rename"
+
+
+class TableType(Enum):
+    rubric = "emoji_rubric"
+    command = "usage"

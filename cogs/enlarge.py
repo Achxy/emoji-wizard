@@ -12,7 +12,6 @@ class enlarge(commands.Cog):
     @commands.command()
     async def enlarge_(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
 
-        cmd_type = "cmd_enlarge"
         successful_additions = 0
 
         for index, i in enumerate(emotes):
@@ -34,7 +33,7 @@ class enlarge(commands.Cog):
             successful_additions += 1
             await ctx.send(embed=embed)
 
-        await increment_usage(self.bot, ctx, cmd_type, successful_additions)
+        await increment_usage(self.bot, ctx, CommandType.enlarge)
 
 
 def setup(bot):
