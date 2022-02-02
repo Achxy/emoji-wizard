@@ -92,7 +92,7 @@ async def increment_usage(
             else:
                 # We don't have the command in cache
                 # Fetch the sum of usage count from db where type_of_cmd = type_of_cmd
-                query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
+                query = f"SELECT SUM(usage_count) FROM {table} WHERE {type_column}= $1"
                 r = await pool.fetch(query, type_of_cmd)
                 r = r[0].get("sum")
                 if r is None:
@@ -108,7 +108,7 @@ async def increment_usage(
             else:
                 # We don't have the rubric in cache
                 # Fetch the sum of usage count from db where type_of_cmd = type_of_cmd
-                query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
+                query = f"SELECT SUM(usage_count) FROM {table} WHERE {type_column} = $1"
                 r = await pool.fetch(query, type_of_cmd)
                 r = r[0].get("sum")
                 if r is None:
