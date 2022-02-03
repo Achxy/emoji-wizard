@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from tools.database_tools import increment_usage
 from typing import Union
 
 
@@ -44,8 +43,6 @@ class remove(commands.Cog):
 
             successful_removals += 1
             await ctx.send(embed=embed)
-
-        await increment_usage(self.bot, ctx, cmd_type, successful_removals)
 
 
 def setup(bot):

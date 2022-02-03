@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from tools.bot_tools import seperate_chunks
-from tools.database_tools import increment_usage
+from tools.enum_tools import TableType
 
 
 class list_(commands.Cog):
@@ -24,7 +24,6 @@ class list_(commands.Cog):
                 else:
                     msg += f"{count}. ~~{each_emoji}~~ -- `{each_emoji}` **(unavailable)**\n"
             await ctx.send(msg)
-        await increment_usage(self.bot, ctx, cmd_type, count)
 
 
 def setup(bot):

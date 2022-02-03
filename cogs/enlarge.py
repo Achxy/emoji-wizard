@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.database_tools import increment_usage
+from tools.enum_tools import TableType
 
 
 class enlarge(commands.Cog):
@@ -32,8 +32,6 @@ class enlarge(commands.Cog):
 
             successful_additions += 1
             await ctx.send(embed=embed)
-
-        await increment_usage(self.bot, ctx, cmd_type, successful_additions)
 
 
 def setup(bot):

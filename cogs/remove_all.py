@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from tools.database_tools import increment_usage
 
 
 class remove_all(commands.Cog):
@@ -30,8 +29,6 @@ class remove_all(commands.Cog):
                 )
                 embed.set_footer(text=f"{len(ctx.guild.emojis)} more to go")
                 await ctx.send(embed=embed)
-
-        await increment_usage(self.bot, ctx, cmd_type, count)
 
 
 def setup(bot):

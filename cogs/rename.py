@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.database_tools import get_prefix_for_guild, increment_usage
+from tools.database_tools import get_prefix_for_guild
 
 
 class rename_(commands.Cog):
@@ -83,7 +83,6 @@ class rename_(commands.Cog):
                 description=f"Successfully renamed {new_emoji} from **{before_name}** to **{after_name}**",
             )
             await ctx.send(embed=embed)
-            await increment_usage(self.bot, ctx, cmd_type, 1)
 
 
 def setup(bot):
