@@ -80,6 +80,7 @@ class DatabaseTools:
             column = "type_of_cmd"
         elif table == "emoji_rubric":
             column = "type_of_rubric"
+            command_or_rubric_name += ":rubric"
         else:
             raise ValueError(f"Table {table} doesn't exist")
 
