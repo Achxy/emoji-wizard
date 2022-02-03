@@ -1,7 +1,6 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.database_tools import get_prefix_for_guild
 
 
 class rename_(commands.Cog):
@@ -23,7 +22,9 @@ class rename_(commands.Cog):
 
         # Check if the argument count is 2 or not
         if len(emoji_and_name) > 2:
-            prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
+            prefix = await self.bot.db.tools.get_prefix_for_guild(
+                self.bot.db, ctx.guild
+            )
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
                 description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
@@ -31,7 +32,9 @@ class rename_(commands.Cog):
             await ctx.send(embed=embed)
             return
         if len(emoji_and_name) < 2:
-            prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
+            prefix = await self.bot.db.tools.get_prefix_for_guild(
+                self.bot.db, ctx.guild
+            )
             embed = discord.Embed(
                 title="That command at least takes 2 arguments",
                 description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
