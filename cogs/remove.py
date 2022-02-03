@@ -47,6 +47,12 @@ class Remove(commands.Cog):
         await self.bot.tools.increment_usage(
             ctx, __import__("inspect").stack()[0][3], TableType.command
         )
+        await self.bot.tools.increment_usage(
+            ctx,
+            f"{__import__('inspect').stack()[0][3]}:{ctx.command.name}",
+            TableType.rubric,
+            successful_removals,
+        )
 
 
 def setup(bot):
