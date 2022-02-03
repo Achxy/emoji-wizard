@@ -29,6 +29,10 @@ class List(commands.Cog):
                     msg += f"{count}. ~~{each_emoji}~~ -- `{each_emoji}` **(unavailable)**\n"
             await ctx.send(msg)
 
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
+
 
 def setup(bot):
     bot.add_cog(List(bot))

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from typing import Union
+from tools.enum_tools import TableType
 
 
 class Remove(commands.Cog):
@@ -42,6 +43,10 @@ class Remove(commands.Cog):
 
             successful_removals += 1
             await ctx.send(embed=embed)
+
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
 
 
 def setup(bot):

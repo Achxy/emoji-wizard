@@ -2,6 +2,7 @@ import discord
 import inspect
 import os
 from discord.ext import commands
+from tools.enum_tools import TableType
 
 
 class Source(commands.Cog):
@@ -50,6 +51,9 @@ class Source(commands.Cog):
 
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         await ctx.send(final_url)
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
 
 
 def setup(bot):

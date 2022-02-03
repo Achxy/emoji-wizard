@@ -32,6 +32,10 @@ class Enlarge(commands.Cog):
             successful_additions += 1
             await ctx.send(embed=embed)
 
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
+
 
 def setup(bot):
     bot.add_cog(Enlarge(bot))

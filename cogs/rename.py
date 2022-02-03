@@ -1,6 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
+from tools.enum_tools import TableType
 
 
 class Rename(commands.Cog):
@@ -80,6 +81,10 @@ class Rename(commands.Cog):
                 description=f"Successfully renamed {new_emoji} from **{before_name}** to **{after_name}**",
             )
             await ctx.send(embed=embed)
+
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
 
 
 def setup(bot):
