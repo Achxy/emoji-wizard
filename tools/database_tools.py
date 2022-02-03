@@ -1,36 +1,57 @@
 import asyncpg
 import discord
 from tools.bot_tools import get_default_prefix
+from typing import Union
 
 
-async def confirm_tables(pool: asyncpg.pool.Pool):
-    """
-    Takes an asyncpg.pool.Pool object as sole argument
-    returns None
+class DatabaseTools:
+    def __init__(self, bot: discord.ext.commands.bot.Bot):
+        self.bot = bot
+        self.pool = bot.db
 
-    The purpose of this is to create required tables if they don't exist
-    This will make the bot very plug-and-play friendly
-    """
-    # Table for storing custom prefix
-    query = """CREATE TABLE IF NOT EXISTS guilds (
-                guild_id BIGINT,
-                prefix TEXT
-                );
-            """
-    await pool.execute(query)
+    async def confirm_tables(self):
+        """
+        The purpose of this is to create required tables if they don't exist
+        This will make the bot very plug-and-play friendly
+        """
+        # Table for storing custom prefix
+        query = """CREATE TABLE IF NOT EXISTS guilds (
+                        guild_id BIGINT,
+                        prefix TEXT
+                        );
+                    """
+        await self.pool.execute(query)
 
-    # Table for storing bot usage stats
-    query = """CREATE TABLE IF NOT EXISTS usage (
-                -- We would like to have each user's usage in each channel and in each guild
-                guild_id BIGINT,
-                channel_id BIGINT,
-                user_id BIGINT,
-                type_of_cmd TEXT,
-                usage_count INT
+        # Table for storing bot usage stats
+        query = """CREATE TABLE IF NOT EXISTS usage (
+                        -- We would like to have each user's usage in each channel and in each guild
+                        guild_id BIGINT,
+                        channel_id BIGINT,
+                        user_id BIGINT,
+                        type_of_cmd TEXT,
+                        usage_count INT
 
-            );
-            """
-    await pool.execute(query)
+                    );
+                    """
+        await self.pool.execute(query)
+
+    async def get_prefix_for_guild(
+        self,
+        guild: Union[discord.guild.Guild, int],
+        place_hold_with=get_default_prefix(),
+    ):
+        if isinstance(guild, discord.guild.Guild):
+            guild_id = guild.id
+        else:
+            guild_id = guild
+
+        query = "SELECT prefix FROM guilds WHERE guild_id = $1"
+        prefix = await self.pool.fetch(query, guild_id)
+
+        if len(prefix) == 0:
+            return place_hold_with
+        else:
+            return prefix[0].get("prefix")
 
 
 async def increment_usage(
@@ -117,20 +138,6 @@ async def increment_usage(
             ctx.author.id,
             type_of_cmd,
         )
-
-
-async def get_prefix_for_guild(
-    pool: asyncpg.pool.Pool,
-    guild: discord.guild.Guild,
-    place_hold_with=get_default_prefix(),
-):
-    query = "SELECT prefix FROM guilds WHERE guild_id = $1"
-    prefix = await pool.fetch(query, guild.id)
-
-    if len(prefix) == 0:
-        return place_hold_with
-    else:
-        return prefix[0].get("prefix")
 
 
 async def get_usage_of(pool: asyncpg.pool.Pool, cmd: str = "global"):
