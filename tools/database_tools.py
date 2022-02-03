@@ -1,6 +1,7 @@
 import asyncpg
 import discord
 from tools.bot_tools import get_default_prefix
+from tools.enum_tools import CommandType
 from typing import Union
 
 
@@ -54,8 +55,15 @@ class DatabaseTools:
             return prefix[0].get("prefix")
 
     async def increment_usage(
-        self, ctx, command_or_rubric_name, table, value_to_increment=1
+        self,
+        ctx,
+        command_or_rubric_name,
+        table: Union[CommandType, str],
+        value_to_increment=1,
     ):
+        if isinstance(table, CommandType):
+            table = table.value
+
         # See if the record of user exist in database
         if table == "usage":
             column = "type_of_cmd"
