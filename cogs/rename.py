@@ -3,7 +3,7 @@ import typing
 from discord.ext import commands
 
 
-class rename_(commands.Cog):
+class Rename(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -85,4 +85,4 @@ class rename_(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(rename_(bot))
+    bot.add_cog(Rename(bot))

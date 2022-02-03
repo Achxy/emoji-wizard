@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class remove_all(commands.Cog):
+class RemoveAll(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,4 +32,4 @@ class remove_all(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(remove_all(bot))
+    bot.add_cog(RemoveAll(bot))

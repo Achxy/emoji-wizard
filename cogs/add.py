@@ -5,7 +5,7 @@ from tools.bot_tools import static_vacancy, animated_vacancy
 from tools.enum_tools import TableType
 
 
-class add_(commands.Cog):
+class Add(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -100,4 +100,4 @@ class add_(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(add_(bot))
+    bot.add_cog(Add(bot))

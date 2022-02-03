@@ -3,7 +3,7 @@ from discord.ext import commands
 from tools.enum_tools import TableType
 
 
-class meta(commands.Cog):
+class Meta(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -38,4 +38,4 @@ class meta(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(meta(bot))
+    bot.add_cog(Meta(bot))

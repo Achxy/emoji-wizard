@@ -3,7 +3,7 @@ from discord.ext import commands
 from typing import Union
 
 
-class remove(commands.Cog):
+class Remove(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -46,4 +46,4 @@ class remove(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(remove(bot))
+    bot.add_cog(Remove(bot))

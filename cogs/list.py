@@ -4,12 +4,16 @@ from tools.bot_tools import seperate_chunks
 from tools.enum_tools import TableType
 
 
-class list_(commands.Cog):
+class List(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def list(self, ctx):
+    @commands.command(
+        aliases=[
+            "list",
+        ]
+    )
+    async def list_emoji(self, ctx):
         """
         Send each emoji in the guild as a chunk of 10
         """
@@ -27,4 +31,4 @@ class list_(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(list_(bot))
+    bot.add_cog(List(bot))
