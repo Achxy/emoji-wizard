@@ -81,7 +81,7 @@ class DatabaseTools:
         elif table == "rubrics":
             column = "type_of_rubric"
         else:
-            raise Exception(f"Table {table} doesn't exist")
+            raise ValueError(f"Table {table} doesn't exist")
 
         query = f"""SELECT usage_count FROM {table}
                     WHERE (
