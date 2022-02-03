@@ -78,7 +78,7 @@ class DatabaseTools:
         # See if the record of user exist in database
         if table == "usage":
             column = "type_of_cmd"
-        elif table == "rubrics":
+        elif table == "emoji_rubric":
             column = "type_of_rubric"
         else:
             raise ValueError(f"Table {table} doesn't exist")
