@@ -1,10 +1,10 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.database_tools import get_prefix_for_guild, increment_usage
+from tools.enum_tools import TableType
 
 
-class rename_(commands.Cog):
+class Rename(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -19,11 +19,9 @@ class rename_(commands.Cog):
         we need to confirm that the emoji we are acting upon matches ctx.guild to prevent any attackers
         """
 
-        cmd_type = "cmd_rename"
-
         # Check if the argument count is 2 or not
         if len(emoji_and_name) > 2:
-            prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
+            prefix = await self.bot.tools.get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
                 description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
@@ -31,7 +29,7 @@ class rename_(commands.Cog):
             await ctx.send(embed=embed)
             return
         if len(emoji_and_name) < 2:
-            prefix = await get_prefix_for_guild(self.bot.db, ctx.guild)
+            prefix = await self.bot.tools.get_prefix_for_guild(self.bot.db, ctx.guild)
             embed = discord.Embed(
                 title="That command at least takes 2 arguments",
                 description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
@@ -83,8 +81,17 @@ class rename_(commands.Cog):
                 description=f"Successfully renamed {new_emoji} from **{before_name}** to **{after_name}**",
             )
             await ctx.send(embed=embed)
-            await increment_usage(self.bot, ctx, cmd_type, 1)
+
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
+        await self.bot.tools.increment_usage(
+            ctx,
+            f"{__import__('inspect').stack()[0][3]}",
+            TableType.rubric,
+            1,
+        )
 
 
 def setup(bot):
-    bot.add_cog(rename_(bot))
+    bot.add_cog(Rename(bot))

@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
-from tools.database_tools import increment_usage
 from typing import Union
+from tools.enum_tools import TableType
 
 
-class remove(commands.Cog):
+class Remove(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -12,7 +12,6 @@ class remove(commands.Cog):
     @commands.has_permissions(manage_emojis=True)
     async def remove(self, ctx, *emotes: Union[discord.Emoji, str]):
 
-        cmd_type = "cmd_remove"
         successful_removals = 0
 
         for index, i in enumerate(emotes):
@@ -45,8 +44,16 @@ class remove(commands.Cog):
             successful_removals += 1
             await ctx.send(embed=embed)
 
-        await increment_usage(self.bot, ctx, cmd_type, successful_removals)
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
+        await self.bot.tools.increment_usage(
+            ctx,
+            f"{__import__('inspect').stack()[0][3]}",
+            TableType.rubric,
+            successful_removals,
+        )
 
 
 def setup(bot):
-    bot.add_cog(remove(bot))
+    bot.add_cog(Remove(bot))

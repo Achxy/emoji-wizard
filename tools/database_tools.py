@@ -1,96 +1,128 @@
 import asyncpg
 import discord
 from tools.bot_tools import get_default_prefix
+from tools.enum_tools import TableType
+from typing import Union
 
 
-async def confirm_tables(pool: asyncpg.pool.Pool):
-    """
-    Takes an asyncpg.pool.Pool object as sole argument
-    returns None
+class DatabaseTools:
+    def __init__(self, bot: discord.ext.commands.bot.Bot):
+        self.bot = bot
+        self.pool = bot.db
 
-    The purpose of this is to create required tables if they don't exist
-    This will make the bot very plug-and-play friendly
-    """
-    # Table for storing custom prefix
-    query = """CREATE TABLE IF NOT EXISTS guilds (
-                guild_id BIGINT,
-                prefix TEXT
-                );
-            """
-    await pool.execute(query)
+    async def confirm_tables(self):
+        """
+        The purpose of this is to create required tables if they don't exist
+        This will make the bot very plug-and-play friendly
+        """
+        # Table for storing custom prefix
+        query = """CREATE TABLE IF NOT EXISTS guilds (
+                        guild_id BIGINT,
+                        prefix TEXT
+                        );
+                    """
+        await self.pool.execute(query)
 
-    # Table for storing bot usage stats
-    query = """CREATE TABLE IF NOT EXISTS usage (
-                -- We would like to have each user's usage in each channel and in each guild
-                guild_id BIGINT,
-                channel_id BIGINT,
-                user_id BIGINT,
-                type_of_cmd TEXT,
-                usage_count INT
+        # Table for storing bot usage stats
+        query = """CREATE TABLE IF NOT EXISTS usage (
+                        -- We would like to have each user's usage in each channel and in each guild
+                        guild_id BIGINT,
+                        channel_id BIGINT,
+                        user_id BIGINT,
+                        type_of_cmd TEXT,
+                        usage_count INT
 
-            );
-            """
-    await pool.execute(query)
+                    );
+                    """
+        await self.pool.execute(query)
 
-
-async def increment_usage(
-    bot: discord.ext.commands.bot.Bot,
-    ctx: discord.ext.commands.context.Context,
-    type_of_cmd: str,
-    value_to_increment: int,
-    with_caching=True,
-):
-
-    pool: asyncpg.pool.Pool = bot.db
-
-    # There is no need to log anything to db or cache
-    if value_to_increment == 0:
-        return
-
-    if with_caching:
-        bot.usage_cache += value_to_increment
-
-    # See if the record of user exist in database
-    query = """SELECT usage_count FROM usage
-                WHERE (
-                    guild_id = $1 AND
-                    channel_id = $2 AND
-                    user_id = $3 AND
-                    type_of_cmd = $4
-                );
-            """
-
-    count = await pool.fetch(
-        query, ctx.guild.id, ctx.channel.id, ctx.author.id, type_of_cmd
-    )
-
-    if not count:
-        # Row didn't use to exist
-        # Create it
-        query = """INSERT INTO usage (
-                    guild_id,
-                    channel_id,
-                    user_id,
-                    type_of_cmd,
-                    usage_count
-                    )
-                    VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        $4,
-                        $5
+        # Table for storing emoji rubric stats
+        query = """CREATE TABLE IF NOT EXISTS emoji_rubric(
+                    guild_id BIGINT,
+                    channel_id BIGINT,
+                    user_id BIGINT,
+                    type_of_rubric TEXT,
+                    usage_count BIGINT
                     );
                 """
-        await pool.execute(
-            query,
-            ctx.guild.id,
-            ctx.channel.id,
-            ctx.author.id,
-            type_of_cmd,
-            value_to_increment,
+        await self.pool.execute(query)
+
+    async def get_prefix_for_guild(
+        self,
+        guild: Union[discord.guild.Guild, int],
+        place_hold_with=get_default_prefix(),
+    ):
+        if isinstance(guild, discord.guild.Guild):
+            guild_id = guild.id
+        else:
+            guild_id = guild
+
+        query = "SELECT prefix FROM guilds WHERE guild_id = $1"
+        prefix = await self.pool.fetch(query, guild_id)
+
+        if len(prefix) == 0:
+            return place_hold_with
+        else:
+            return prefix[0].get("prefix")
+
+    async def increment_usage(
+        self,
+        ctx,
+        command_or_rubric_name,
+        table: Union[TableType, str],
+        value_to_increment=1,
+    ):
+        if isinstance(table, TableType):
+            table = table.value
+
+        # See if the record of user exist in database
+        if table == "usage":
+            column = "type_of_cmd"
+        elif table == "emoji_rubric":
+            column = "type_of_rubric"
+            command_or_rubric_name += ":rubric"
+        else:
+            raise ValueError(f"Table {table} doesn't exist")
+
+        query = f"""SELECT usage_count FROM {table}
+                    WHERE (
+                        guild_id = $1 AND
+                        channel_id = $2 AND
+                        user_id = $3 AND
+                        {column} = $4
+                    );
+                """
+        count = await self.pool.fetch(
+            query, ctx.guild.id, ctx.channel.id, ctx.author.id, command_or_rubric_name
         )
-    else:
+        if not count:
+            # Row didn't use to exist
+            # Create it
+            query = f"""INSERT INTO {table} (
+                        guild_id,
+                        channel_id,
+                        user_id,
+                        {column},
+                        usage_count
+                        )
+                        VALUES (
+                            $1,
+                            $2,
+                            $3,
+                            $4,
+                            $5
+                        );
+                    """
+            await self.pool.execute(
+                query,
+                ctx.guild.id,
+                ctx.channel.id,
+                ctx.author.id,
+                command_or_rubric_name,
+                value_to_increment,
+            )
+            return
+
         # The row does exist
         # Which means a same user has previously used the comamnd on the same guild on the same channel
         # Increment the existing count with that of the successful additions
@@ -109,40 +141,11 @@ async def increment_usage(
                     );
                 """
 
-        await pool.execute(
+        await self.pool.execute(
             query,
             count + value_to_increment,
             ctx.guild.id,
             ctx.channel.id,
             ctx.author.id,
-            type_of_cmd,
+            command_or_rubric_name,
         )
-
-
-async def get_prefix_for_guild(
-    pool: asyncpg.pool.Pool,
-    guild: discord.guild.Guild,
-    place_hold_with=get_default_prefix(),
-):
-    query = "SELECT prefix FROM guilds WHERE guild_id = $1"
-    prefix = await pool.fetch(query, guild.id)
-
-    if len(prefix) == 0:
-        return place_hold_with
-    else:
-        return prefix[0].get("prefix")
-
-
-async def get_usage_of(pool: asyncpg.pool.Pool, cmd: str = "global"):
-
-    if cmd.lower() == "global":
-        query = "SELECT SUM(usage_count) FROM usage"
-        r = await pool.fetch(query)
-        r = r[0].get("sum")
-        return int(r)
-
-    query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
-    r = await pool.fetch(query, cmd)
-    r = r[0].get("sum")
-    assert r is not None  # We do not want to return None value just interrupt execution
-    return int(r)

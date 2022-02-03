@@ -2,10 +2,10 @@ import discord
 import typing
 from discord.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy
-from tools.database_tools import increment_usage
+from tools.enum_tools import TableType
 
 
-class add_(commands.Cog):
+class Add(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -13,8 +13,6 @@ class add_(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
-
-        cmd_type = "cmd_add"
 
         # We want to log how many emotes were successfully added to the guild
         # We make an success count and increment it on success
@@ -96,8 +94,16 @@ class add_(commands.Cog):
                 # Increment success counter
                 successful_additions += 1
 
-        await increment_usage(self.bot, ctx, cmd_type, successful_additions)
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
+        await self.bot.tools.increment_usage(
+            ctx,
+            f"{__import__('inspect').stack()[0][3]}",
+            TableType.rubric,
+            successful_additions,
+        )
 
 
 def setup(bot):
-    bot.add_cog(add_(bot))
+    bot.add_cog(Add(bot))

@@ -1,17 +1,16 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.database_tools import increment_usage
+from tools.enum_tools import TableType
 
 
-class enlarge(commands.Cog):
+class Enlarge(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def enlarge_(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
+    async def enlarge(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
 
-        cmd_type = "cmd_enlarge"
         successful_additions = 0
 
         for index, i in enumerate(emotes):
@@ -33,8 +32,16 @@ class enlarge(commands.Cog):
             successful_additions += 1
             await ctx.send(embed=embed)
 
-        await increment_usage(self.bot, ctx, cmd_type, successful_additions)
+        await self.bot.tools.increment_usage(
+            ctx, __import__("inspect").stack()[0][3], TableType.command
+        )
+        await self.bot.tools.increment_usage(
+            ctx,
+            f"{__import__('inspect').stack()[0][3]}",
+            TableType.rubric,
+            successful_additions,
+        )
 
 
 def setup(bot):
-    bot.add_cog(enlarge(bot))
+    bot.add_cog(Enlarge(bot))
