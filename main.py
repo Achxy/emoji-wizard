@@ -1,8 +1,8 @@
 import discord
 import os
 import asyncpg
-from discord.ext import commands, tasks
-from tools.database_tools import confirm_tables, get_usage_of
+from discord.ext import commands
+from tools.database_tools import confirm_tables
 from tools.bot_tools import get_default_prefix, get_mobile
 
 
@@ -34,10 +34,6 @@ async def get_prefix(bot, message):
 initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
 
-MIN_DELAY_OF_RPC = 25  # The use of this is mentioned under the docs of update_presence
-bot._prev = None
-bot._count = MIN_DELAY_OF_RPC
-
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
@@ -48,46 +44,6 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
-    bot.usage_cache = await get_usage_of(bot.db, "global")
-    if not update_presence.is_running():
-        await bot.wait_until_ready()
-        update_presence.start()
-
-
-@tasks.loop(seconds=1)
-async def update_presence():
-    """
-    We are interested in having overall command usage as the bot's rpc
-    And this value being reflected in the rpc instantaneously after command usage is satisfactory
-    If there are multiple changes in minimal duration of time then the rpc should not spam requests to the discord api
-    here we will enforce our own limit to prevent such an occurence. This limit (in seconds) is dictated by MIN_DELAY_OF_RPC
-
-    Albeit the database can handle multiple requests in a second (in terms of resources)
-    We will not be checking the db every seconds because it is bad from a design perspective
-    Instead we will be caching this under bot.prev_cache and inheritents of commands.Cog will manipulate this value
-    Such way requests to the database can be kept to an minimum and be performant
-    """
-    # print(f"{bot._count = }, {bot._prev = }, {bot.usage_cache = }") # If you need to debug
-    if (
-        MIN_DELAY_OF_RPC > bot._count
-    ):  # We don't really need to increment _count if it's already higher than MIN_DELAY_OF_RPC
-        bot._count += 1
-    if bot._prev == bot.usage_cache or MIN_DELAY_OF_RPC > bot._count:
-        return
-    bot._prev = bot.usage_cache
-    bot._count = 0
-    """
-    await bot.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.competing,
-            name=f"worked with {bot.usage_cache}+ emotes",
-        )
-    )
-    """
-    # Uncomment the above code for the "competing in" status (and then comment the below code)
-    await bot.change_presence(
-        activity=discord.Game(name=f"worked with {bot.usage_cache}+ emotes")
-    )
 
 
 # To get all the .py files form the cogs folder
