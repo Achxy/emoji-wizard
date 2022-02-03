@@ -138,18 +138,3 @@ async def increment_usage(
             ctx.author.id,
             type_of_cmd,
         )
-
-
-async def get_usage_of(pool: asyncpg.pool.Pool, cmd: str = "global"):
-
-    if cmd.lower() == "global":
-        query = "SELECT SUM(usage_count) FROM usage"
-        r = await pool.fetch(query)
-        r = r[0].get("sum")
-        return int(r)
-
-    query = "SELECT SUM(usage_count) FROM usage WHERE type_of_cmd = $1"
-    r = await pool.fetch(query, cmd)
-    r = r[0].get("sum")
-    assert r is not None  # We do not want to return None value just interrupt execution
-    return int(r)
