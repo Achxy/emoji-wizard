@@ -36,6 +36,17 @@ class DatabaseTools:
                     """
         await self.pool.execute(query)
 
+        # Table for storing emoji rubric stats
+        query = """CREATE TABLE IF NOT EXISTS emoji_rubric(
+                    guild_id BIGINT,
+                    channel_id BIGINT,
+                    user_id BIGINT,
+                    type_of_rubric TEXT,
+                    usage_count BIGINT
+                    );
+                """
+        await self.pool.execute(query)
+
     async def get_prefix_for_guild(
         self,
         guild: Union[discord.guild.Guild, int],
