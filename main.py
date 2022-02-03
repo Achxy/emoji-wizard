@@ -38,8 +38,8 @@ bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitiv
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
-    bot.db.tools = DatabaseTools(bot)
-    await bot.db.tools.confirm_tables()
+    bot.tools = DatabaseTools(bot)
+    await bot.tools.confirm_tables()
 
 
 @bot.event

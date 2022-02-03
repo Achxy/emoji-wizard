@@ -94,7 +94,7 @@ class add_(commands.Cog):
                 # Increment success counter
                 successful_additions += 1
 
-        await self.bot.db.tools.increment_usage(
+        await self.bot.tools.increment_usage(
             ctx, __import__("inspect").stack()[0][3], TableType.command
         )
 
