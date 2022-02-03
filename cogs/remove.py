@@ -11,7 +11,6 @@ class Remove(commands.Cog):
     @commands.has_permissions(manage_emojis=True)
     async def remove(self, ctx, *emotes: Union[discord.Emoji, str]):
 
-        cmd_type = "cmd_remove"
         successful_removals = 0
 
         for index, i in enumerate(emotes):

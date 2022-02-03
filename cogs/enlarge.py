@@ -11,7 +11,6 @@ class Enlarge(commands.Cog):
     @commands.command()
     async def enlarge(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
 
-        cmd_type = "cmd_enlarge"
         successful_additions = 0
 
         for index, i in enumerate(emotes):

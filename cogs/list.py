@@ -17,7 +17,7 @@ class List(commands.Cog):
         """
         Send each emoji in the guild as a chunk of 10
         """
-        cmd_type = "cmd_list"
+
         count = 0
         for each_chunk in seperate_chunks(ctx.guild.emojis, 10):
             msg = ""

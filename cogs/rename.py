@@ -18,8 +18,6 @@ class Rename(commands.Cog):
         we need to confirm that the emoji we are acting upon matches ctx.guild to prevent any attackers
         """
 
-        cmd_type = "cmd_rename"
-
         # Check if the argument count is 2 or not
         if len(emoji_and_name) > 2:
             prefix = await self.bot.tools.get_prefix_for_guild(self.bot.db, ctx.guild)

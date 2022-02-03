@@ -12,7 +12,7 @@ class RemoveAll(commands.Cog):
         """
         Takes no parameters, removes all emojis from the server
         """
-        cmd_type = "cmd_remove_all"
+
         count = 0
         for each_emoji in ctx.guild.emojis:
             count += 1

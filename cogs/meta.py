@@ -10,8 +10,6 @@ class Meta(commands.Cog):
     @commands.command()
     async def ping(self, ctx):
 
-        cmd_type = "cmd_ping"
-
         embed = discord.Embed(
             title="Pong! 🏓",
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
@@ -21,8 +19,6 @@ class Meta(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, new_prefix):
-
-        cmd_type = "cmd_setprefix"
 
         query = "SELECT prefix FROM guilds WHERE guild_id = $1"
         old_prefix = await self.bot.db.fetch(query, ctx.guild.id)
