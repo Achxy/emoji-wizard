@@ -53,65 +53,56 @@ class DatabaseTools:
         else:
             return prefix[0].get("prefix")
 
+    async def increment_usage(
+        self, ctx, command_or_rubric_name, table, value_to_increment=1
+    ):
+        # See if the record of user exist in database
+        if table == "usage":
+            column = "type_of_cmd"
+        elif table == "rubrics":
+            column = "type_of_rubric"
+        else:
+            raise Exception(f"Table {table} doesn't exist")
 
-async def increment_usage(
-    bot: discord.ext.commands.bot.Bot,
-    ctx: discord.ext.commands.context.Context,
-    type_of_cmd: str,
-    value_to_increment: int,
-    with_caching=True,
-):
-
-    pool: asyncpg.pool.Pool = bot.db
-
-    # There is no need to log anything to db or cache
-    if value_to_increment == 0:
-        return
-
-    if with_caching:
-        bot.usage_cache += value_to_increment
-
-    # See if the record of user exist in database
-    query = """SELECT usage_count FROM usage
-                WHERE (
-                    guild_id = $1 AND
-                    channel_id = $2 AND
-                    user_id = $3 AND
-                    type_of_cmd = $4
-                );
-            """
-
-    count = await pool.fetch(
-        query, ctx.guild.id, ctx.channel.id, ctx.author.id, type_of_cmd
-    )
-
-    if not count:
-        # Row didn't use to exist
-        # Create it
-        query = """INSERT INTO usage (
-                    guild_id,
-                    channel_id,
-                    user_id,
-                    type_of_cmd,
-                    usage_count
-                    )
-                    VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        $4,
-                        $5
+        query = f"""SELECT usage_count FROM {table}
+                    WHERE (
+                        guild_id = $1 AND
+                        channel_id = $2 AND
+                        user_id = $3 AND
+                        {column} = $4
                     );
                 """
-        await pool.execute(
-            query,
-            ctx.guild.id,
-            ctx.channel.id,
-            ctx.author.id,
-            type_of_cmd,
-            value_to_increment,
+        count = await self.pool.fetch(
+            query, ctx.guild.id, ctx.channel.id, ctx.author.id, command_or_rubric_name
         )
-    else:
+        if not count:
+            # Row didn't use to exist
+            # Create it
+            query = f"""INSERT INTO {table} (
+                        guild_id,
+                        channel_id,
+                        user_id,
+                        {column},
+                        usage_count
+                        )
+                        VALUES (
+                            $1,
+                            $2,
+                            $3,
+                            $4,
+                            $5
+                        );
+                    """
+            await self.pool.execute(
+                query,
+                ctx.guild.id,
+                ctx.channel.id,
+                ctx.author.id,
+                command_or_rubric_name,
+                value_to_increment,
+            )
+            return
+
         # The row does exist
         # Which means a same user has previously used the comamnd on the same guild on the same channel
         # Increment the existing count with that of the successful additions
@@ -130,11 +121,11 @@ async def increment_usage(
                     );
                 """
 
-        await pool.execute(
+        await self.pool.execute(
             query,
             count + value_to_increment,
             ctx.guild.id,
             ctx.channel.id,
             ctx.author.id,
-            type_of_cmd,
+            command_or_rubric_name,
         )
