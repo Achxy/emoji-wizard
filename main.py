@@ -2,7 +2,7 @@ import discord
 import os
 import asyncpg
 from discord.ext import commands
-from tools.database_tools import confirm_tables
+from tools.database_tools import DatabaseTools
 from tools.bot_tools import get_default_prefix, get_mobile
 
 
@@ -38,7 +38,8 @@ bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitiv
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
-    await confirm_tables(bot.db)
+    bot.db.tools = DatabaseTools(bot)
+    await bot.db.tools.confirm_tables()
 
 
 @bot.event

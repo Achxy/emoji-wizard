@@ -1,7 +1,7 @@
 import asyncpg
 import discord
 from tools.bot_tools import get_default_prefix
-from tools.enum_tools import CommandType
+from tools.enum_tools import TableType
 from typing import Union
 
 
@@ -58,10 +58,10 @@ class DatabaseTools:
         self,
         ctx,
         command_or_rubric_name,
-        table: Union[CommandType, str],
+        table: Union[TableType, str],
         value_to_increment=1,
     ):
-        if isinstance(table, CommandType):
+        if isinstance(table, TableType):
             table = table.value
 
         # See if the record of user exist in database
