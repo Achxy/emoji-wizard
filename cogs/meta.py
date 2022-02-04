@@ -23,6 +23,9 @@ class Meta(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, new_prefix):
+        """
+        Changes the bot's prefix for specific guilds
+        """
 
         query = "SELECT prefix FROM guilds WHERE guild_id = $1"
         old_prefix = await self.bot.db.fetch(query, ctx.guild.id)
