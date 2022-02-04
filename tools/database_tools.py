@@ -50,8 +50,8 @@ class DatabaseTools:
         self,
         ctx,
         table: Union[TableType, str],
-        value_to_increment=1,
-    ):
+        value_to_increment: int = 1,
+    ) -> None:
         """
         This function is used to increment the usage count of a command or emoji actions (ie, emoji rubric)
         """
