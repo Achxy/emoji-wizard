@@ -22,6 +22,10 @@ def animated_vacancy(guild: discord.guild.Guild) -> int:
 
 
 def reset_config_json(file="config.json"):
+    """
+    Overwrite config.json file with default values
+    This is supposed to be called when when the content of the file is bad
+    """
     with open(file, "w+") as fwp:
         default_json = '{"DEFAULT_PREFIX": "?"}'
         fwp.write(default_json)
@@ -87,5 +91,9 @@ def get_mobile():
 
 
 def seperate_chunks(l, into):
+    """
+    This function takes a list and a number of chunks as arguments
+    Returns a list of chunks of the list
+    """
     for i in range(0, len(l), into):
         yield l[i : i + into]
