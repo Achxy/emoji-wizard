@@ -1,6 +1,5 @@
 import asyncpg
 import discord
-from tools.bot_tools import get_default_prefix
 from tools.enum_tools import TableType
 from typing import Union
 
@@ -47,33 +46,20 @@ class DatabaseTools:
                 """
         await self.pool.execute(query)
 
-    async def get_prefix_for_guild(
-        self,
-        guild: Union[discord.guild.Guild, int],
-        place_hold_with=get_default_prefix(),
-    ):
-        if isinstance(guild, discord.guild.Guild):
-            guild_id = guild.id
-        else:
-            guild_id = guild
-
-        query = "SELECT prefix FROM guilds WHERE guild_id = $1"
-        prefix = await self.pool.fetch(query, guild_id)
-
-        if len(prefix) == 0:
-            return place_hold_with
-        else:
-            return prefix[0].get("prefix")
-
     async def increment_usage(
         self,
         ctx,
-        command_or_rubric_name,
         table: Union[TableType, str],
-        value_to_increment=1,
-    ):
+        value_to_increment: int = 1,
+    ) -> None:
+        """
+        This function is used to increment the usage count of a command or emoji actions (ie, emoji rubric)
+        """
+
         if isinstance(table, TableType):
             table = table.value
+
+        command_or_rubric_name = ctx.command.name
 
         # See if the record of user exist in database
         if table == "usage":

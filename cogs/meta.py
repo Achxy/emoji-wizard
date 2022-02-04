@@ -9,19 +9,23 @@ class Meta(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-
+        """
+        Sends an embed with the bot's latency
+        but really this command is just used to test the bot's responsiveness
+        """
         embed = discord.Embed(
             title="Pong! 🏓",
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
         )
         await ctx.reply(embed=embed)
-        await self.bot.tools.increment_usage(
-            ctx, __import__("inspect").stack()[0][3], TableType.command
-        )
+        await self.bot.tools.increment_usage(ctx, TableType.command)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, new_prefix):
+        """
+        Changes the bot's prefix for specific guilds
+        """
 
         query = "SELECT prefix FROM guilds WHERE guild_id = $1"
         old_prefix = await self.bot.db.fetch(query, ctx.guild.id)
@@ -34,9 +38,7 @@ class Meta(commands.Cog):
             description=f"The old prefix used to be **{old_prefix}** now its **{new_prefix}**",
         )
         await ctx.send(embed=embed)
-        await self.bot.tools.increment_usage(
-            ctx, __import__("inspect").stack()[0][3], TableType.command
-        )
+        await self.bot.tools.increment_usage(ctx, TableType.command)
 
 
 def setup(bot):

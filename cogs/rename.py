@@ -20,19 +20,10 @@ class Rename(commands.Cog):
         """
 
         # Check if the argument count is 2 or not
-        if len(emoji_and_name) > 2:
-            prefix = await self.bot.tools.get_prefix_for_guild(self.bot.db, ctx.guild)
+        if not len(emoji_and_name) == 2:
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
-                description=f"`rename` command only takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
-            )
-            await ctx.send(embed=embed)
-            return
-        if len(emoji_and_name) < 2:
-            prefix = await self.bot.tools.get_prefix_for_guild(self.bot.db, ctx.guild)
-            embed = discord.Embed(
-                title="That command at least takes 2 arguments",
-                description=f"`rename` command at least takes 2 arguments but you have only given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{prefix}rename <emoji> <name>`",
+                description=f"`rename` command takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{ctx.prefix}rename <emoji> <name>`",
             )
             await ctx.send(embed=embed)
             return
@@ -82,12 +73,9 @@ class Rename(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-        await self.bot.tools.increment_usage(
-            ctx, __import__("inspect").stack()[0][3], TableType.command
-        )
+        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
-            f"{__import__('inspect').stack()[0][3]}",
             TableType.rubric,
             1,
         )

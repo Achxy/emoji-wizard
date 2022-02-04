@@ -3,13 +3,13 @@ import os
 import asyncpg
 from discord.ext import commands
 from tools.database_tools import DatabaseTools
-from tools.bot_tools import get_default_prefix, get_mobile
+from tools.bot_tools import get_mobile
 
 
 discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
 )  # Remove this line if bot isn't working, experimental thing
-DEFAULT_PREFIX = get_default_prefix()
+DEFAULT_PREFIX = "?"
 
 # Get custom prefix for the guild
 # Handle if not used in guild
