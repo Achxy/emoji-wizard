@@ -9,7 +9,10 @@ class Meta(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        print(f"{ctx.author} used the ping command")
+        """
+        Sends an embed with the bot's latency
+        but really this command is just used to test the bot's responsiveness
+        """
         embed = discord.Embed(
             title="Pong! 🏓",
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
