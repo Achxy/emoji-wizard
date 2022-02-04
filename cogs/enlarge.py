@@ -2,6 +2,7 @@ import discord
 import typing
 from discord.ext import commands
 from tools.enum_tools import TableType
+from tools.bot_tools import page_index
 
 
 class Enlarge(commands.Cog):
@@ -12,6 +13,7 @@ class Enlarge(commands.Cog):
     async def enlarge(self, ctx, *emotes: typing.Union[discord.PartialEmoji, str]):
 
         successful_additions = 0
+        footer_enumer = page_index("enlarge", len(emotes))
 
         for index, i in enumerate(emotes):
 
@@ -25,9 +27,7 @@ class Enlarge(commands.Cog):
 
             embed = discord.Embed(title=f"Enlarged view of {i.name}")
             embed.set_image(url=i.url)
-            embed.set_footer(
-                text=f"{index + 1} of {len(emotes)} to enlarge {'' if not (index + 1) == len(emotes) else '(over)'}"
-            )
+            embed.set_footer(text=footer_enumer(index))
 
             successful_additions += 1
             await ctx.send(embed=embed)

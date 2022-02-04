@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from tools.bot_tools import static_vacancy, animated_vacancy
+from tools.bot_tools import static_vacancy, animated_vacancy, page_index
 from tools.enum_tools import TableType
 
 
@@ -18,6 +18,7 @@ class Add(commands.Cog):
         # We make an success count and increment it on success
 
         successful_additions = 0
+        footer_enumer = page_index("add", len(emojis))
 
         for index, each_emoji in enumerate(emojis):
 
@@ -38,9 +39,7 @@ class Add(commands.Cog):
                     title="That is not a custom emote",
                     description=f"{each_emoji} is not an custom emote and thus cannot be added to your guild",
                 )
-                embed.set_footer(
-                    text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
-                )
+                embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
                 continue
 
@@ -50,9 +49,7 @@ class Add(commands.Cog):
                     title="Guild cannot accept any more of that",
                     description=f"The guild cannot accept any more static emotes (perhaps add some animated emotes now) as such **{each_emoji.name}** was not added to the guild",
                 )
-                embed.set_footer(
-                    text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
-                )
+                embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
                 continue
 
@@ -62,9 +59,7 @@ class Add(commands.Cog):
                     title="Guild cannot accept any more of that",
                     description=f"The guild cannot accept any more animated emotes (perhaps add some static emotes now) as such **{each_emoji.name}** was not added to the guild",
                 )
-                embed.set_footer(
-                    text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
-                )
+                embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
                 continue
 
@@ -86,9 +81,7 @@ class Add(commands.Cog):
                     title=f"Successfully added {added_emoji.name}",
                     description=f"Successfully added {added_emoji} to the guild.",
                 )
-                embed.set_footer(
-                    text=f"{index + 1} of {len(emojis)} to add {'' if not (index + 1) == len(emojis) else '(over)'}"
-                )
+                embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
 
                 # Increment success counter
