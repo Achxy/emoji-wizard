@@ -94,12 +94,9 @@ class Add(commands.Cog):
                 # Increment success counter
                 successful_additions += 1
 
-        await self.bot.tools.increment_usage(
-            ctx, __import__("inspect").stack()[0][3], TableType.command
-        )
+        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
-            f"{__import__('inspect').stack()[0][3]}",
             TableType.rubric,
             successful_additions,
         )

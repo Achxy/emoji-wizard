@@ -46,16 +46,20 @@ class DatabaseTools:
                 """
         await self.pool.execute(query)
 
-
     async def increment_usage(
         self,
         ctx,
-        command_or_rubric_name,
         table: Union[TableType, str],
         value_to_increment=1,
     ):
+        """
+        This function is used to increment the usage count of a command or emoji actions (ie, emoji rubric)
+        """
+
         if isinstance(table, TableType):
             table = table.value
+
+        command_or_rubric_name = ctx.command.name
 
         # See if the record of user exist in database
         if table == "usage":

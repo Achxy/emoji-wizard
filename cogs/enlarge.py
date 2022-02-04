@@ -32,12 +32,9 @@ class Enlarge(commands.Cog):
             successful_additions += 1
             await ctx.send(embed=embed)
 
-        await self.bot.tools.increment_usage(
-            ctx, __import__("inspect").stack()[0][3], TableType.command
-        )
+        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
-            f"{__import__('inspect').stack()[0][3]}",
             TableType.rubric,
             successful_additions,
         )
