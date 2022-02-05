@@ -46,7 +46,7 @@ def get_mobile() -> Callable:
     """
 
     def source(o: Callable) -> str:
-        s: str = inspect.getsource(o).split("\n")
+        s: list = inspect.getsource(o).split("\n")
         indent: int = len(s[0]) - len(s[0].lstrip())
 
         return "\n".join(i[indent:] for i in s)
