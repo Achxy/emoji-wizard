@@ -31,7 +31,6 @@ async def get_prefix(bot, message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
-initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
 
 
@@ -47,17 +46,18 @@ async def on_ready():
     print(f"Successfully logged in as {bot.user}")
 
 
-# To get all the .py files form the cogs folder
-print("            -           ")
+# Get all the python files from the cogs folder
+# and add them as cogs with bot.load_extension
+print("            -           ")  # This is just for the formatting
 for filename in os.listdir("./cogs"):
+    # Check if the file is a python file
     if filename.endswith(".py"):
-        print(f"Adding {filename} from cogs...")
-        initial_ext.append(f"cogs.{filename[:-3]}")
-
-
-if __name__ == "__main__":
-    for ext in initial_ext:
-        bot.load_extension(ext)
+        # Print the filename
+        print(f"Adding {filename} from cogs...", end="")
+        # Load the cog after stripping the .py
+        bot.load_extension(f"cogs.{filename[:-3]}")
+        # Give the user a nice 'Done' message to make them happy
+        print("Done")
 
 
 bot.loop.run_until_complete(create_db_pool())
