@@ -13,7 +13,7 @@ DEFAULT_PREFIX: str = "?"
 
 # Get custom prefix for the guild
 # Handle if not used in guild
-async def get_prefix(bot, message):
+async def get_prefix(bot: commands.Bot, message: discord.Message):
     if not message.guild:
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
@@ -25,9 +25,9 @@ async def get_prefix(bot, message):
         query = "INSERT INTO guilds (guild_id, prefix) VALUES ($1, $2)"
         await bot.db.execute(query, message.guild.id, DEFAULT_PREFIX)
         prefix = DEFAULT_PREFIX
-
     else:
         prefix = prefix[0].get("prefix")
+
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
