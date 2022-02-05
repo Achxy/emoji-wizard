@@ -22,7 +22,7 @@ class Meta(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def setprefix(self, ctx, new_prefix):
+    async def setprefix(self, ctx, new_prefix: str):
         """
         Changes the bot's prefix for specific guilds
         """

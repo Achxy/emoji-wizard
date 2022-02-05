@@ -1,6 +1,7 @@
 import discord
 import inspect
 import os
+from typing import Optional
 from discord.ext import commands
 from tools.enum_tools import TableType
 
@@ -10,7 +11,7 @@ class Source(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def source(self, ctx, *, command: str = None):
+    async def source(self, ctx, *, command: Optional[str] = None):
         """
         Displays my full source code or for a specific command.
         """

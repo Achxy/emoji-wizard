@@ -1,5 +1,5 @@
 import discord
-import typing
+from typing import Union, Callable
 from discord.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
 from tools.enum_tools import TableType
@@ -12,13 +12,13 @@ class Add(commands.Cog):
     # TODO: Add more features and error handling to this.
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def add(self, ctx, *emojis: typing.Union[discord.PartialEmoji, str]):
+    async def add(self, ctx, *emojis: Union[discord.PartialEmoji, str]):
 
         # We want to log how many emotes were successfully added to the guild
         # We make an success count and increment it on success
 
-        successful_additions = 0
-        footer_enumer = page_index("add", len(emojis))
+        successful_additions: int = 0
+        footer_enumer: Callable[[int], str] = page_index("add", len(emojis))
 
         for index, each_emoji in enumerate(emojis):
 
