@@ -55,7 +55,7 @@ def get_mobile() -> Callable:
     return loc["identify"]
 
 
-def seperate_chunks(l: Sequence, into: int) -> Generator:
+def seperate_chunks(l: Sequence, into: int) -> Generator[Sequence, None, None]:
     """
     This function takes a list and a number of chunks as arguments
     Returns a list of chunks of the list
