@@ -9,11 +9,11 @@ from tools.bot_tools import get_mobile
 discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
 )  # Remove this line if bot isn't working, experimental thing
-DEFAULT_PREFIX = "?"
+DEFAULT_PREFIX: str = "?"
 
 # Get custom prefix for the guild
 # Handle if not used in guild
-async def get_prefix(bot, message):
+async def get_prefix(bot: commands.Bot, message: discord.Message):
     if not message.guild:
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
@@ -25,13 +25,12 @@ async def get_prefix(bot, message):
         query = "INSERT INTO guilds (guild_id, prefix) VALUES ($1, $2)"
         await bot.db.execute(query, message.guild.id, DEFAULT_PREFIX)
         prefix = DEFAULT_PREFIX
-
     else:
         prefix = prefix[0].get("prefix")
+
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
-initial_ext = list()
 bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
 
 
@@ -47,17 +46,18 @@ async def on_ready():
     print(f"Successfully logged in as {bot.user}")
 
 
-# To get all the .py files form the cogs folder
-print("            -           ")
+# Get all the python files from the cogs folder
+# and add them as cogs with bot.load_extension
+print("            -           ")  # This is just for the formatting
 for filename in os.listdir("./cogs"):
+    # Check if the file is a python file
     if filename.endswith(".py"):
-        print(f"Adding {filename} from cogs...")
-        initial_ext.append(f"cogs.{filename[:-3]}")
-
-
-if __name__ == "__main__":
-    for ext in initial_ext:
-        bot.load_extension(ext)
+        # Print the filename
+        print(f"Adding {filename} from cogs...", end="")
+        # Load the cog after stripping the .py
+        bot.load_extension(f"cogs.{filename[:-3]}")
+        # Give the user a nice 'Done' message to make them happy
+        print("Done")
 
 
 bot.loop.run_until_complete(create_db_pool())

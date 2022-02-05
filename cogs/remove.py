@@ -12,7 +12,7 @@ class Remove(commands.Cog):
     @commands.has_permissions(manage_emojis=True)
     async def remove(self, ctx, *emotes: Union[discord.Emoji, str]):
 
-        successful_removals = 0
+        successful_removals: int = 0
 
         for index, i in enumerate(emotes):
 

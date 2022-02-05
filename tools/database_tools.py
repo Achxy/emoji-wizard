@@ -4,6 +4,9 @@ from tools.enum_tools import TableType
 from typing import Union
 
 
+__all__ = ("DatabaseTools",)
+
+
 class DatabaseTools:
     def __init__(self, bot: discord.ext.commands.bot.Bot):
         self.bot = bot
@@ -54,6 +57,8 @@ class DatabaseTools:
     ) -> None:
         """
         This function is used to increment the usage count of a command or emoji actions (ie, emoji rubric)
+        Function name will be taken from ctx, this is what that will be logged into the database
+        if the table is of instance TableType.rubric then :rubric will be appended to the end of the function name
         """
 
         if isinstance(table, TableType):
