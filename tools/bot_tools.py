@@ -38,19 +38,19 @@ def get_mobile() -> Callable:
     """
 
     def source(o: Callable) -> str:
-        s = inspect.getsource(o).split("\n")
-        indent = len(s[0]) - len(s[0].lstrip())
+        s: str = inspect.getsource(o).split("\n")
+        indent: int = len(s[0]) - len(s[0].lstrip())
 
         return "\n".join(i[indent:] for i in s)
 
-    source_ = source(discord.gateway.DiscordWebSocket.identify)
-    patched = re.sub(
+    source_: str = source(discord.gateway.DiscordWebSocket.identify)
+    patched: str = re.sub(
         r'([\'"]\$browser[\'"]:\s?[\'"]).+([\'"])',
         r"\1Discord Android\2",
         source_,
     )
 
-    loc = {}
+    loc: dict = {}
     exec(compile(ast.parse(patched), "<string>", "exec"), discord.gateway.__dict__, loc)
     return loc["identify"]
 
