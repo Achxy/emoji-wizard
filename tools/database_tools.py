@@ -4,6 +4,9 @@ from tools.enum_tools import TableType
 from typing import Union
 
 
+__all__ = ("DatabaseTools",)
+
+
 class DatabaseTools:
     def __init__(self, bot: discord.ext.commands.bot.Bot):
         self.bot = bot
