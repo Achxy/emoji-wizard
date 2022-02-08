@@ -2,8 +2,7 @@ import discord
 import ast
 import inspect
 import re
-import aiohttp # This comes along with pycord, there's no need to add this to the requirements.txt
-from typing import Callable, Generator, Sequence, List
+from typing import Callable, Generator, Sequence
 
 __all__ = (
     "static_vacancy",
@@ -12,8 +11,6 @@ __all__ = (
     "seperate_chunks",
     "page_index",
 )
-
-MISSING = object()
 
 
 def static_vacancy(guild: discord.guild.Guild) -> int:
@@ -85,31 +82,3 @@ def page_index(name: str, page_count: int) -> Callable:
         return f"{index + 1} of {page_count} to {name} {'' if not (index + 1) == page_count else '(over)'}"
 
     return pg
-
-
-async def find_all_emojis(string: str, replace_with = MISSING) -> List[bytes]:
-    """
-    This function takes a string as argument
-    If replace_with is MISSING then bad values won't be replaced
-    Returns a list of emojis found in the string as a bytes-like object
-    """
-    matches =  re.findall(r"[0-9]{16,20}", string)
-    result = []
-    async with aiohttp.ClientSession() as session:
-        for match in matches:
-            # We do not know if the emoji is animated or not, so we try both
-            # I do not expect the emoji to be nicely formatted like <a:foo:bar> or <:foo:bar>
-            # or for the emoji to be ending in an appropriate extension
-            async with session.get(f"https://cdn.discordapp.com/emojis/{match}.gif") as resp:
-                if resp.status == 200:
-                    # Is a gif
-                    result.append(await resp.read())
-                elif resp.status == 425:
-                    # Is not a gif
-                    async with session.get(f"https://cdn.discordapp.com/emojis/{match}.webp") as resp_:
-                        result.append(await resp_.read())
-                else:
-                    # Is neither a gif nor a webp
-                    if not replace_with is MISSING:
-                        result.append(replace_with)
-    return result
