@@ -10,10 +10,11 @@ discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
 )  # Remove this line if bot isn't working, experimental thing
 DEFAULT_PREFIX: str = "?"
-extensions = (
-    "cogs",
-    "utilities",
-)
+extensions = {
+    "cogs": "⚙️",
+    "utilities": "🚀",
+}  # It's the emoji bot, what else would you expect?
+
 
 # Get custom prefix for the guild
 # Handle if not used in guild
@@ -54,16 +55,17 @@ async def on_ready():
 # and add them as cogs with bot.load_extension
 print("            -           ")  # This is just for the formatting
 for ext in extensions:
-    print(f"Getting extensions from {ext}")
+    print(f"Getting extensions from {ext}", end=f"\n{'-' * 10}\n")
     for filename in os.listdir(f"./{ext}"):
         # Check if the file is a python file
         if filename.endswith(".py"):
             # Print the filename
-            print(f"Adding {filename} from {ext}...", end="")
+            print(f"Adding {filename} from {ext} {extensions[ext]} ...", end="")
             # Load the cog after stripping the .py
             bot.load_extension(f"{ext}.{filename[:-3]}")
             # Give the user a nice 'Done' message to make them happy
             print("Done")
+    print()
 
 
 bot.loop.run_until_complete(create_db_pool())
