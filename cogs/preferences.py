@@ -4,7 +4,7 @@ from tools.database_tools import Actions
 from typing import Union
 
 
-class Preferences_(commands.Cog):
+class PreferencesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,4 +32,4 @@ class Preferences_(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Preferences_(bot))
+    bot.add_cog(PreferencesCog(bot))
