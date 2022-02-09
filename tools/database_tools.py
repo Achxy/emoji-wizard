@@ -226,9 +226,7 @@ class DatabaseTools:
 
         # If all of the checks above is passed then we can proceed with the action
 
-        former = (
-            channel[:] if isinstance(channel, discord.discord.TextChannel) else INEPT
-        )
+        former = channel[:] if not isinstance(channel, discord.TextChannel) else INEPT
         assert isinstance(action, Actions)
         # former is the former value of the channel before it gets changed
         # Stage 1 -> 4 :
@@ -242,7 +240,7 @@ class DatabaseTools:
             if channel is None:
                 return await ctx.send(f"Cannot find a channel named **{former}**")
 
-        elif isinstance(channel, discord.discord.TextChannel):
+        elif isinstance(channel, discord.TextChannel):
             # We already have the channel object
             # No further action required here
             # This statement is here to make the code more readable
