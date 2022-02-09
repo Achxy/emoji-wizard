@@ -49,6 +49,15 @@ class DatabaseTools:
                 """
         await self.pool.execute(query)
 
+        # Table for storing guild preferences (disabled / enabled commands and channels)
+        query = """CREATE TABLE IF NOT EXISTS preferences(
+                    guild_id BIGINT,
+                    ignored_channel BIGINT,
+                    ignored_command TEXT,
+                """
+        await self.pool.execute(query)
+        
+
     async def increment_usage(
         self,
         ctx,
