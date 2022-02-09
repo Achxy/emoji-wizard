@@ -243,6 +243,9 @@ class DatabaseTools:
                 return await ctx.send(f"Cannot find a channel named **{former}**")
 
         elif isinstance(channel, discord.discord.TextChannel):
+            # We already have the channel object
+            # No further action required here
+            # This statement is here to make the code more readable
             pass
 
         else:
