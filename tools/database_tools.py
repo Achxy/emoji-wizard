@@ -140,3 +140,9 @@ class DatabaseTools:
             ctx.author.id,
             command_or_rubric_name,
         )
+    async def is_preferred(self, ctx):
+        """
+        Returns true if the command is not disabled in the guild
+        else returns false
+        commands or channels can be re-enabled or disabled using the ignore command
+        """
