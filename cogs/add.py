@@ -3,6 +3,7 @@ from typing import Union, Callable
 from discord.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
 from tools.enum_tools import TableType
+from utilities.preference import Preference
 
 
 class Add(commands.Cog):
@@ -12,6 +13,7 @@ class Add(commands.Cog):
     # TODO: Add more features and error handling to this.
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
+    @Preference.is_usable
     async def add(self, ctx, *emojis: Union[discord.PartialEmoji, str]):
 
         # We want to log how many emotes were successfully added to the guild

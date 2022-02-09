@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from tools.bot_tools import seperate_chunks
 from tools.enum_tools import TableType
+from utilities.preference import Preference
 
 
 class List(commands.Cog):
@@ -13,6 +14,7 @@ class List(commands.Cog):
             "list",
         ]
     )
+    @Preference.is_usable
     async def list_emoji(self, ctx):
         """
         Send each emoji in the guild as a chunk of 10
