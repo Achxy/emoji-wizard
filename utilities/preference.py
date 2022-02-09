@@ -7,7 +7,13 @@ class Preference(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def is_usable(func):
+    def is_usable(self, func=None):
+        """
+        This is a decorator that checks for preference in context
+        works regardless of whether this is used with a instance or not
+        """
+        func = self if func is None else func
+
         @functools.wraps(func)
         async def wrapper(self, ctx, *args, **kwargs):
             if await self.bot.tools.is_preferred_channel(ctx.guild.id, ctx.channel.id):
