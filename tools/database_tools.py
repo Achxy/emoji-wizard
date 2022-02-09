@@ -1,5 +1,6 @@
 import asyncpg
 import discord
+from discord.ext import commands
 from tools.enum_tools import TableType
 from typing import Union
 
@@ -49,14 +50,23 @@ class DatabaseTools:
                 """
         await self.pool.execute(query)
 
-        # Table for storing guild preferences (disabled / enabled commands and channels)
-        query = """CREATE TABLE IF NOT EXISTS preferences(
+        # Table for storing command preferences 
+        query = """CREATE TABLE IF NOT EXISTS command_preferences(
                     guild_id BIGINT,
-                    ignored_channel BIGINT,
-                    ignored_command TEXT,
+                    ignored_command TEXT
+                    );
                 """
         await self.pool.execute(query)
-        
+
+        # Table for storing channel preferences
+        query = """CREATE TABLE IF NOT EXISTS channel_preferences(
+                    guild_id BIGINT,
+                    channel_id BIGINT
+                    );
+                """
+        await self.pool.execute(query)
+
+
 
     async def increment_usage(
         self,
@@ -149,9 +159,68 @@ class DatabaseTools:
             ctx.author.id,
             command_or_rubric_name,
         )
-    async def is_preferred(self, ctx):
+
+    async def is_preferred_channel(self, guild_id: int, channel_id: int):
+        """
+        Returns true if the channel is not disabled in the guild
+        else returns false
+        channels can be re-enabled or disabled using the ignore / unignore command
+        """
+        query = """SELECT channel_id FROM channel_preferences WHERE guild_id = $1;"""
+        channels = await self.pool.fetch(query, guild_id)
+        if not channels:
+            return True
+        for channel in channels:
+            if channel.get("channel_id") == channel_id:
+                return False
+        return True
+
+    async def is_preferred_command(self, guild_id:int, command_name: str):
         """
         Returns true if the command is not disabled in the guild
         else returns false
-        commands or channels can be re-enabled or disabled using the ignore command
+        commands can be re-enabled or disabled using the enable / disable command
         """
+        query = """SELECT ignored_command FROM command_preferences WHERE guild_id = $1;"""
+        commands = await self.pool.fetch(query, guild_id)
+        if not commands:
+            return True
+        for command in commands:
+            if command.get("ignored_command") == command_name:
+                return False
+        return True
+        
+
+    async def ignore_command(self, guild_id: int, command_name: str):
+        """
+        This function is used to ignore a command in the guild
+        """
+        query = """INSERT INTO command_preferences (guild_id, ignored_command)
+                    VALUES ($1, $2);"""
+        await self.pool.execute(query, guild_id, command_name)
+
+
+    async def unignore_command(self, guild_id: int, command_name: str):
+        """
+        This function is used to unignore a command in the guild
+        """
+        query = """DELETE FROM command_preferences WHERE guild_id = $1 AND ignored_command = $2;"""
+        await self.pool.execute(query, guild_id, command_name)
+
+
+    async def ignore_channel(self, guild_id: int, channel_id: int):
+        """
+        This function is used to ignore a channel in the guild
+        """
+        query = """INSERT INTO channel_preferences (guild_id, channel_id)
+                    VALUES ($1, $2);"""
+        await self.pool.execute(query, guild_id, channel_id)
+
+
+    async def unignore_channel(self, guild_id: int, channel_id: int):
+        """
+        This function is used to unignore a channel in the guild
+        """
+        query = """DELETE FROM channel_preferences WHERE guild_id = $1 AND channel_id = $2;"""
+        await self.pool.execute(query, guild_id, channel_id)
+        
