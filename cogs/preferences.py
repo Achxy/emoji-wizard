@@ -19,6 +19,17 @@ class Preferences(commands.Cog):
         for each_channel in channels:
             await self.bot.tools.channel_action(ctx, Actions.ignore, each_channel)
 
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def unignore(self, ctx, *channel: Union[discord.TextChannel, int, str]):
+        """
+        Unignores a text channel(s)
+        This command will work in regardless of whether the channel is ignored.
+        """
+
+        for each_channel in channel:
+            await self.bot.tools.channel_action(ctx, Actions.unignore, each_channel)
+
 
 def setup(bot):
     bot.add_cog(Preferences(bot))
