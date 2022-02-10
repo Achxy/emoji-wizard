@@ -1,5 +1,6 @@
 from tools.enum_tools import TableType
 import functools
+import json
 
 
 class Cache:
@@ -25,11 +26,15 @@ class Cache:
         # and then we can use the values to get the data from the database
         # the cache is later accessed by the same enums
         self._ready = False
-        self.caching_values = {}
 
         for tb in map(lambda x: x.value, tables):
             query = f"SELECT * FROM {tb}"
             data = await self._pool.fetch(query)
+            # Since this part was a success,
+            # We can delete the previous cache
+            if tb in self.caching_values:
+                del self.caching_values[tb]
+
             self.caching_values[tb] = [
                 [v for v in n] for n in [j.values() for j in data]
             ]
@@ -70,6 +75,11 @@ class Cache:
                 inner_index = row.index(tuple(x ^ y)[0])
                 self.caching_values[table.value][i][inner_index] += increment
                 return
+
+    @_if_ready
+    def __str__(self) -> str:
+        print(self.caching_values)
+        return json.dumps(self.caching_values, indent=4)
 
     @property
     def is_ready(self):

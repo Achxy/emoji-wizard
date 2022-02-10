@@ -54,6 +54,7 @@ async def on_ready():
     print(f"Successfully logged in as {bot.user}")
     for table in TableType:
         await bot.cache.populate_cache(table)
+    print(bot.cache)
 
 
 # Get all the python files from the cogs folder
