@@ -13,6 +13,10 @@ class Preference(commands.Cog):
         works regardless of whether this is used with a instance or not
         """
         func = self if func is None else func
+        # It may look like this line of code can be replaced with a
+        # @classmethod or @staticmethod decorator but it cannot be,
+        # The reason for it is because doing that will loose us the self
+        # which we need.
 
         @functools.wraps(func)
         async def wrapper(self, ctx, *args, **kwargs):
