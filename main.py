@@ -3,6 +3,8 @@ import os
 import asyncpg
 from discord.ext import commands
 from tools.database_tools import DatabaseTools
+from tools.enum_tools import TableType
+from tools.caching import Cache
 from tools.bot_tools import get_mobile
 
 
@@ -44,11 +46,14 @@ async def create_db_pool():
     print("Successfully connected to the database")
     bot.tools = DatabaseTools(bot)
     await bot.tools.confirm_tables()
+    bot.cache = Cache(bot)
 
 
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
+    for table in TableType:
+        await bot.cache.populate_cache(table)
 
 
 # Get all the python files from the cogs folder

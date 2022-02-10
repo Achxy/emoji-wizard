@@ -1,4 +1,4 @@
-from enum_tools import TableType
+from tools.enum_tools import TableType
 import functools
 
 
@@ -10,12 +10,12 @@ class Cache:
 
         self.caching_values = {}
 
-    def _if_ready(self, func):
+    def _if_ready(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             if not self._ready:
                 raise RuntimeError("Cache is not ready")
-            return func(*args, **kwargs)
+            return func(self, *args, **kwargs)
 
         return wrapper
 
