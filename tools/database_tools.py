@@ -1,10 +1,29 @@
 import asyncpg
 import discord
+from discord.ext import commands
+from enum import Enum
 from tools.enum_tools import TableType
 from typing import Union
 
 
-__all__ = ("DatabaseTools",)
+__all__ = (
+    "DatabaseTools",
+    "Actions",
+)
+
+INEPT = object()
+
+
+class Actions(Enum):
+    """
+    Enum for the different actions that can be done with the database
+    switches for ignoring and unignoring channels and commands
+    """
+
+    ignore = 1
+    unignore = 2
+    enable = unignore
+    disable = ignore
 
 
 class DatabaseTools:
@@ -45,6 +64,22 @@ class DatabaseTools:
                     user_id BIGINT,
                     type_of_rubric TEXT,
                     usage_count BIGINT
+                    );
+                """
+        await self.pool.execute(query)
+
+        # Table for storing command preferences
+        query = """CREATE TABLE IF NOT EXISTS command_preferences(
+                    guild_id BIGINT,
+                    ignored_command TEXT
+                    );
+                """
+        await self.pool.execute(query)
+
+        # Table for storing channel preferences
+        query = """CREATE TABLE IF NOT EXISTS channel_preferences(
+                    guild_id BIGINT,
+                    channel_id BIGINT
                     );
                 """
         await self.pool.execute(query)
@@ -140,3 +175,106 @@ class DatabaseTools:
             ctx.author.id,
             command_or_rubric_name,
         )
+
+    async def is_preferred_channel(self, guild_id: int, channel_id: int):
+        """
+        Returns true if the channel is not disabled in the guild
+        else returns false
+        channels can be re-enabled or disabled using the ignore / unignore command
+        """
+        query = """SELECT channel_id FROM channel_preferences WHERE guild_id = $1;"""
+        channels = await self.pool.fetch(query, guild_id)
+        if not channels:
+            return True
+        for channel in channels:
+            if channel.get("channel_id") == channel_id:
+                return False
+        return True
+
+    async def is_preferred_command(self, guild_id: int, command_name: str):
+        """
+        Returns true if the command is not disabled in the guild
+        else returns false
+        commands can be re-enabled or disabled using the enable / disable command
+        """
+        query = (
+            """SELECT ignored_command FROM command_preferences WHERE guild_id = $1;"""
+        )
+        commands = await self.pool.fetch(query, guild_id)
+        if not commands:
+            return True
+        for command in commands:
+            if command.get("ignored_command") == command_name:
+                return False
+        return True
+
+    async def channel_action(
+        self, ctx, action: Actions, channel: Union[discord.TextChannel, int, str]
+    ):
+        """
+        This function is used to enable or disable a channel in the guild
+        """
+        # Check list :
+        # 1. If the channel is an int, then assert there's an associated channel (in bot's cache, no fetching)
+        # 2. If the channel is a str, then find the channel then get it's ID
+        # 3. If the channel is a discord.TextChannel, then get it's ID
+        # 4. If the channel is not found then send an appropriate error message
+        # -- At this point we have the channel ID --
+        # 5. If the new action doesn't necessarily do anything to the current state then send the issue message
+        # -- Security --
+        # 6. Check the origin of the channel matches ctx.guild
+
+        # If all of the checks above is passed then we can proceed with the action
+
+        former = channel[:] if not isinstance(channel, discord.TextChannel) else INEPT
+        assert isinstance(action, Actions)
+        # former is the former value of the channel before it gets changed
+        # Stage 1 -> 4 :
+        if isinstance(channel, int):
+            channel = await self.bot.get_channel(channel)
+            if channel is None:
+                return await ctx.send(f"Cannot find a channel with that ID")
+
+        elif isinstance(channel, str):
+            channel = discord.utils.get(ctx.guild.text_channels, name=channel)
+            if channel is None:
+                return await ctx.send(f"Cannot find a channel named **{former}**")
+
+        elif isinstance(channel, discord.TextChannel):
+            # We already have the channel object
+            # No further action required here
+            # This statement is here to make the code more readable
+            pass
+
+        else:
+            raise ValueError(f"{type(channel)} is not a valid type for channel")
+
+        # Stage 5
+        if await self.is_preferred_channel(
+            ctx.guild.id, channel.id
+        ):  # If true, then the channel is not ignored
+            if action is Actions.unignore:
+                return await ctx.send(
+                    f"{channel.mention} is not ignored to begin with!"
+                )
+        else:  # The channel is ignored
+            if action is Actions.ignore:
+                return await ctx.send(f"{channel.mention} is already ignored")
+
+        # Stage 6
+        if channel not in ctx.guild.text_channels:
+            return await ctx.send(f"**{channel.name}** is not a channel in your guild")
+
+        # -- All checks passed --
+
+        if action is Actions.ignore:
+            query = """INSERT INTO channel_preferences (guild_id, channel_id) VALUES ($1, $2);"""
+            await self.pool.execute(query, ctx.guild.id, channel.id)
+            return await ctx.send(f"{channel.mention} has been ignored")
+
+        elif action is Actions.unignore:
+            query = """DELETE FROM channel_preferences WHERE guild_id = $1 AND channel_id = $2;"""
+            await self.pool.execute(query, ctx.guild.id, channel.id)
+            return await ctx.send(f"{channel.mention} has been unignored")
+
+    # TODO: Make a command_action

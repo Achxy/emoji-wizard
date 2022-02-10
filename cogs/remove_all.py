@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from tools.enum_tools import TableType
+from utilities.preference import Preference
 
 
 class RemoveAll(commands.Cog):
@@ -9,6 +10,7 @@ class RemoveAll(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
+    @Preference.is_usable
     async def remove_all(self, ctx):
         """
         Takes no parameters, removes all emojis from the server
