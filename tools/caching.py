@@ -49,7 +49,9 @@ class Cache:
         return self.caching_values[table.value]
 
     @_if_ready
-    def touch(self, table: TableType, rows: list, coincide=None, increment=None):
+    def touch(
+        self, table: TableType, rows: list, coincide=None, increment_or_new_value=None
+    ):
         """
         Adds to the cache
         If coincide is True then the value will be incremented where all other row of existing row is match
@@ -57,7 +59,7 @@ class Cache:
         If coincide is False then then new row is created regardless.
         """
         assert isinstance(coincide, bool)
-        assert isinstance(increment, int) if coincide else ...
+        assert isinstance(increment_or_new_value, int) if coincide else ...
         if not coincide:
             self.caching_values[table.value].append(rows)
             return
@@ -73,8 +75,26 @@ class Cache:
             if (x := set(row)) >= (y := set(rows)):
                 # We got the value we are looking for, we can increment it
                 inner_index = row.index(tuple(x ^ y)[0])
-                self.caching_values[table.value][i][inner_index] += increment
+                self.caching_values[table.value][i][
+                    inner_index
+                ] += increment_or_new_value
                 return
+
+    @_if_ready
+    async def get_prefix(self, table, guild_id, default_prefix):
+        """
+        This function can actually write to the database
+        returns the custom prefix of the guild if available in cache
+        else writes the default to database and returns it
+        """
+        if guild_id not in self.caching_values[table.value]:
+            query = f"INSERT INTO {table.value} VALUES ($1, $2)"
+            await self._pool.execute(query, guild_id, default_prefix)
+            return default_prefix
+        # Return the prefix in the cache
+        for i in self.caching_values[table.value]:
+            if i[0] == guild_id:
+                return i[1]
 
     @_if_ready
     def __str__(self) -> str:
