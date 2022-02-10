@@ -25,8 +25,14 @@ async def get_prefix(bot: commands.Bot, message: discord.Message):
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
     # Actually in a guild
-    query = "SELECT prefix FROM guilds WHERE guild_id = $1"
-    prefix = await bot.db.fetch(query, message.guild.id)
+    if not bot.cache.is_ready:
+        query = "SELECT prefix FROM guilds WHERE guild_id = $1"
+        prefix = await bot.db.fetch(query, message.guild.id)
+    else:
+        for i in bot.cache.get_cache(TableType.guilds):
+            if i[0] == message.guild.id:
+                prefix = i[1]
+                return commands.when_mentioned_or(prefix)(bot, message)
 
     if len(prefix) == 0:
         query = "INSERT INTO guilds (guild_id, prefix) VALUES ($1, $2)"
@@ -34,8 +40,6 @@ async def get_prefix(bot: commands.Bot, message: discord.Message):
         prefix = DEFAULT_PREFIX
     else:
         prefix = prefix[0].get("prefix")
-
-    return commands.when_mentioned_or(prefix)(bot, message)
 
 
 bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)

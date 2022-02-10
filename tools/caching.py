@@ -41,7 +41,7 @@ class Cache:
         self._ready = True
 
     @_if_ready
-    async def get_cache(self, table: TableType):
+    def get_cache(self, table: TableType):
         """
         Get the cache for a specific table
         raises RuntimeError if the cache is not ready
@@ -49,7 +49,7 @@ class Cache:
         return self.caching_values[table.value]
 
     @_if_ready
-    async def touch(self, table: TableType, rows: list, coincide=None, increment=None):
+    def touch(self, table: TableType, rows: list, coincide=None, increment=None):
         """
         Adds to the cache
         If coincide is True then the value will be incremented where all other row of existing row is match
