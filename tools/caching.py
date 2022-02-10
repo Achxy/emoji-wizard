@@ -69,3 +69,8 @@ class Cache:
                 # We got the value we are looking for, we can increment it
                 inner_index = row.index(tuple(x ^ y)[0])
                 self.caching_values[table.value][i][inner_index] += increment
+                return
+
+    @property
+    def is_ready(self):
+        return self._ready
