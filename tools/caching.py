@@ -78,7 +78,6 @@ class Cache:
 
     @_if_ready
     def __str__(self) -> str:
-        print(self.caching_values)
         return json.dumps(self.caching_values, indent=4)
 
     @property
