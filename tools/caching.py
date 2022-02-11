@@ -66,10 +66,11 @@ class Cache:
         If coincide is False then then new row is created regardless.
         """
         assert isinstance(value, int) and isinstance(action, InterpolateAction)
-        print("Old : ", self.caching_values[table.value])
+
         if action is InterpolateAction.append:
             self.caching_values[table.value].append(rows)
-            return print(f"new : {self.caching_values[table.value]}")
+            return
+
         assert len(rows) == len(self.caching_values[table.value][0]) - 1
         # Everything is fine, we can proceed
         # take action upon the non-provided row
@@ -79,9 +80,9 @@ class Cache:
                 inner_index = row.index(tuple(x ^ y)[0])
                 if action is InterpolateAction.overwrite:
                     self.caching_values[table.value][i][inner_index] = value
-                    return print(f"new : {self.caching_values[table.value]}")
+                    return
                 self.caching_values[table.value][i][inner_index] += value  # Is coincide
-                return print(f"new : {self.caching_values[table.value]}")
+                return
 
     @_if_ready
     async def get_prefix(self, table, guild_id, default_prefix):

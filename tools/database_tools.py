@@ -2,8 +2,9 @@ import asyncpg
 import discord
 from discord.ext import commands
 from enum import Enum
-from tools.enum_tools import TableType
 from typing import Union
+from tools.enum_tools import TableType
+from tools.caching import InterpolateAction
 
 
 __all__ = (
@@ -97,6 +98,7 @@ class DatabaseTools:
         """
 
         if isinstance(table, TableType):
+            table_ = table  # Keep one former copy
             table = table.value
 
         command_or_rubric_name = ctx.command.name
@@ -109,6 +111,14 @@ class DatabaseTools:
             command_or_rubric_name += ":rubric"
         else:
             raise ValueError(f"Table {table} doesn't exist")
+
+        # Interpolate the data to existing cache
+        # Both command and rubric interpolation should be of type coinciding
+        # So there isn't a need to make another check
+        rows = [ctx.guild.id, ctx.channel.id, ctx.author.id, command_or_rubric_name]
+        self.bot.cache.interpolate(
+            table_, rows, InterpolateAction.coincide, value_to_increment
+        )
 
         query = f"""SELECT usage_count FROM {table}
                     WHERE (
