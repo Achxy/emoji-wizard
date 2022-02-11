@@ -15,7 +15,7 @@ class PreferencesCog(commands.Cog):
         Ignores a text channel(s)
         This command will work regardless of whether the channel is ignored.
         """
-        await self.bot.tools.ignore_channel(ctx.guild.id, channel.id)
+        await self.bot.tools.channel_action(ctx, Actions.ignore, channel)
 
     @commands.command()
     @commands.has_permissions(administrator=True)

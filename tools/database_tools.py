@@ -186,36 +186,18 @@ class DatabaseTools:
             command_or_rubric_name,
         )
 
-    async def is_preferred_channel(self, guild_id: int, channel_id: int):
-        """
-        Returns true if the channel is not disabled in the guild
-        else returns false
-        channels can be re-enabled or disabled using the ignore / unignore command
-        """
-        query = """SELECT channel_id FROM channel_preferences WHERE guild_id = $1;"""
-        channels = await self.pool.fetch(query, guild_id)
-        if not channels:
-            return True
-        for channel in channels:
-            if channel.get("channel_id") == channel_id:
-                return False
-        return True
-
-    async def is_preferred_command(self, guild_id: int, command_name: str):
-        """
-        Returns true if the command is not disabled in the guild
-        else returns false
-        commands can be re-enabled or disabled using the enable / disable command
-        """
-        query = (
-            """SELECT ignored_command FROM command_preferences WHERE guild_id = $1;"""
-        )
-        commands = await self.pool.fetch(query, guild_id)
-        if not commands:
-            return True
-        for command in commands:
-            if command.get("ignored_command") == command_name:
-                return False
+    def is_preferred(self, ctx, table: TableType, entity):
+        assert isinstance(table, TableType)
+        # entity is either a channel or a command
+        # We need to check if the channel or command is preferred
+        for values in filter(
+            lambda x: x[0] == ctx.guild.id, self.bot.cache.get_cache(table)
+        ):
+            # values is a list containing two elements
+            # 0 -> guild_id (We are filtering where guild_id = ctx.guild.id)
+            # 1 -> channel_id or command_name
+            if values[1] == entity:
+                return False  # If this is in the cache, it is not preferred
         return True
 
     async def channel_action(self, ctx, action: Actions, channel):
@@ -241,7 +223,7 @@ class DatabaseTools:
                         VALUES ($1, $2);"""
 
             self.bot.cache.interpolate(
-                TableType.channel, rows, InterpolateAction.append
+                TableType.channel_preference, rows, InterpolateAction.append
             )
             await self.pool.execute(query, *rows)
             return await ctx.send(f"Channel {channel.name} has been ignored")
@@ -252,7 +234,7 @@ class DatabaseTools:
                         WHERE guild_id = $1 AND channel_id = $2;"""
 
             self.bot.cache.interpolate(
-                TableType.channel, rows, InterpolateAction.destruct
+                TableType.channel_preference, rows, InterpolateAction.destruct
             )
             await self.pool.execute(query, *rows)
             return await ctx.send(f"Channel {channel.name} has been unignored")
