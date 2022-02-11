@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from tools.database_tools import Actions
-from typing import Union
+from typing import Optional
 
 
 class PreferencesCog(commands.Cog):
@@ -10,25 +10,21 @@ class PreferencesCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def ignore(self, ctx, *channels: Union[discord.TextChannel, int, str]):
+    async def ignore(self, ctx, channel: Optional[discord.TextChannel] = None):
         """
         Ignores a text channel(s)
         This command will work regardless of whether the channel is ignored.
         """
-
-        for each_channel in channels:
-            await self.bot.tools.channel_action(ctx, Actions.ignore, each_channel)
+        await self.bot.tools.ignore_channel(ctx.guild.id, channel.id)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def unignore(self, ctx, *channel: Union[discord.TextChannel, int, str]):
+    async def unignore(self, ctx, channel: Optional[discord.TextChannel] = None):
         """
         Unignores a text channel(s)
         This command will work regardless of whether the channel is ignored.
         """
-
-        for each_channel in channel:
-            await self.bot.tools.channel_action(ctx, Actions.unignore, each_channel)
+        await self.bot.tools.channel_action(ctx, Actions.unignore, channel)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
