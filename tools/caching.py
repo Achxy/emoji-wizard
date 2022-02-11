@@ -73,7 +73,9 @@ class Cache:
         )
 
         if action is InterpolateAction.destruct:
-            self.caching_values[table.value].remove(rows)
+            self.caching_values[table.value] = [
+                n for n in self.caching_values[table.value] if not n == rows
+            ]
             return
 
         if action is InterpolateAction.append:

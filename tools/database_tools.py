@@ -255,7 +255,6 @@ class DatabaseTools:
         This function is used to enable or disable a command in the guild
         """
         assert isinstance(action, Actions)
-        print(self.bot.cache.get_cache(TableType.command_preference))
         if command.lower() not in map(
             lambda y: y.name.lower(), filter(lambda x: not x.hidden, self.bot.commands)
         ):
@@ -264,13 +263,11 @@ class DatabaseTools:
         # Just add it to the cache and database
         # Check if the command is already ignored / unignored
         if action is Actions.enable and self.is_preferred(
-            ctx, TableType.command, command
+            ctx, TableType.command_preference, command
         ):
             return await ctx.send(f"`{command}` is already enabled")
-        # FIXME: This is not working
-        # Commands can be disabled again even if disabled
         if action is Actions.disable and not self.is_preferred(
-            ctx, TableType.command, command
+            ctx, TableType.command_preference, command
         ):
             return await ctx.send(f"`{command}` is already disabled")
         # All good to go
