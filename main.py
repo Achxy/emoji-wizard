@@ -24,12 +24,10 @@ extensions = {
 async def get_prefix(bot: commands.Bot, message: discord.Message):
     if not message.guild:
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
-    t0 = time.perf_counter()
+
     prefix = await bot.cache.get_prefix(
         TableType.guilds, message.guild.id, DEFAULT_PREFIX
     )
-    t1 = time.perf_counter()
-    print(f"Time to get prefix: {(t1 - t0) * 1000}ms")
 
     return commands.when_mentioned_or(prefix)(bot, message)
 
@@ -48,9 +46,11 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
+    _t0 = time.perf_counter()
     for table in TableType:
         await bot.cache.populate_cache(table)
-    print("Successfully populated cache")
+    _t1 = time.perf_counter()
+    print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
 
 
 # Get all the python files from the cogs folder
