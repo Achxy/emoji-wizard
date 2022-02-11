@@ -8,6 +8,7 @@ class InterpolateAction(Enum):
     overwrite = 1
     coincide = 2
     append = 3
+    destruct = 4
 
 
 class Cache:
@@ -65,9 +66,15 @@ class Cache:
             - If not matched then new row is created
         If coincide is False then then new row is created regardless.
         """
-        assert (isinstance(value, int) and isinstance(action, InterpolateAction)) or (
-            action is InterpolateAction.append and value is None
+        assert (
+            (isinstance(value, int) and isinstance(action, InterpolateAction))
+            or (action is InterpolateAction.append and value is None)
+            or (action is InterpolateAction.destruct and value is None)
         )
+
+        if action is InterpolateAction.destruct:
+            self.caching_values[table.value].remove(rows)
+            return
 
         if action is InterpolateAction.append:
             self.caching_values[table.value].append(rows)
