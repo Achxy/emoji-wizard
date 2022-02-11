@@ -4,7 +4,7 @@ import functools
 import json
 
 
-class TouchAction(Enum):
+class InterpolateAction(Enum):
     overwrite = 1
     coincide = 2
     append = 3
@@ -56,8 +56,8 @@ class Cache:
         return self.caching_values[table.value]
 
     @_if_ready
-    def touch(
-        self, table: TableType, rows: list, action: TouchAction = None, value=None
+    def interpolate(
+        self, table: TableType, rows: list, action: InterpolateAction = None, value=None
     ):
         """
         Adds to the cache
@@ -65,9 +65,9 @@ class Cache:
             - If not matched then new row is created
         If coincide is False then then new row is created regardless.
         """
-        assert isinstance(value, int) and isinstance(action, TouchAction)
+        assert isinstance(value, int) and isinstance(action, InterpolateAction)
         print("Old : ", self.caching_values[table.value])
-        if action is TouchAction.append:
+        if action is InterpolateAction.append:
             self.caching_values[table.value].append(rows)
             return print(f"new : {self.caching_values[table.value]}")
         assert len(rows) == len(self.caching_values[table.value][0]) - 1
@@ -77,7 +77,7 @@ class Cache:
             if (x := set(row)) >= (y := set(rows)):
                 # We got the value we are looking for, we can act upon it
                 inner_index = row.index(tuple(x ^ y)[0])
-                if action is TouchAction.overwrite:
+                if action is InterpolateAction.overwrite:
                     self.caching_values[table.value][i][inner_index] = value
                     return print(f"new : {self.caching_values[table.value]}")
                 self.caching_values[table.value][i][inner_index] += value  # Is coincide
