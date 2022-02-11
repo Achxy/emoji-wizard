@@ -33,6 +33,7 @@ class PreferencesCog(commands.Cog):
         Enables a command
         This command will work regardless of whether the channel is ignored.
         """
+        await self.bot.tools.command_action(ctx, Actions.enable, command_name)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -41,6 +42,7 @@ class PreferencesCog(commands.Cog):
         Disables a command
         This command will work in regardless of whether the channel is ignored.
         """
+        await self.bot.tools.command_action(ctx, Actions.disable, command_name)
 
 
 def setup(bot):
