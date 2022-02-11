@@ -32,7 +32,7 @@ class PreferencesCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def enable(ctx, command_name: str):
+    async def enable(self, ctx, command_name: str):
         """
         Enables a command
         This command will work regardless of whether the channel is ignored.
@@ -40,7 +40,7 @@ class PreferencesCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def disable(ctx, command_name: str):
+    async def disable(self, ctx, command_name: str):
         """
         Disables a command
         This command will work in regardless of whether the channel is ignored.
