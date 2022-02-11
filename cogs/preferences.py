@@ -13,7 +13,7 @@ class PreferencesCog(commands.Cog):
     async def ignore(self, ctx, *channels: Union[discord.TextChannel, int, str]):
         """
         Ignores a text channel(s)
-        This command will work in regardless of whether the channel is ignored.
+        This command will work regardless of whether the channel is ignored.
         """
 
         for each_channel in channels:
@@ -24,11 +24,27 @@ class PreferencesCog(commands.Cog):
     async def unignore(self, ctx, *channel: Union[discord.TextChannel, int, str]):
         """
         Unignores a text channel(s)
-        This command will work in regardless of whether the channel is ignored.
+        This command will work regardless of whether the channel is ignored.
         """
 
         for each_channel in channel:
             await self.bot.tools.channel_action(ctx, Actions.unignore, each_channel)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def enable(ctx, command_name: str):
+        """
+        Enables a command
+        This command will work regardless of whether the channel is ignored.
+        """
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def disable(ctx, command_name: str):
+        """
+        Disables a command
+        This command will work in regardless of whether the channel is ignored.
+        """
 
 
 def setup(bot):

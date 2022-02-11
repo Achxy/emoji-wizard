@@ -276,15 +276,18 @@ class DatabaseTools:
             return await ctx.send(f"**{channel.name}** is not a channel in your guild")
 
         # -- All checks passed --
-
+        rows = [ctx.guild.id, channel.id]
         if action is Actions.ignore:
             query = """INSERT INTO channel_preferences (guild_id, channel_id) VALUES ($1, $2);"""
-            await self.pool.execute(query, ctx.guild.id, channel.id)
+            self.bot.cache.interpolate(
+                TableType.channel_preference, rows, InterpolateAction.append
+            )
+            await self.pool.execute(query, *rows)
             return await ctx.send(f"{channel.mention} has been ignored")
 
         elif action is Actions.unignore:
             query = """DELETE FROM channel_preferences WHERE guild_id = $1 AND channel_id = $2;"""
-            await self.pool.execute(query, ctx.guild.id, channel.id)
+            await self.pool.execute(query, *rows)
             return await ctx.send(f"{channel.mention} has been unignored")
 
     # TODO: Make a command_action

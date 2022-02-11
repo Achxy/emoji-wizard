@@ -65,7 +65,9 @@ class Cache:
             - If not matched then new row is created
         If coincide is False then then new row is created regardless.
         """
-        assert isinstance(value, int) and isinstance(action, InterpolateAction)
+        assert (isinstance(value, int) and isinstance(action, InterpolateAction)) or (
+            action is InterpolateAction.append and value is None
+        )
 
         if action is InterpolateAction.append:
             self.caching_values[table.value].append(rows)
