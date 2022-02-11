@@ -34,7 +34,6 @@ class Enlarge(commands.Cog):
             successful_additions += 1
             await ctx.send(embed=embed)
 
-        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
             TableType.rubric,

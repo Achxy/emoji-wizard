@@ -90,6 +90,7 @@ class Cache:
         returns the custom prefix of the guild if available in cache
         else writes the default to database and returns it
         """
+        # In cache and db, the row's first value should represent the guild_id
         if guild_id not in map(lambda d: d[0], self.caching_values[table.value]):
             query = f"INSERT INTO {table.value} VALUES ($1, $2)"
             await self._pool.execute(query, guild_id, default_prefix)

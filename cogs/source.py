@@ -54,7 +54,6 @@ class Source(commands.Cog):
 
         final_url = f"<{source_url}/blob/{branch}/{location}#L{firstlineno}-L{firstlineno + len(lines) - 1}>"
         await ctx.send(final_url)
-        await self.bot.tools.increment_usage(ctx, TableType.command)
 
 
 def setup(bot):
