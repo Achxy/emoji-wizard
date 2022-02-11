@@ -20,7 +20,6 @@ class Meta(commands.Cog):
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
         )
         await ctx.reply(embed=embed)
-        await self.bot.tools.increment_usage(ctx, TableType.command)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -41,7 +40,6 @@ class Meta(commands.Cog):
             description=f"The old prefix used to be **{old_prefix}** now its **{new_prefix}**",
         )
         await ctx.send(embed=embed)
-        await self.bot.tools.increment_usage(ctx, TableType.command)
 
 
 def setup(bot):

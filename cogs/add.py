@@ -89,7 +89,6 @@ class Add(commands.Cog):
                 # Increment success counter
                 successful_additions += 1
 
-        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
             TableType.rubric,

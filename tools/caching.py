@@ -1,6 +1,14 @@
 from tools.enum_tools import TableType
+from enum import Enum
 import functools
 import json
+
+
+class InterpolateAction(Enum):
+    overwrite = 1
+    coincide = 2
+    append = 3
+    destruct = 4
 
 
 class Cache:
@@ -49,8 +57,8 @@ class Cache:
         return self.caching_values[table.value]
 
     @_if_ready
-    def touch(
-        self, table: TableType, rows: list, coincide=None, increment_or_new_value=None
+    def interpolate(
+        self, table: TableType, rows: list, action: InterpolateAction = None, value=None
     ):
         """
         Adds to the cache
@@ -58,26 +66,33 @@ class Cache:
             - If not matched then new row is created
         If coincide is False then then new row is created regardless.
         """
-        assert isinstance(coincide, bool)
-        assert isinstance(increment_or_new_value, int) if coincide else ...
-        if not coincide:
+        assert (
+            (isinstance(value, int) and isinstance(action, InterpolateAction))
+            or (action is InterpolateAction.append and value is None)
+            or (action is InterpolateAction.destruct and value is None)
+        )
+
+        if action is InterpolateAction.destruct:
+            self.caching_values[table.value] = [
+                n for n in self.caching_values[table.value] if not n == rows
+            ]
+            return
+
+        if action is InterpolateAction.append:
             self.caching_values[table.value].append(rows)
             return
-        # If coincide is True then the value will be incremented where all other row of existing row is match
-        # - If not matched then new row is created
-        # The increment value is provided seperately not within the rows
-        # So it can be asserted that (rows - 1) == len(self.caching_values[table.value][0])
-        # This is to prevent shooting oneself in the foot
+
         assert len(rows) == len(self.caching_values[table.value][0]) - 1
         # Everything is fine, we can proceed
-        # increment the missing value in the row with the increment value
+        # take action upon the non-provided row
         for i, row in enumerate(self.caching_values[table.value]):
             if (x := set(row)) >= (y := set(rows)):
-                # We got the value we are looking for, we can increment it
+                # We got the value we are looking for, we can act upon it
                 inner_index = row.index(tuple(x ^ y)[0])
-                self.caching_values[table.value][i][
-                    inner_index
-                ] += increment_or_new_value
+                if action is InterpolateAction.overwrite:
+                    self.caching_values[table.value][i][inner_index] = value
+                    return
+                self.caching_values[table.value][i][inner_index] += value  # Is coincide
                 return
 
     @_if_ready
@@ -87,7 +102,8 @@ class Cache:
         returns the custom prefix of the guild if available in cache
         else writes the default to database and returns it
         """
-        if guild_id not in self.caching_values[table.value]:
+        # In cache and db, the row's first value should represent the guild_id
+        if guild_id not in map(lambda d: d[0], self.caching_values[table.value]):
             query = f"INSERT INTO {table.value} VALUES ($1, $2)"
             await self._pool.execute(query, guild_id, default_prefix)
             return default_prefix

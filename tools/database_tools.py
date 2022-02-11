@@ -2,8 +2,9 @@ import asyncpg
 import discord
 from discord.ext import commands
 from enum import Enum
-from tools.enum_tools import TableType
 from typing import Union
+from tools.enum_tools import TableType
+from tools.caching import InterpolateAction
 
 
 __all__ = (
@@ -97,6 +98,7 @@ class DatabaseTools:
         """
 
         if isinstance(table, TableType):
+            table_ = table  # Keep one former copy
             table = table.value
 
         command_or_rubric_name = ctx.command.name
@@ -109,6 +111,14 @@ class DatabaseTools:
             command_or_rubric_name += ":rubric"
         else:
             raise ValueError(f"Table {table} doesn't exist")
+
+        # Interpolate the data to existing cache
+        # Both command and rubric interpolation should be of type coinciding
+        # So there isn't a need to make another check
+        rows = [ctx.guild.id, ctx.channel.id, ctx.author.id, command_or_rubric_name]
+        self.bot.cache.interpolate(
+            table_, rows, InterpolateAction.coincide, value_to_increment
+        )
 
         query = f"""SELECT usage_count FROM {table}
                     WHERE (
@@ -176,105 +186,108 @@ class DatabaseTools:
             command_or_rubric_name,
         )
 
-    async def is_preferred_channel(self, guild_id: int, channel_id: int):
-        """
-        Returns true if the channel is not disabled in the guild
-        else returns false
-        channels can be re-enabled or disabled using the ignore / unignore command
-        """
-        query = """SELECT channel_id FROM channel_preferences WHERE guild_id = $1;"""
-        channels = await self.pool.fetch(query, guild_id)
-        if not channels:
-            return True
-        for channel in channels:
-            if channel.get("channel_id") == channel_id:
-                return False
+    def is_preferred(self, ctx, table: TableType, entity):
+        assert isinstance(table, TableType)
+        # entity is either a channel or a command
+        # We need to check if the channel or command is preferred
+        for values in filter(
+            lambda x: x[0] == ctx.guild.id, self.bot.cache.get_cache(table)
+        ):
+            # values is a list containing two elements
+            # 0 -> guild_id (We are filtering where guild_id = ctx.guild.id)
+            # 1 -> channel_id or command_name
+            if values[1] == entity:
+                return False  # If this is in the cache, it is not preferred
         return True
 
-    async def is_preferred_command(self, guild_id: int, command_name: str):
-        """
-        Returns true if the command is not disabled in the guild
-        else returns false
-        commands can be re-enabled or disabled using the enable / disable command
-        """
-        query = (
-            """SELECT ignored_command FROM command_preferences WHERE guild_id = $1;"""
-        )
-        commands = await self.pool.fetch(query, guild_id)
-        if not commands:
-            return True
-        for command in commands:
-            if command.get("ignored_command") == command_name:
-                return False
-        return True
-
-    async def channel_action(
-        self, ctx, action: Actions, channel: Union[discord.TextChannel, int, str]
-    ):
+    async def channel_action(self, ctx, action: Actions, channel):
         """
         This function is used to enable or disable a channel in the guild
         """
-        # Check list :
-        # 1. If the channel is an int, then assert there's an associated channel (in bot's cache, no fetching)
-        # 2. If the channel is a str, then find the channel then get it's ID
-        # 3. If the channel is a discord.TextChannel, then get it's ID
-        # 4. If the channel is not found then send an appropriate error message
-        # -- At this point we have the channel ID --
-        # 5. If the new action doesn't necessarily do anything to the current state then send the issue message
-        # -- Security --
-        # 6. Check the origin of the channel matches ctx.guild
-
-        # If all of the checks above is passed then we can proceed with the action
-
-        former = channel[:] if not isinstance(channel, discord.TextChannel) else INEPT
         assert isinstance(action, Actions)
-        # former is the former value of the channel before it gets changed
-        # Stage 1 -> 4 :
-        if isinstance(channel, int):
-            channel = await self.bot.get_channel(channel)
-            if channel is None:
-                return await ctx.send(f"Cannot find a channel with that ID")
-
-        elif isinstance(channel, str):
-            channel = discord.utils.get(ctx.guild.text_channels, name=channel)
-            if channel is None:
-                return await ctx.send(f"Cannot find a channel named **{former}**")
-
-        elif isinstance(channel, discord.TextChannel):
-            # We already have the channel object
-            # No further action required here
-            # This statement is here to make the code more readable
-            pass
-
-        else:
-            raise ValueError(f"{type(channel)} is not a valid type for channel")
-
-        # Stage 5
-        if await self.is_preferred_channel(
-            ctx.guild.id, channel.id
-        ):  # If true, then the channel is not ignored
-            if action is Actions.unignore:
-                return await ctx.send(
-                    f"{channel.mention} is not ignored to begin with!"
-                )
-        else:  # The channel is ignored
-            if action is Actions.ignore:
-                return await ctx.send(f"{channel.mention} is already ignored")
-
-        # Stage 6
-        if channel not in ctx.guild.text_channels:
-            return await ctx.send(f"**{channel.name}** is not a channel in your guild")
-
-        # -- All checks passed --
+        if not isinstance(channel, discord.TextChannel):
+            return await ctx.send("That channel was not found")
+        # We have a valid channel
+        # Check if the channel's origin matches that of ctx.guild
+        if not channel.guild == ctx.guild:
+            return await ctx.send(
+                "That channel was not found"
+            )  # Indistinguishable message for privacy
+        # Check if the channel is already ignored / unignored
+        if action is Actions.ignore and self.is_preferred(
+            ctx, TableType.channel, channel
+        ):
+            return await ctx.send(f"That {channel.mention} is already ignored")
+        if action is Actions.unignore and not self.is_preferred(
+            ctx, TableType.channel, channel
+        ):
+            return await ctx.send(
+                f"That {channel.mention} is not ignored to begin with!"
+            )
+        # All good to go
+        # Check if the action is to enable or disable
+        # Appropriatly cache the action
+        rows = [ctx.guild.id, channel.id]
 
         if action is Actions.ignore:
-            query = """INSERT INTO channel_preferences (guild_id, channel_id) VALUES ($1, $2);"""
-            await self.pool.execute(query, ctx.guild.id, channel.id)
-            return await ctx.send(f"{channel.mention} has been ignored")
+            query = """INSERT INTO channel_preferences (guild_id, channel_id)
+                        VALUES ($1, $2);"""
+
+            self.bot.cache.interpolate(
+                TableType.channel_preference, rows, InterpolateAction.append
+            )
+            await self.pool.execute(query, *rows)
+            return await ctx.send(f"Channel {channel.mention} has been ignored")
 
         elif action is Actions.unignore:
-            query = """DELETE FROM channel_preferences WHERE guild_id = $1 AND channel_id = $2;"""
-            await self.pool.execute(query, ctx.guild.id, channel.id)
-            return await ctx.send(f"{channel.mention} has been unignored")
+            # Can be written outside elif, this is for readability
+            query = """DELETE FROM channel_preferences
+                        WHERE guild_id = $1 AND channel_id = $2;"""
 
-    # TODO: Make a command_action
+            self.bot.cache.interpolate(
+                TableType.channel_preference, rows, InterpolateAction.destruct
+            )
+            await self.pool.execute(query, *rows)
+            return await ctx.send(f"Channel {channel.mention} has been unignored")
+
+    async def command_action(self, ctx, action: Actions, command):
+        """
+        This function is used to enable or disable a command in the guild
+        """
+        assert isinstance(action, Actions)
+        if command.lower() not in map(
+            lambda y: y.name.lower(), filter(lambda x: not x.hidden, self.bot.commands)
+        ):
+            return await ctx.send("That command was not found")
+        # We have a valid command
+        # Just add it to the cache and database
+        # Check if the command is already ignored / unignored
+        if action is Actions.enable and self.is_preferred(
+            ctx, TableType.command_preference, command
+        ):
+            return await ctx.send(f"`{command}` is already enabled")
+        if action is Actions.disable and not self.is_preferred(
+            ctx, TableType.command_preference, command
+        ):
+            return await ctx.send(f"`{command}` is already disabled")
+        # All good to go
+        # Check if the action is to enable or disable
+        rows = [ctx.guild.id, command]
+        if action is Actions.disable:
+            query = """INSERT INTO command_preferences (guild_id, ignored_command)
+                        VALUES ($1, $2);"""
+
+            self.bot.cache.interpolate(
+                TableType.command_preference, rows, InterpolateAction.append
+            )
+            await self.pool.execute(query, *rows)
+            return await ctx.send(f"Command `{command}` has been disabled")
+        if action is Actions.enable:
+            query = """DELETE FROM command_preferences
+                        WHERE guild_id = $1 AND ignored_command = $2;"""
+
+            self.bot.cache.interpolate(
+                TableType.command_preference, rows, InterpolateAction.destruct
+            )
+            await self.pool.execute(query, *rows)
+            return await ctx.send(f"Command `{command}` has been enabled")

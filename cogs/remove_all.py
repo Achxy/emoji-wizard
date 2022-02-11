@@ -33,7 +33,6 @@ class RemoveAll(commands.Cog):
                 embed.set_footer(text=f"{len(ctx.guild.emojis)} more to go")
                 await ctx.send(embed=embed)
 
-        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
             TableType.rubric,

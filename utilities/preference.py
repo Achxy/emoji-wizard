@@ -1,6 +1,7 @@
 import discord
 import functools
 from discord.ext import commands
+from tools.enum_tools import TableType
 
 
 class Preference(commands.Cog):
@@ -20,7 +21,13 @@ class Preference(commands.Cog):
 
         @functools.wraps(func)
         async def wrapper(self, ctx, *args, **kwargs):
-            if await self.bot.tools.is_preferred_channel(ctx.guild.id, ctx.channel.id):
+            # Though tools is a instance of DatabaseTools,
+            # This internally calls the cache
+            if self.bot.tools.is_preferred(
+                ctx, TableType.channel_preference, ctx.channel.id
+            ) and self.bot.tools.is_preferred(
+                ctx, TableType.command_preference, ctx.command.name
+            ):
                 return await func(self, ctx, *args, **kwargs)
             raise RuntimeError("This command can only be used in preferred channels")
 

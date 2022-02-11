@@ -46,7 +46,6 @@ class Remove(commands.Cog):
             successful_removals += 1
             await ctx.send(embed=embed)
 
-        await self.bot.tools.increment_usage(ctx, TableType.command)
         await self.bot.tools.increment_usage(
             ctx,
             TableType.rubric,

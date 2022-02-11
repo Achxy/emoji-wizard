@@ -1,6 +1,7 @@
 import discord
 import os
 import asyncpg
+import time
 from discord.ext import commands
 from tools.database_tools import DatabaseTools
 from tools.enum_tools import TableType
@@ -45,9 +46,11 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
+    _t0 = time.perf_counter()
     for table in TableType:
         await bot.cache.populate_cache(table)
-    print("Successfully populated cache")
+    _t1 = time.perf_counter()
+    print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
 
 
 # Get all the python files from the cogs folder
