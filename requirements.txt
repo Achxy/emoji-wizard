@@ -1,2 +1,2 @@
-git+https://github.com/Pycord-Development/pycord
+disnake==2.3.*
 asyncpg==0.25.0
