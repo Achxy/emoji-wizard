@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from typing import Union
 from tools.enum_tools import TableType
 from utilities.preference import Preference
@@ -12,14 +12,14 @@ class Remove(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     @Preference.is_usable
-    async def remove(self, ctx, *emotes: Union[discord.Emoji, str]):
+    async def remove(self, ctx, *emotes: Union[disnake.Emoji, str]):
 
         successful_removals: int = 0
 
         for index, i in enumerate(emotes):
 
-            if not isinstance(i, discord.Emoji):
-                embed = discord.Embed(
+            if not isinstance(i, disnake.Emoji):
+                embed = disnake.Embed(
                     title="That is not an custom emoji",
                     description=f"You need to give me an custom discord emoji (Make sure the emoji that you give is actually in your server)\nYou passed in : {i}",
                 )
@@ -28,14 +28,14 @@ class Remove(commands.Cog):
 
             # For security reasons, we need to check if the emoji origin's is the same as ctx.guild
             if not i.guild.id == ctx.guild.id:
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title="That is not an emoji from this server",
                     description=f"You need to give me an emoji that is actually in your server!",
                 )
                 await ctx.send(embed=embed)
                 continue
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"Removed {i.name}",
                 description="Successfully removed the emoji from the server",
             )

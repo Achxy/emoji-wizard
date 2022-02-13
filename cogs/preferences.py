@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from tools.database_tools import Actions
 from typing import Optional
 
@@ -10,7 +10,7 @@ class PreferencesCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def ignore(self, ctx, channel: Optional[discord.TextChannel] = None):
+    async def ignore(self, ctx, channel: Optional[disnake.TextChannel] = None):
         """
         Ignores a text channel(s)
         This command will work regardless of whether the channel is ignored.
@@ -19,7 +19,7 @@ class PreferencesCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def unignore(self, ctx, channel: Optional[discord.TextChannel] = None):
+    async def unignore(self, ctx, channel: Optional[disnake.TextChannel] = None):
         """
         Unignores a text channel(s)
         This command will work regardless of whether the channel is ignored.

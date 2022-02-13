@@ -1,6 +1,6 @@
-import discord
+import disnake
 import typing
-from discord.ext import commands
+from disnake.ext import commands
 from tools.enum_tools import TableType
 from utilities.preference import Preference
 
@@ -12,10 +12,10 @@ class Rename(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
     @Preference.is_usable
-    async def rename(self, ctx, *emoji_and_name: typing.Union[discord.Emoji, str]):
+    async def rename(self, ctx, *emoji_and_name: typing.Union[disnake.Emoji, str]):
         """
         Albeit variadic accepts many, we only accept 2 and raise issues if there are more than 2 args
-        The two args can be in any order, one of which is discord.Emoji and the one is a str instance
+        The two args can be in any order, one of which is disnake.Emoji and the one is a str instance
 
         Since bot only checks for manage_emojis perm in current guild but acts upon emojis in the bot's guild emoji pool
         we need to confirm that the emoji we are acting upon matches ctx.guild to prevent any attackers
@@ -23,7 +23,7 @@ class Rename(commands.Cog):
 
         # Check if the argument count is 2 or not
         if not len(emoji_and_name) == 2:
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="That command only takes 2 arguments",
                 description=f"`rename` command takes 2 arguments but you have given **{len(emoji_and_name)}**.\nThe syntax for `rename` is : \n\n`{ctx.prefix}rename <emoji> <name>`",
             )
@@ -34,13 +34,13 @@ class Rename(commands.Cog):
         name = None
 
         for i in emoji_and_name:
-            if isinstance(i, discord.Emoji):
+            if isinstance(i, disnake.Emoji):
                 emoji = i
             else:
                 name = i
 
         if emoji is None or name is None:
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="Bad arguments",
                 description="You need to give me exactly one emoji (__that is actually in your guild__) and exactly one name",
             )
@@ -50,7 +50,7 @@ class Rename(commands.Cog):
         # For security reasons we need to check the orgin of the emoji (guild)
         # Matches that of context's guild
         if not emoji.guild_id == ctx.guild.id:
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="Gimme a emoji that is actually in your guild",
                 description="That emoji isn't actually in your guild.",
             )
@@ -69,7 +69,7 @@ class Rename(commands.Cog):
             pass
         else:
             # Success
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="Success!",
                 description=f"Successfully renamed {new_emoji} from **{before_name}** to **{after_name}**",
             )

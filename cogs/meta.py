@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from tools.enum_tools import TableType
 from utilities.preference import Preference
 
@@ -15,7 +15,7 @@ class Meta(commands.Cog):
         Sends an embed with the bot's latency
         but really this command is just used to test the bot's responsiveness
         """
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Pong! 🏓",
             description=f"Current Latency of the bot is {round(self.bot.latency * 1000)}ms",
         )
@@ -35,7 +35,7 @@ class Meta(commands.Cog):
 
         query = "UPDATE guilds SET prefix = $1 WHERE guild_id = $2"
         await self.bot.db.execute(query, new_prefix, ctx.guild.id)
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Successfully changed prefix",
             description=f"The old prefix used to be **{old_prefix}** now its **{new_prefix}**",
         )

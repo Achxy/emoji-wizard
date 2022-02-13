@@ -1,6 +1,6 @@
-import discord
+import disnake
 from typing import Union, Callable
-from discord.ext import commands
+from disnake.ext import commands
 from tools.enum_tools import TableType
 from tools.bot_tools import page_index
 from utilities.preference import Preference
@@ -12,22 +12,22 @@ class Enlarge(commands.Cog):
 
     @commands.command()
     @Preference.is_usable
-    async def enlarge(self, ctx, *emotes: Union[discord.PartialEmoji, str]):
+    async def enlarge(self, ctx, *emotes: Union[disnake.PartialEmoji, str]):
 
         successful_additions: int = 0
         footer_enumer: Callable[[int], str] = page_index("enlarge", len(emotes))
 
         for index, i in enumerate(emotes):
 
-            if not isinstance(i, discord.PartialEmoji):
-                embed = discord.Embed(
+            if not isinstance(i, disnake.PartialEmoji):
+                embed = disnake.Embed(
                     title="That is not an custom emoji",
                     description=f"You need to give me an custom discord emoji!\nYou passed in : {i}",
                 )
                 await ctx.send(embed=embed)
                 continue
 
-            embed = discord.Embed(title=f"Enlarged view of {i.name}")
+            embed = disnake.Embed(title=f"Enlarged view of {i.name}")
             embed.set_image(url=i.url)
             embed.set_footer(text=footer_enumer(index))
 

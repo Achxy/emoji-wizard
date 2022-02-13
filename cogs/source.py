@@ -1,8 +1,8 @@
-import discord
+import disnake
 import inspect
 import os
 from typing import Optional
-from discord.ext import commands
+from disnake.ext import commands
 from tools.enum_tools import TableType
 from utilities.preference import Preference
 
@@ -20,7 +20,7 @@ class Source(commands.Cog):
         source_url = "https://github.com/Achxy/emoji-wizard"
         branch = "main"
         if command is None:
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="Emoji-wizard is an open source project!",
                 description=f"You can find it's source code here : **{source_url}**",
             )

@@ -1,6 +1,6 @@
 import asyncpg
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from enum import Enum
 from typing import Union
 from tools.enum_tools import TableType
@@ -28,7 +28,7 @@ class Actions(Enum):
 
 
 class DatabaseTools:
-    def __init__(self, bot: discord.ext.commands.bot.Bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.pool = bot.db
 
@@ -205,7 +205,7 @@ class DatabaseTools:
         This function is used to enable or disable a channel in the guild
         """
         assert isinstance(action, Actions)
-        if not isinstance(channel, discord.TextChannel):
+        if not isinstance(channel, disnake.TextChannel):
             return await ctx.send("That channel was not found")
         # We have a valid channel
         # Check if the channel's origin matches that of ctx.guild
@@ -215,11 +215,11 @@ class DatabaseTools:
             )  # Indistinguishable message for privacy
         # Check if the channel is already ignored / unignored
         if action is Actions.ignore and self.is_preferred(
-            ctx, TableType.channel, channel
+            ctx, TableType.channel_preference, channel
         ):
             return await ctx.send(f"That {channel.mention} is already ignored")
         if action is Actions.unignore and not self.is_preferred(
-            ctx, TableType.channel, channel
+            ctx, TableType.channel_preference, channel
         ):
             return await ctx.send(
                 f"That {channel.mention} is not ignored to begin with!"

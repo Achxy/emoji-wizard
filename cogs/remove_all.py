@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from tools.enum_tools import TableType
 from utilities.preference import Preference
 
@@ -21,12 +21,12 @@ class RemoveAll(commands.Cog):
             count += 1
             try:
                 await each_emoji.delete()
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 pass
-            except discord.HTTPException:
+            except disnake.HTTPException:
                 pass
             else:
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title="Success!",
                     description=f"Removed **{each_emoji}** from the server",
                 )

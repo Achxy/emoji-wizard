@@ -1,4 +1,4 @@
-import discord
+import disnake
 import ast
 import inspect
 import re
@@ -13,7 +13,7 @@ __all__ = (
 )
 
 
-def static_vacancy(guild: discord.guild.Guild) -> int:
+def static_vacancy(guild: disnake.guild.Guild) -> int:
     """
     This function takes guild object as sole argument
     Returns an integer reflecting count of additional static emotes the guild could potentially accept
@@ -21,7 +21,7 @@ def static_vacancy(guild: discord.guild.Guild) -> int:
     return guild.emoji_limit - len([_ for _ in guild.emojis if not _.animated])
 
 
-def animated_vacancy(guild: discord.guild.Guild) -> int:
+def animated_vacancy(guild: disnake.guild.Guild) -> int:
     """
     This function takes guild object as sole argument
     Returns an integer reflecting count of additional animated emotes the guild could potentially accept
@@ -34,7 +34,7 @@ def get_mobile() -> Callable:
     This is unstable and may break your bot, but it is fun :D
 
     Takes no argument, returns function object
-    Overwrite in place for discord.gateway.DiscordWebSocket.identify
+    Overwrite in place for disnake.gateway.DiscordWebSocket.identify
 
     The Gateway's IDENTIFY packet contains a properties field, containing $os, $browser and $device fields.
     Discord uses that information to know when your phone client and only your phone client has connected to Discord,
@@ -51,7 +51,7 @@ def get_mobile() -> Callable:
 
         return "\n".join(i[indent:] for i in s)
 
-    source_: str = source(discord.gateway.DiscordWebSocket.identify)
+    source_: str = source(disnake.gateway.DiscordWebSocket.identify)
     patched: str = re.sub(
         r'([\'"]\$browser[\'"]:\s?[\'"]).+([\'"])',
         r"\1Discord Android\2",
@@ -59,7 +59,7 @@ def get_mobile() -> Callable:
     )
 
     loc: dict = {}
-    exec(compile(ast.parse(patched), "<string>", "exec"), discord.gateway.__dict__, loc)
+    exec(compile(ast.parse(patched), "<string>", "exec"), disnake.gateway.__dict__, loc)
     return loc["identify"]
 
 
