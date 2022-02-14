@@ -1,6 +1,6 @@
-import discord
+import disnake as discord
 from typing import Union, Callable
-from discord.ext import commands
+from disnake.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
 from tools.enum_tools import TableType
 from utilities.preference import Preference

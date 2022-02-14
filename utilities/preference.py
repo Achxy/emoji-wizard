@@ -1,6 +1,6 @@
-import discord
+import disnake as discord
 import functools
-from discord.ext import commands
+from disnake.ext import commands
 from tools.enum_tools import TableType
 
 

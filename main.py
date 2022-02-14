@@ -1,8 +1,8 @@
-import discord
+import disnake as discord
 import os
 import asyncpg
 import time
-from discord.ext import commands
+from disnake.ext import commands
 from tools.database_tools import DatabaseTools
 from tools.enum_tools import TableType
 from tools.caching import Cache

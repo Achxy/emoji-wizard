@@ -1,6 +1,6 @@
 import asyncpg
-import discord
-from discord.ext import commands
+import disnake as discord
+from disnake.ext import commands
 from enum import Enum
 from typing import Union
 from tools.enum_tools import TableType
