@@ -1,8 +1,8 @@
-import discord
+import disnake as discord
 import inspect
 import os
 from typing import Optional
-from discord.ext import commands
+from disnake.ext import commands
 from tools.enum_tools import TableType
 from utilities.preference import Preference
 

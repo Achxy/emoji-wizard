@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake as discord
+from disnake.ext import commands
 from tools.database_tools import Actions
 from typing import Optional
 
