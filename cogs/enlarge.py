@@ -3,7 +3,6 @@ from typing import Union, Callable
 from disnake.ext import commands
 from tools.enum_tools import TableType
 from tools.bot_tools import page_index
-from utilities.preference import Preference
 
 
 class Enlarge(commands.Cog):
@@ -11,7 +10,6 @@ class Enlarge(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @Preference.is_usable
     async def enlarge(self, ctx, *emotes: Union[discord.PartialEmoji, str]):
 
         successful_additions: int = 0

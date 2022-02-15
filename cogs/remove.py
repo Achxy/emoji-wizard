@@ -2,7 +2,6 @@ import disnake as discord
 from disnake.ext import commands
 from typing import Union
 from tools.enum_tools import TableType
-from utilities.preference import Preference
 
 
 class Remove(commands.Cog):
@@ -11,7 +10,6 @@ class Remove(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    @Preference.is_usable
     async def remove(self, ctx, *emotes: Union[discord.Emoji, str]):
 
         successful_removals: int = 0

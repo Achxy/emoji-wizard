@@ -4,7 +4,6 @@ import os
 from typing import Optional
 from disnake.ext import commands
 from tools.enum_tools import TableType
-from utilities.preference import Preference
 
 
 class Source(commands.Cog):
@@ -12,7 +11,6 @@ class Source(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @Preference.is_usable
     async def source(self, ctx, *, command: Optional[str] = None):
         """
         Displays my full source code or for a specific command.
