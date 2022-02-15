@@ -2,7 +2,6 @@ import disnake as discord
 from disnake.ext import commands
 import typing
 from tools.enum_tools import TableType
-from utilities.preference import Preference
 
 
 class Rename(commands.Cog):
@@ -11,7 +10,6 @@ class Rename(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    @Preference.is_usable
     async def rename(self, ctx, *emoji_and_name: typing.Union[discord.Emoji, str]):
         """
         Albeit variadic accepts many, we only accept 2 and raise issues if there are more than 2 args

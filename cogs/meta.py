@@ -1,7 +1,6 @@
 import disnake as discord
 from disnake.ext import commands
 from tools.enum_tools import TableType
-from utilities.preference import Preference
 
 
 class Meta(commands.Cog):
@@ -9,7 +8,6 @@ class Meta(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @Preference.is_usable
     async def ping(self, ctx):
         """
         Sends an embed with the bot's latency
@@ -23,7 +21,6 @@ class Meta(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    @Preference.is_usable
     async def setprefix(self, ctx, new_prefix: str):
         """
         Changes the bot's prefix for specific guilds
