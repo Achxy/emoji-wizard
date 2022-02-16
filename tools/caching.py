@@ -82,7 +82,6 @@ class Cache:
             self.caching_values[table.value].append(rows)
             return
 
-        assert len(rows) == len(self.caching_values[table.value][0]) - 1
         # Everything is fine, we can proceed
         # take action upon the non-provided row
         for i, row in enumerate(self.caching_values[table.value]):
