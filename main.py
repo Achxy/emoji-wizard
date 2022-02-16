@@ -6,13 +6,13 @@ from disnake.ext import commands
 from tools.database_tools import DatabaseTools
 from tools.enum_tools import TableType
 from tools.caching import Cache
-from tools.bot_tools import get_mobile
+from tools.bot_tools import get_mobile, get_default_prefix
 
 
 discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
 )  # Remove this line if bot isn't working, experimental thing
-DEFAULT_PREFIX: str = "?"
+DEFAULT_PREFIX: str = get_default_prefix()
 extensions = {
     "cogs": "⚙️",
     "utilities": "🚀",

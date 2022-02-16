@@ -1,7 +1,11 @@
 from tools.enum_tools import TableType
 from enum import Enum
+from tools.bot_tools import get_default_prefix
 import functools
 import json
+
+
+DEFAULT_PREFIX: str = get_default_prefix()
 
 
 class InterpolateAction(Enum):
@@ -95,7 +99,7 @@ class Cache:
                 return
 
     @_if_ready
-    async def get_prefix(self, table, guild_id, default_prefix):
+    async def get_prefix(self, table, guild_id, default_prefix=DEFAULT_PREFIX):
         """
         This function can actually write to the database
         returns the custom prefix of the guild if available in cache
