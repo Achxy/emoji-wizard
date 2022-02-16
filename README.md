@@ -19,7 +19,7 @@ Have any bugs, issues or suggestions? Let me know in the **https://github.com/Ac
 <li>Ping command ✅</li>
 <li>Help command</li>
 <li>Backup command</li>
-<li>Invite command</li>
+<li>Invite command ✅</li>
 <li>Uptime command</li>
 <li>Remove command ✅</li>
 <li>Remove-all command ✅</li>
