@@ -51,22 +51,6 @@ class DatabaseTools:
                 """
         await self.pool.execute(query)
 
-        # Table for storing command preferences
-        query = """CREATE TABLE IF NOT EXISTS command_preferences(
-                    guild_id BIGINT,
-                    ignored_command TEXT
-                    );
-                """
-        await self.pool.execute(query)
-
-        # Table for storing channel preferences
-        query = """CREATE TABLE IF NOT EXISTS channel_preferences(
-                    guild_id BIGINT,
-                    channel_id BIGINT
-                    );
-                """
-        await self.pool.execute(query)
-
     async def increment_usage(
         self,
         ctx,
