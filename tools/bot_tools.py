@@ -63,13 +63,15 @@ def get_mobile() -> Callable:
     return loc["identify"]
 
 
-def seperate_chunks(l: Sequence, into: int) -> Generator[Sequence, None, None]:
+def seperate_chunks(
+    sequential_data: Sequence, into: int
+) -> Generator[Sequence, None, None]:
     """
     This function takes a list and a number of chunks as arguments
     Returns a list of chunks of the list
     """
-    for i in range(0, len(l), into):
-        yield l[i : i + into]
+    for i in range(0, len(sequential_data), into):
+        yield sequential_data[i : i + into]
 
 
 def page_index(name: str, page_count: int) -> Callable:
