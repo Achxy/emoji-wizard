@@ -19,7 +19,10 @@ class Remove(commands.Cog):
             if not isinstance(i, discord.Emoji):
                 embed = discord.Embed(
                     title="That is not an custom emoji",
-                    description=f"You need to give me an custom discord emoji (Make sure the emoji that you give is actually in your server)\nYou passed in : {i}",
+                    description=(
+                        "You need to give me an custom discord emoji "
+                        f"(Make sure the emoji that you give is actually in your server)\nYou passed in : {i}"
+                    ),
                 )
                 await ctx.send(embed=embed)
                 continue
@@ -28,7 +31,7 @@ class Remove(commands.Cog):
             if not i.guild.id == ctx.guild.id:
                 embed = discord.Embed(
                     title="That is not an emoji from this server",
-                    description=f"You need to give me an emoji that is actually in your server!",
+                    description="You need to give me an emoji that is actually in your server!",
                 )
                 await ctx.send(embed=embed)
                 continue
