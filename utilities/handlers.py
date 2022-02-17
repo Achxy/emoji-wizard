@@ -14,7 +14,12 @@ class Handler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
-
+        # TODO: Make a seperate listener for this for fine grained control
+        # This is safe enough to pushed for now
+        # Edge case:
+        # If a message is edited multiple times, the bot will count all of it
+        # we should only count the last edit
+        # We will make interim class later, this is okay for now
         if before.content == after.content:
             return
 
