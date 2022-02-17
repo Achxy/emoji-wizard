@@ -8,6 +8,7 @@ from tools.enum_tools import TableType
 from tools.caching import Cache
 from tools.bot_tools import get_mobile, get_default_prefix
 from tools.interim import Interim
+from helpers.context_patch import PatchedContext
 
 
 discord.gateway.DiscordWebSocket.identify = (
@@ -55,6 +56,14 @@ async def on_ready():
         await bot.cache.populate_cache(table)
     _t1: float = time.perf_counter()
     print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
+
+
+@bot.event
+async def on_message(message: discord.Message):
+    # Here we override the default on_message function
+    # We will process commands from here but with our own context class
+    ctx = await bot.get_context(message, cls=PatchedContext)
+    await bot.invoke(ctx)
 
 
 # Get all the python files from the cogs folder
