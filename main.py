@@ -33,7 +33,9 @@ async def get_prefix(bot: commands.Bot, message: discord.Message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
-bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
+bot: commands.Bot = commands.Bot(
+    command_prefix=get_prefix, help_command=None, case_insensitive=True
+)
 
 
 async def create_db_pool():
@@ -48,10 +50,10 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
-    _t0 = time.perf_counter()
+    _t0: float = time.perf_counter()
     for table in TableType:
         await bot.cache.populate_cache(table)
-    _t1 = time.perf_counter()
+    _t1: float = time.perf_counter()
     print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
 
 
