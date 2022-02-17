@@ -4,6 +4,18 @@ from disnake.ext import commands
 from tools.enum_tools import TableType
 
 
+class PatchedContext(commands.Context):
+    def _get_patch_message(self, content):
+        msg = "This command was invoked by an edit"
+        return msg if content is None else f"{msg}\n{content}"
+
+    def send(self, content=None, **kwargs):
+        return super().send(self._get_patch_message(content), **kwargs)
+
+    def reply(self, content=None, **kwargs):
+        return self.send(self._get_patch_message(content), **kwargs)
+
+
 class Handler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -17,7 +29,6 @@ class Handler(commands.Cog):
         # If a message is edited multiple times,
         # we should only count the last edit
         delta_sec = datetime.now().timestamp() - before.created_at.timestamp()
-        print(delta_sec)
         if before.content == after.content or delta_sec > 35:
             # We won't take any actions if previous message is same as new
             # or if the the time elapsed from the initial message is greater than 35 seconds
@@ -36,15 +47,18 @@ class Handler(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         for i in self.bot.interim.get_list()[::-1]:
+            # Traversing through the reversed heap means that
+            # the first match will be the last edit made to the message
             if (
                 i.id == payload.message_id
                 and payload.emoji.name == "🔁"
                 and payload.user_id == i.author.id
             ):
-                ctx = await self.bot.get_context(i)
+                ctx = await self.bot.get_context(i, cls=PatchedContext)
                 await self.bot.invoke(ctx)
-                await ctx.send("This command was invoked by an edit")
-                # TODO: Make a better delivery on this ^
+                # We are done with processing the last edit made
+                # We would now end the function definition
+                return
 
 
 def setup(bot):

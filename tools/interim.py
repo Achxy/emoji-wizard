@@ -14,9 +14,12 @@ class TimedData:
         if self._life > time.time():
             self._has_expired = False
             return
-        self._has_expired = True
-        # At this point, the data can be safely deleted
-        del self._data
+        if not self._has_expired:
+            self._has_expired = True
+            # At this point, the data can be safely deleted
+            # We made this if check because we don't want to attempt to delete
+            # the data if it has already been deleted
+            del self._data
 
     @property
     def has_expired(self):
