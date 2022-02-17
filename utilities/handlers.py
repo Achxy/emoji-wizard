@@ -2,18 +2,7 @@ import disnake as discord
 from datetime import datetime
 from disnake.ext import commands
 from tools.enum_tools import TableType
-
-
-class PatchedContext(commands.Context):
-    def _get_patch_message(self, content):
-        msg = "This command was invoked by an edit"
-        return msg if content is None else f"{msg}\n{content}"
-
-    def send(self, content=None, **kwargs):
-        return super().send(self._get_patch_message(content), **kwargs)
-
-    def reply(self, content=None, **kwargs):
-        return self.send(self._get_patch_message(content), **kwargs)
+from helpers.context_patch import EditInvokeContext
 
 
 class Handler(commands.Cog):
@@ -54,7 +43,7 @@ class Handler(commands.Cog):
                 and payload.emoji.name == "🔁"
                 and payload.user_id == i.author.id
             ):
-                ctx = await self.bot.get_context(i, cls=PatchedContext)
+                ctx = await self.bot.get_context(i, cls=EditInvokeContext)
                 await self.bot.invoke(ctx)
                 # We are done with processing the last edit made
                 # We would now end the function definition
