@@ -10,6 +10,7 @@ class RemoveAll(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
+    @commands.max_concurrency(1, commands.BucketType.guild)
     async def remove_all(self, ctx: EditInvokeContext | PatchedContext):
         """
         Takes no parameters, removes all emojis from the server
