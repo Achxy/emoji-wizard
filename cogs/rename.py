@@ -20,6 +20,7 @@ class Rename(commands.Cog):
         """
 
         # Check if the argument count is 2 or not
+        # TODO: do not hardcode this but handle this in handlers.py
         if not len(emoji_and_name) == 2:
             embed = discord.Embed(
                 title="That command only takes 2 arguments",
