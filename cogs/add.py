@@ -1,8 +1,10 @@
 import disnake as discord
-from typing import Union, Callable
+from disnake import PartialEmoji
+from typing import Callable
 from disnake.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
 from tools.enum_tools import TableType
+from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class Add(commands.Cog):
@@ -12,7 +14,9 @@ class Add(commands.Cog):
     # TODO: Add more features and error handling to this.
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def add(self, ctx, *emojis: Union[discord.PartialEmoji, str]):
+    async def add(
+        self, ctx: EditInvokeContext | PatchedContext, *emojis: PartialEmoji | str
+    ):
 
         # We want to log how many emotes were successfully added to the guild
         # We make an success count and increment it on success
