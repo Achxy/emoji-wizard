@@ -23,10 +23,20 @@ class Add(commands.Cog):
 
         successful_additions: int = 0
         footer_enumer: Callable[[int], str] = page_index("add", len(emojis))
+        # Instead of making multiple function calls, we we will store vacancy as a variable
+        # then decrement it as we move along
+        var_static_vac = static_vacancy(ctx.guild)
+        var_animated_vac = animated_vacancy(ctx.guild)
 
         for index, each_emoji in enumerate(emojis):
+            # Case 1: The guild cannot accept any more of any emotes
+            # Case 2: The emote is an str
+            # Case 3: The guild cannot accept any more of static emotes but can accept animated
+            # Case 4: The guild cannot accept any more of animated emotes but can accept static
+            # Case 5: The guild can accept both static and animated emotes (working!)
+            # Now, we could combine them to have a bit less of repetition but I wanted custom messages for each
 
-            if static_vacancy(ctx.guild) == 0 and animated_vacancy(ctx.guild) == 0:
+            if var_animated_vac == 0 and var_static_vac == 0:
                 # Send a message indicating that the guild cannot accept any more emotes
                 # If this condition is hit then we want to terminate the function definition
                 embed = discord.Embed(
@@ -51,21 +61,21 @@ class Add(commands.Cog):
                 await ctx.send(embed=embed)
                 continue
 
-            if not each_emoji.animated and static_vacancy(ctx.guild) == 0:
+            if not each_emoji.animated and var_static_vac == 0:
                 # Send a message indicating that the guild cannot accept any more static emotes
                 embed = discord.Embed(
                     title="Guild cannot accept any more of that",
                     description=(
                         "The guild cannot accept any more static emotes "
                         "(perhaps add some animated emotes now) as such "
-                        "**{each_emoji.name}** was not added to the guild"
+                        f"**{each_emoji.name}** was not added to the guild"
                     ),
                 )
                 embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
                 continue
 
-            if each_emoji.animated and animated_vacancy(ctx.guild) == 0:
+            if each_emoji.animated and var_animated_vac == 0:
                 # Send a message indicating that the guild cannot accept any more animated emotes
                 embed = discord.Embed(
                     title="Guild cannot accept any more of that",
@@ -101,6 +111,11 @@ class Add(commands.Cog):
 
                 # Increment success counter
                 successful_additions += 1
+                # Decrement the vacancy
+                if each_emoji.animated:
+                    var_animated_vac -= 1
+                else:
+                    var_static_vac -= 1
 
         await self.bot.tools.increment_usage(
             ctx,
