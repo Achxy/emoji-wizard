@@ -7,6 +7,7 @@ from tools.database_tools import DatabaseTools
 from tools.enum_tools import TableType
 from tools.caching import Cache
 from tools.bot_tools import get_mobile, get_default_prefix
+from tools.interim import Interim
 
 
 discord.gateway.DiscordWebSocket.identify = (
@@ -41,6 +42,7 @@ async def create_db_pool():
     bot.tools = DatabaseTools(bot)
     await bot.tools.confirm_tables()
     bot.cache = Cache(bot)
+    bot.interim = Interim(bot)
 
 
 @bot.event

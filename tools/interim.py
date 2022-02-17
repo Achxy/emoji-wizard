@@ -75,3 +75,12 @@ class Interim:
 
     def get_time_left(self, key):
         return self.dictionary_data[key].time_left
+
+    def refresh_key(self, key):
+        self.dictionary_data[key].refresh()
+
+    def clear_list(self):
+        self.data = []
+
+    def clear_dictionary(self):
+        self.dictionary_data = {}
