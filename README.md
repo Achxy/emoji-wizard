@@ -19,7 +19,7 @@ Have any bugs, issues or suggestions? Let me know in the **https://github.com/Ac
 <li>Ping command ✅</li>
 <li>Help command</li>
 <li>Backup command</li>
-<li>Invite command</li>
+<li>Invite command ✅</li>
 <li>Uptime command</li>
 <li>Remove command ✅</li>
 <li>Remove-all command ✅</li>
@@ -28,8 +28,8 @@ Have any bugs, issues or suggestions? Let me know in the **https://github.com/Ac
 <li>Stats command</li>
 <li>Set-status command (dev only)</li>
 <li>Source command ✅</li>
-<li>Enable command ✅</li>
-<li>Disable command ✅</li>
+<li>Enable command </li>
+<li>Disable command </li>
 <li>Ignore command (to ignore a said channel)</li>
 <br> --
 <li>Better error handling</li>

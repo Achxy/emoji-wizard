@@ -2,7 +2,9 @@ import disnake as discord
 import ast
 import inspect
 import re
+import json
 from typing import Callable, Generator, Sequence
+
 
 __all__ = (
     "static_vacancy",
@@ -63,13 +65,15 @@ def get_mobile() -> Callable:
     return loc["identify"]
 
 
-def seperate_chunks(l: Sequence, into: int) -> Generator[Sequence, None, None]:
+def seperate_chunks(
+    sequential_data: Sequence, into: int
+) -> Generator[Sequence, None, None]:
     """
     This function takes a list and a number of chunks as arguments
     Returns a list of chunks of the list
     """
-    for i in range(0, len(l), into):
-        yield l[i : i + into]
+    for i in range(0, len(sequential_data), into):
+        yield sequential_data[i : i + into]
 
 
 def page_index(name: str, page_count: int) -> Callable:
@@ -82,3 +86,13 @@ def page_index(name: str, page_count: int) -> Callable:
         return f"{index + 1} of {page_count} to {name} {'' if not (index + 1) == page_count else '(over)'}"
 
     return pg
+
+
+def get_default_prefix() -> str:
+    """
+    This function takes no argument
+    Returns the default prefix (custom prefixes are of course stored in the database)
+    """
+    with open("config.json", "r") as f:
+        config = json.load(f)
+    return config["default_prefix"]

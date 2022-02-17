@@ -3,7 +3,6 @@ import inspect
 import os
 from typing import Optional
 from disnake.ext import commands
-from tools.enum_tools import TableType
 
 
 class Source(commands.Cog):

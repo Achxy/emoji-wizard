@@ -1,6 +1,5 @@
 import disnake as discord
 from disnake.ext import commands
-from tools.enum_tools import TableType
 
 
 class Meta(commands.Cog):

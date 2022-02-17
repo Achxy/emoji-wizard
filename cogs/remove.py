@@ -1,7 +1,8 @@
 import disnake as discord
 from disnake.ext import commands
-from typing import Union
+from typing import Union, Callable
 from tools.enum_tools import TableType
+from tools.bot_tools import page_index
 
 
 class Remove(commands.Cog):
@@ -13,13 +14,17 @@ class Remove(commands.Cog):
     async def remove(self, ctx, *emotes: Union[discord.Emoji, str]):
 
         successful_removals: int = 0
+        footer_enumer: Callable[[int], str] = page_index("remove", len(emotes))
 
         for index, i in enumerate(emotes):
 
             if not isinstance(i, discord.Emoji):
                 embed = discord.Embed(
                     title="That is not an custom emoji",
-                    description=f"You need to give me an custom discord emoji (Make sure the emoji that you give is actually in your server)\nYou passed in : {i}",
+                    description=(
+                        "You need to give me an custom discord emoji "
+                        f"(Make sure the emoji that you give is actually in your server)\nYou passed in : {i}"
+                    ),
                 )
                 await ctx.send(embed=embed)
                 continue
@@ -28,7 +33,7 @@ class Remove(commands.Cog):
             if not i.guild.id == ctx.guild.id:
                 embed = discord.Embed(
                     title="That is not an emoji from this server",
-                    description=f"You need to give me an emoji that is actually in your server!",
+                    description="You need to give me an emoji that is actually in your server!",
                 )
                 await ctx.send(embed=embed)
                 continue
@@ -37,9 +42,7 @@ class Remove(commands.Cog):
                 title=f"Removed {i.name}",
                 description="Successfully removed the emoji from the server",
             )
-            embed.set_footer(
-                text=f"{index + 1} of {len(emotes)} to remove {'' if not (index + 1) == len(emotes) else '(over)'}"
-            )
+            embed.set_footer(text=footer_enumer(index))
 
             successful_removals += 1
             await ctx.send(embed=embed)
