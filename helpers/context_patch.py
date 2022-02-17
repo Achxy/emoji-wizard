@@ -1,4 +1,4 @@
-from disnake import commands
+from disnake.ext import commands
 
 
 class PatchedContext(commands.Context):

@@ -1,8 +1,9 @@
+import functools
+import json
+import asyncio
 from tools.enum_tools import TableType
 from enum import Enum
 from tools.bot_tools import get_default_prefix
-import functools
-import json
 
 
 DEFAULT_PREFIX: str = get_default_prefix()
@@ -19,25 +20,65 @@ class Cache:
     def __init__(self, bot) -> None:
         self.bot = bot
         self._pool = bot.db
-        self._ready = False
+        self._ready = True
+        self._event = asyncio.Event()
+        asyncio.create_task(self.wait_until_ready(self._event))
+        self._event.set()
 
         self.caching_values = {}
 
+    async def wait_until_ready(self, event):
+        self._ready = False
+        await event.wait()
+        self._ready = True
+
     def _if_ready(func):
+        """
+        Decorator to check if the cache is ready before executing the function
+        Wait for the cache to be ready before executing the function
+        Lock the cache while executing the function
+        This decorator ALWAYS returns a coroutine (even if the function is not)
+        """
+
         @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
+        async def wrapper(self, *args, **kwargs):
             if not self._ready:
-                raise RuntimeError("Cache is not ready")
-            return func(self, *args, **kwargs)
+                # Some other function is occupying.
+                # Wait for the cache to be ready
+                print("Waiting for cache to be ready")
+                await self.wait_until_ready(self._event)
+                # Lock the cache
+                self._event.clear()
+                if asyncio.iscoroutinefunction(func):
+                    r = await func(self, *args, **kwargs)
+                else:
+                    r = func(self, *args, **kwargs)
+                # Unlock the cache
+                self._event.set()
+                return r
+            # Cache is already ready
+            # Occuply it for ourselves
+            print("Occupying cache")
+            self._event.clear()
+            if asyncio.iscoroutinefunction(func):
+                r = await func(self, *args, **kwargs)
+            else:
+                r = func(self, *args, **kwargs)
+            # Unlock the cache
+            self._event.set()
+            return r
 
         return wrapper
 
+    @_if_ready
     async def populate_cache(self, *tables: TableType):
         # Tables is supposed to be an enum
         # we need to get the values of it and then pass it to the query
         # and then we can use the values to get the data from the database
         # the cache is later accessed by the same enums
-        self._ready = False
+
+        # Clear the existing cache
+        self.caching_values.clear()
 
         for tb in map(lambda x: x.value, tables):
             query = f"SELECT * FROM {tb}"
@@ -50,7 +91,6 @@ class Cache:
             self.caching_values[tb] = [
                 [v for v in n] for n in [j.values() for j in data]
             ]
-        self._ready = True
 
     @_if_ready
     def get_cache(self, table: TableType):
@@ -121,4 +161,8 @@ class Cache:
 
     @property
     def is_ready(self):
+        """
+        Returns True if the cache is ready
+        This value may change several times during the runtime
+        """
         return self._ready
