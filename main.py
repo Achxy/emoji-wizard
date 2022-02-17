@@ -13,7 +13,7 @@ from helpers.context_patch import PatchedContext
 
 discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
-)  # Remove this line if bot isn't working, experimental thing
+)  # Remove this line if you don't want mobile status
 DEFAULT_PREFIX: str = get_default_prefix()
 extensions = {
     "cogs": "⚙️",
@@ -26,7 +26,7 @@ extensions = {
 async def get_prefix(bot: commands.Bot, message: discord.Message):
     if not message.guild:
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
-
+    # Get prefix from cache
     prefix = await bot.cache.get_prefix(
         TableType.guilds, message.guild.id, DEFAULT_PREFIX
     )
@@ -51,10 +51,12 @@ async def create_db_pool():
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
+    # Time the time it takes for the bot to populate the cache from the database
     _t0: float = time.perf_counter()
     for table in TableType:
         await bot.cache.populate_cache(table)
     _t1: float = time.perf_counter()
+    # display the time it took
     print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
 
 
