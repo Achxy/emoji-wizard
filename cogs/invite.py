@@ -1,6 +1,7 @@
 import disnake as discord
 from disnake.ui import View, Button
 from disnake.ext import commands
+from helpers.context_patch import PatchedContext, EditInvokeContext
 
 
 class Invite(commands.Cog):
@@ -8,7 +9,7 @@ class Invite(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def invite(self, ctx):
+    async def invite(self, ctx: EditInvokeContext | PatchedContext):
         """
         Sends a link to invite the bot to your server
         """

@@ -1,5 +1,6 @@
 import disnake as discord
 from disnake.ext import commands
+from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class Meta(commands.Cog):
@@ -7,7 +8,7 @@ class Meta(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def ping(self, ctx):
+    async def ping(self, ctx: EditInvokeContext | PatchedContext):
         """
         Sends an embed with the bot's latency
         but really this command is just used to test the bot's responsiveness
@@ -20,7 +21,7 @@ class Meta(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def setprefix(self, ctx, new_prefix: str):
+    async def setprefix(self, ctx: EditInvokeContext | PatchedContext, new_prefix: str):
         """
         Changes the bot's prefix for specific guilds
         """

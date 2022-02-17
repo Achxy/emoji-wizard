@@ -1,7 +1,8 @@
 import disnake as discord
+from disnake import Emoji
 from disnake.ext import commands
-import typing
 from tools.enum_tools import TableType
+from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class Rename(commands.Cog):
@@ -10,7 +11,9 @@ class Rename(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def rename(self, ctx, *emoji_and_name: typing.Union[discord.Emoji, str]):
+    async def rename(
+        self, ctx: EditInvokeContext | PatchedContext, *emoji_and_name: Emoji | str
+    ):
         """
         Albeit variadic accepts many, we only accept 2 and raise issues if there are more than 2 args
         The two args can be in any order, one of which is discord.Emoji and the one is a str instance

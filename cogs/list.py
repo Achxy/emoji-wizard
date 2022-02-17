@@ -1,9 +1,10 @@
 from disnake.ext import commands
 from tools.bot_tools import seperate_chunks
 from tools.enum_tools import TableType
+from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
-class List(commands.Cog):
+class ListEmojis(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -12,7 +13,7 @@ class List(commands.Cog):
             "list",
         ]
     )
-    async def list_emoji(self, ctx):
+    async def list_emoji(self, ctx: EditInvokeContext | PatchedContext):
         """
         Send each emoji in the guild as a chunk of 10
         """
@@ -36,4 +37,4 @@ class List(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(List(bot))
+    bot.add_cog(ListEmojis(bot))

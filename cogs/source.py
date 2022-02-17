@@ -3,6 +3,7 @@ import inspect
 import os
 from typing import Optional
 from disnake.ext import commands
+from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class Source(commands.Cog):
@@ -10,7 +11,9 @@ class Source(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def source(self, ctx, *, command: Optional[str] = None):
+    async def source(
+        self, ctx: EditInvokeContext | PatchedContext, *, command: Optional[str] = None
+    ):
         """
         Displays my full source code or for a specific command.
         """

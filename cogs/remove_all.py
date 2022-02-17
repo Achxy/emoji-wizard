@@ -1,6 +1,7 @@
 import disnake as discord
 from disnake.ext import commands
 from tools.enum_tools import TableType
+from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class RemoveAll(commands.Cog):
@@ -9,7 +10,7 @@ class RemoveAll(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def remove_all(self, ctx):
+    async def remove_all(self, ctx: EditInvokeContext | PatchedContext):
         """
         Takes no parameters, removes all emojis from the server
         """
