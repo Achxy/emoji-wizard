@@ -27,7 +27,11 @@ class Add(commands.Cog):
                 # If this condition is hit then we want to terminate the function definition
                 embed = discord.Embed(
                     title="The guild is absolutely full",
-                    description="Your guild is full of emotes, it cannot accept any more of either static or animated emotes, please remove some emotes before trying again",
+                    description=(
+                        "Your guild is full of emotes, "
+                        "it cannot accept any more of either static or animated emotes, "
+                        "please remove some emotes before trying again"
+                    ),
                 )
                 await ctx.send(embed=embed)
                 # End the function definiton
@@ -47,7 +51,11 @@ class Add(commands.Cog):
                 # Send a message indicating that the guild cannot accept any more static emotes
                 embed = discord.Embed(
                     title="Guild cannot accept any more of that",
-                    description=f"The guild cannot accept any more static emotes (perhaps add some animated emotes now) as such **{each_emoji.name}** was not added to the guild",
+                    description=(
+                        "The guild cannot accept any more static emotes "
+                        "(perhaps add some animated emotes now) as such "
+                        "**{each_emoji.name}** was not added to the guild"
+                    ),
                 )
                 embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
@@ -57,7 +65,10 @@ class Add(commands.Cog):
                 # Send a message indicating that the guild cannot accept any more animated emotes
                 embed = discord.Embed(
                     title="Guild cannot accept any more of that",
-                    description=f"The guild cannot accept any more animated emotes (perhaps add some static emotes now) as such **{each_emoji.name}** was not added to the guild",
+                    description=(
+                        "The guild cannot accept any more animated emotes (perhaps add some static emotes now) "
+                        f"as such **{each_emoji.name}** was not added to the guild"
+                    ),
                 )
                 embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
