@@ -156,8 +156,10 @@ class Cache:
                 return i[1]
 
     @_if_ready
-    def __str__(self) -> str:
-        return json.dumps(self.caching_values, indent=4)
+    def print_cache(self):
+        v = json.dumps(self.caching_values, indent=4)
+        print(v)
+        return v
 
     @property
     def is_ready(self):

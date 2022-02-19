@@ -82,7 +82,7 @@ class DatabaseTools:
         # Both command and rubric interpolation should be of type coinciding
         # So there isn't a need to make another check
         rows = [ctx.guild.id, ctx.channel.id, ctx.author.id, command_or_rubric_name]
-        self.bot.cache.interpolate(
+        await self.bot.cache.interpolate(
             table_, rows, InterpolateAction.coincide, value_to_increment
         )
 

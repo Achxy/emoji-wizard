@@ -7,7 +7,6 @@ from tools.database_tools import DatabaseTools
 from tools.enum_tools import TableType
 from tools.caching import Cache
 from tools.bot_tools import get_mobile, get_default_prefix
-from tools.interim import Interim
 from helpers.context_patch import PatchedContext
 
 
@@ -45,7 +44,6 @@ async def create_db_pool():
     bot.tools = DatabaseTools(bot)
     await bot.tools.confirm_tables()
     bot.cache = Cache(bot)
-    bot.interim = Interim(bot)
 
 
 @bot.event
@@ -58,6 +56,7 @@ async def on_ready():
     _t1: float = time.perf_counter()
     # display the time it took
     print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
+    await bot.cache.print_cache()
 
 
 @bot.event
