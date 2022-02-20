@@ -13,7 +13,6 @@ class Remove(commands.Cog):
     @commands.has_permissions(manage_emojis=True)
     async def remove(self, ctx, *emotes: Emoji | str):
 
-        successful_removals: int = 0
         footer_enumer: Callable[[int], str] = page_index("remove", len(emotes))
 
         for index, i in enumerate(emotes):
@@ -44,7 +43,6 @@ class Remove(commands.Cog):
             )
             embed.set_footer(text=footer_enumer(index))
 
-            successful_removals += 1
             await ctx.send(embed=embed)
 
 

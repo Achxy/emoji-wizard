@@ -14,9 +14,8 @@ class RemoveAll(commands.Cog):
         Takes no parameters, removes all emojis from the server
         """
 
-        count: int = 0
         for each_emoji in ctx.guild.emojis:
-            count += 1
+
             try:
                 await each_emoji.delete()
             except discord.Forbidden:
