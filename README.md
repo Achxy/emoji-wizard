@@ -24,7 +24,7 @@ Have any bugs, issues or suggestions? Let me know in the **https://github.com/Ac
 <li>Remove command ✅</li>
 <li>Remove-all command ✅</li>
 <li>Snipe-emoji-by-id command</li>
-<li>Remove-duplicate-command command</li>>
+<li>Remove-duplicate-command command</li>
 <li>Set-status command (dev only)</li>
 <li>Source command ✅</li>
 <br> --
