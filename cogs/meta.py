@@ -20,10 +20,26 @@ class Meta(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def setprefix(self, ctx, new_prefix: str):
+    async def setprefix(self, ctx, *, new_prefix: str):
         """
         Changes the bot's prefix for specific guilds
         """
+
+        reason = (
+            "too long\nMust be less than or equal to 8 characters"
+            if len(new_prefix) > 8
+            else "too short"
+            if not new_prefix
+            else None
+        )
+
+        if reason is not None:
+            embed = discord.Embed(
+                title="Cannot set that as prefix",
+                description=f"The prefix you entered is {reason}",
+            )
+            return await ctx.reply(embed=embed)
+
         await self.bot.tools.set_prefix(ctx.guild.id, new_prefix)
 
         embed = discord.Embed(
