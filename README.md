@@ -24,13 +24,9 @@ Have any bugs, issues or suggestions? Let me know in the **https://github.com/Ac
 <li>Remove command ✅</li>
 <li>Remove-all command ✅</li>
 <li>Snipe-emoji-by-id command</li>
-<li>Remove-duplicate-command command</li>
-<li>Stats command</li>
+<li>Remove-duplicate-command command</li>>
 <li>Set-status command (dev only)</li>
 <li>Source command ✅</li>
-<li>Enable command </li>
-<li>Disable command </li>
-<li>Ignore command (to ignore a said channel)</li>
 <br> --
 <li>Better error handling</li>
 </ol>
