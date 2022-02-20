@@ -2,7 +2,6 @@ import disnake as discord
 import ast
 import inspect
 import re
-import json
 from typing import Callable, Generator, Sequence
 
 
@@ -86,13 +85,3 @@ def page_index(name: str, page_count: int) -> Callable:
         return f"{index + 1} of {page_count} to {name} {'' if not (index + 1) == page_count else '(over)'}"
 
     return pg
-
-
-def get_default_prefix() -> str:
-    """
-    This function takes no argument
-    Returns the default prefix (custom prefixes are of course stored in the database)
-    """
-    with open("config.json", "r") as f:
-        config = json.load(f)
-    return config["default_prefix"]

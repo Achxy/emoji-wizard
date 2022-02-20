@@ -130,7 +130,7 @@ dmypy.json
 
 
 # Some tests I do
-testing.*
+t_*.*
 
 # vscode preferences
 .vscode

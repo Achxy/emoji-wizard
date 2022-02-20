@@ -1,58 +1,38 @@
 import disnake as discord
 import os
 import asyncpg
-import time
 from disnake.ext import commands
-from tools.database_tools import DatabaseTools
-from tools.enum_tools import TableType
-from tools.caching import Cache
-from tools.bot_tools import get_mobile, get_default_prefix
-from tools.interim import Interim
+from tools.bot_tools import get_mobile
+from tools.database import Database
 
 
 discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
-)  # Remove this line if bot isn't working, experimental thing
-DEFAULT_PREFIX: str = get_default_prefix()
+)  # Remove this line if you don't want mobile status
+DEFAULT_PREFIX = "?"
 extensions = {
     "cogs": "⚙️",
-    "utilities": "🚀",
 }  # It's the emoji bot, what else would you expect?
 
 
-# Get custom prefix for the guild
-# Handle if not used in guild
-async def get_prefix(bot: commands.Bot, message: discord.Message):
-    if not message.guild:
-        return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
-
-    prefix = await bot.cache.get_prefix(
-        TableType.guilds, message.guild.id, DEFAULT_PREFIX
-    )
-
-    return commands.when_mentioned_or(prefix)(bot, message)
-
-
-bot = commands.Bot(command_prefix=get_prefix, help_command=None, case_insensitive=True)
+bot: commands.Bot = commands.Bot(
+    command_prefix=Database.get_prefix(DEFAULT_PREFIX, debug=False),
+    help_command=None,
+    case_insensitive=True,
+)
 
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
-    bot.tools = DatabaseTools(bot)
+    bot.tools = Database(bot)
     await bot.tools.confirm_tables()
-    bot.cache = Cache(bot)
-    bot.interim = Interim(bot)
 
 
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
-    _t0 = time.perf_counter()
-    for table in TableType:
-        await bot.cache.populate_cache(table)
-    _t1 = time.perf_counter()
-    print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
+    await bot.tools.populate_cache()
 
 
 # Get all the python files from the cogs folder

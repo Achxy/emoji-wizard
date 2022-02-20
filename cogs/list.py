@@ -1,9 +1,8 @@
 from disnake.ext import commands
 from tools.bot_tools import seperate_chunks
-from tools.enum_tools import TableType
 
 
-class List(commands.Cog):
+class ListEmojis(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,12 +27,6 @@ class List(commands.Cog):
                     msg += f"{count}. ~~{each_emoji}~~ -- `{each_emoji}` **(unavailable)**\n"
             await ctx.send(msg)
 
-        await self.bot.tools.increment_usage(
-            ctx,
-            TableType.rubric,
-            count,
-        )
-
 
 def setup(bot):
-    bot.add_cog(List(bot))
+    bot.add_cog(ListEmojis(bot))

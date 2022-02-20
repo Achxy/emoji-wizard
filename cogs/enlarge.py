@@ -1,7 +1,7 @@
 import disnake as discord
-from typing import Union, Callable
+from disnake import PartialEmoji
+from typing import Callable
 from disnake.ext import commands
-from tools.enum_tools import TableType
 from tools.bot_tools import page_index
 
 
@@ -10,9 +10,8 @@ class Enlarge(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def enlarge(self, ctx, *emotes: Union[discord.PartialEmoji, str]):
+    async def enlarge(self, ctx, *emotes: PartialEmoji | str):
 
-        successful_additions: int = 0
         footer_enumer: Callable[[int], str] = page_index("enlarge", len(emotes))
 
         for index, i in enumerate(emotes):
@@ -29,14 +28,7 @@ class Enlarge(commands.Cog):
             embed.set_image(url=i.url)
             embed.set_footer(text=footer_enumer(index))
 
-            successful_additions += 1
             await ctx.send(embed=embed)
-
-        await self.bot.tools.increment_usage(
-            ctx,
-            TableType.rubric,
-            successful_additions,
-        )
 
 
 def setup(bot):
