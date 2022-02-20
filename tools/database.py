@@ -20,6 +20,13 @@ class Database:
             """
         )
 
+    @staticmethod
+    def _debug(start_time: float, message: str, convert=1000):
+        def check_point():
+            print(message.format((time.perf_counter() - start_time) * convert))
+
+        return check_point
+
     async def populate_cache(self) -> None:
         self._cached_prefixes = {}
         for record in await self.pool.fetch("SELECT * FROM prefixes"):
@@ -31,8 +38,14 @@ class Database:
     @staticmethod
     def get_prefix(default_prefix, debug=False):
         def inner_get_prefix(bot, message):
+            check_point = __class__._debug(
+                time.perf_counter(), "Prefix lookup took {}ms"
+            )
             if not message.guild or message.guild.id not in bot.tools._cached_prefixes:
+                check_point() if debug else None
                 return commands.when_mentioned_or(default_prefix)(bot, message)
+
+            check_point() if debug else None
             return commands.when_mentioned_or(
                 bot.tools._cached_prefixes[message.guild.id]
             )(bot, message)

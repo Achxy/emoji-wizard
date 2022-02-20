@@ -16,7 +16,7 @@ extensions = {
 
 
 bot: commands.Bot = commands.Bot(
-    command_prefix=Database.get_prefix(DEFAULT_PREFIX),
+    command_prefix=Database.get_prefix(DEFAULT_PREFIX, debug=False),
     help_command=None,
     case_insensitive=True,
 )
