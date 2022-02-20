@@ -3,7 +3,6 @@ from disnake import PartialEmoji
 from typing import Callable
 from disnake.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
-from tools.enum_tools import TableType
 from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
@@ -18,10 +17,6 @@ class Add(commands.Cog):
         self, ctx: EditInvokeContext | PatchedContext, *emojis: PartialEmoji | str
     ):
 
-        # We want to log how many emotes were successfully added to the guild
-        # We make an success count and increment it on success
-
-        successful_additions: int = 0
         footer_enumer: Callable[[int], str] = page_index("add", len(emojis))
         # Instead of making multiple function calls, we we will store vacancy as a variable
         # then decrement it as we move along
@@ -109,19 +104,11 @@ class Add(commands.Cog):
                 embed.set_footer(text=footer_enumer(index))
                 await ctx.send(embed=embed)
 
-                # Increment success counter
-                successful_additions += 1
                 # Decrement the vacancy
                 if each_emoji.animated:
                     var_animated_vac -= 1
                 else:
                     var_static_vac -= 1
-
-        await self.bot.tools.increment_usage(
-            ctx,
-            TableType.rubric,
-            successful_additions,
-        )
 
 
 def setup(bot):
