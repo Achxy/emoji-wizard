@@ -1,70 +1,38 @@
 import disnake as discord
 import os
 import asyncpg
-import time
 from disnake.ext import commands
-from tools.database_tools import DatabaseTools
-from tools.enum_tools import TableType
-from tools.caching import Cache
-from tools.bot_tools import get_mobile, get_default_prefix
-from helpers.context_patch import PatchedContext
+from tools.bot_tools import get_mobile
+from tools.database import Database
 
 
 discord.gateway.DiscordWebSocket.identify = (
     get_mobile()
 )  # Remove this line if you don't want mobile status
-DEFAULT_PREFIX: str = get_default_prefix()
+DEFAULT_PREFIX = "?"
 extensions = {
     "cogs": "⚙️",
-    "utilities": "🚀",
 }  # It's the emoji bot, what else would you expect?
 
 
-# Get custom prefix for the guild
-# Handle if not used in guild
-async def get_prefix(bot: commands.Bot, message: discord.Message):
-    if not message.guild:
-        return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
-    # Get prefix from cache
-    prefix = await bot.cache.get_prefix(
-        TableType.guilds, message.guild.id, DEFAULT_PREFIX
-    )
-
-    return commands.when_mentioned_or(prefix)(bot, message)
-
-
 bot: commands.Bot = commands.Bot(
-    command_prefix=get_prefix, help_command=None, case_insensitive=True
+    command_prefix=Database.get_prefix(DEFAULT_PREFIX),
+    help_command=None,
+    case_insensitive=True,
 )
 
 
 async def create_db_pool():
     bot.db = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
     print("Successfully connected to the database")
-    bot.tools = DatabaseTools(bot)
+    bot.tools = Database(bot)
     await bot.tools.confirm_tables()
-    bot.cache = Cache(bot)
 
 
 @bot.event
 async def on_ready():
     print(f"Successfully logged in as {bot.user}")
-    # Time the time it takes for the bot to populate the cache from the database
-    _t0: float = time.perf_counter()
-    for table in TableType:
-        await bot.cache.populate_cache(table)
-    _t1: float = time.perf_counter()
-    # display the time it took
-    print(f"Successfully populated cache in {_t1 - _t0}s (for {len(TableType)} tables)")
-    await bot.cache.print_cache()
-
-
-@bot.event
-async def on_message(message: discord.Message):
-    # Here we override the default on_message function
-    # We will process commands from here but with our own context class
-    ctx = await bot.get_context(message, cls=PatchedContext)
-    await bot.invoke(ctx)
+    await bot.tools.populate_cache()
 
 
 # Get all the python files from the cogs folder

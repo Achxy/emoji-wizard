@@ -2,9 +2,7 @@ import disnake as discord
 from disnake import Emoji
 from disnake.ext import commands
 from typing import Callable
-from tools.enum_tools import TableType
 from tools.bot_tools import page_index
-from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class Remove(commands.Cog):
@@ -13,9 +11,7 @@ class Remove(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def remove(
-        self, ctx: EditInvokeContext | PatchedContext, *emotes: Emoji | str
-    ):
+    async def remove(self, ctx, *emotes: Emoji | str):
 
         successful_removals: int = 0
         footer_enumer: Callable[[int], str] = page_index("remove", len(emotes))
@@ -50,12 +46,6 @@ class Remove(commands.Cog):
 
             successful_removals += 1
             await ctx.send(embed=embed)
-
-        await self.bot.tools.increment_usage(
-            ctx,
-            TableType.rubric,
-            successful_removals,
-        )
 
 
 def setup(bot):

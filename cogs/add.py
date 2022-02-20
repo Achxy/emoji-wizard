@@ -3,7 +3,6 @@ from disnake import PartialEmoji
 from typing import Callable
 from disnake.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
-from helpers.context_patch import EditInvokeContext, PatchedContext
 
 
 class Add(commands.Cog):
@@ -13,9 +12,7 @@ class Add(commands.Cog):
     # TODO: Add more features and error handling to this.
     @commands.command()
     @commands.has_permissions(manage_emojis=True)
-    async def add(
-        self, ctx: EditInvokeContext | PatchedContext, *emojis: PartialEmoji | str
-    ):
+    async def add(self, ctx, *emojis: PartialEmoji | str):
 
         footer_enumer: Callable[[int], str] = page_index("add", len(emojis))
         # Instead of making multiple function calls, we we will store vacancy as a variable
