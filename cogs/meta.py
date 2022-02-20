@@ -28,7 +28,13 @@ class Meta(commands.Cog):
 
         embed = discord.Embed(
             title="Successfully changed prefix",
-            description=f"The old prefix used to be **{ctx.prefix}** now its **{new_prefix}**",
+            description=(
+                f"The old prefix used to be **{ctx.prefix}** now its **{new_prefix}**\n"
+                f"You can change it again by using `{new_prefix}setprefix` (pinging the bot works too!)\n\n"
+                "```fix\n"
+                f"{new_prefix}setprefix <new prefix>\n"
+                "```"
+            ),
         )
         await ctx.send(embed=embed)
 
