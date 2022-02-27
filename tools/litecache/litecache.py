@@ -5,30 +5,33 @@ import sqlite3 as _sqlite3
 
 import time as _time
 import re as _re
-from enum import Enum as _Enum
 from .queries import Queries as _Queries
 from string import Template as _Template
 from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
 from typing import Any, Iterator
 
 
-__all__: tuple[str, ...] = (
-    "Bound",
+__all__: tuple[str, str] = (
     "LiteCache",
     "create_caching_pool",
 )
 
 
-class Bound(_Enum):
-    MEMORY = 0
-    DISK = 1
-
-
 class LiteCache(_asyncpg.Pool):
+    """
+    The inherited class from asyncpg.Pool
+    the args that __init__ takes are similar to that of parent's __init__
+
+    When the instance of the class is awaited, tables from the remote psql
+    database are pulled into the in-memory sqlite database.
+    Important: schema respect is public, this project didn't need that feature.
+    This can be extended by name with `column_record.schema_name`
+    and making appropriate changes in `self.pull`
+    """
+
     def __init__(
         self,
         dsn=None,
-        bounding: Bound = Bound.MEMORY,
         *,
         min_size=10,
         max_size=10,
@@ -41,9 +44,6 @@ class LiteCache(_asyncpg.Pool):
         record_class=_protocol.Record,
         **connect_kwargs,
     ):
-
-        if not isinstance(bounding, Bound):
-            raise TypeError(f"bounding must be of type Bound, got {type(bounding)}")
 
         super().__init__(
             dsn=dsn,
@@ -58,12 +58,8 @@ class LiteCache(_asyncpg.Pool):
             max_inactive_connection_lifetime=max_inactive_connection_lifetime,
             **connect_kwargs,
         )
-        self._bounding = bounding
-        self._lite_con = (
-            _sqlite3.connect(":memory:")
-            if bounding is Bound.MEMORY
-            else _sqlite3.connect("TODO.db")  # TODO:
-        )
+
+        self._lite_con = _sqlite3.connect(":memory:")
         self._cursor = self._lite_con.cursor()
 
     async def pull(self):
