@@ -167,4 +167,8 @@ class LiteCache(_asyncpg.Pool):
 
 
 def create_caching_pool(*args, **kwargs) -> LiteCache:
+    """
+    Returns an instance of LiteCache with the provided arguments and keyword arguments.
+    Similar to asyncpg's create_pool
+    """
     return LiteCache(*args, **kwargs)
