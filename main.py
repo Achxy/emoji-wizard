@@ -6,9 +6,11 @@ from tools.database import Database
 from tools.litecache import litecache
 
 
-discord.gateway.DiscordWebSocket.identify = (
+discord.gateway.DiscordWebSocket.identify = (  # type: ignore
     get_mobile()
-)  # Remove this line if you don't want mobile status
+)  #  Remove this line if you don't want mobile status
+# We type ignored this line because we are monkey patching the identify method
+
 extensions = {
     "cogs": "⚙️",
 }  # It's the emoji bot, what else would you expect?
