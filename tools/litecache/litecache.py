@@ -115,7 +115,7 @@ class LiteCache(_asyncpg.Pool):
         self._lite_con.commit()
         return r
 
-    def fetch(self, query: str, *args) -> tuple[Any, ...]:
+    def fetch(self, query: str, *args) -> list[Any]:
         return self._cursor.execute(query, args).fetchall()
 
     def fetchone(self, query, *args) -> tuple:
@@ -124,6 +124,7 @@ class LiteCache(_asyncpg.Pool):
     def __await__(self):
         yield from super().__await__()
         yield from self.pull().__await__()
+        return self
 
 
 def create_caching_pool(*args, **kwargs) -> LiteCache:
