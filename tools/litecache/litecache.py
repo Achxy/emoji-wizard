@@ -124,7 +124,7 @@ class LiteCache(_asyncpg.Pool):
 
         Pool performs this operation using one of its connections.  Other than
         that, it behaves identically to
-        :meth:`Connection.execute() <asyncpg.connection.Connection.execute>`.
+        `Connection.execute() <asyncpg.connection.Connection.execute>`.
         This executes the identical query on the sqlite3 cache to preserve being synchronised
 
         Args:
