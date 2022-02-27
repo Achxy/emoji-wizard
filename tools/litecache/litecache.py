@@ -27,6 +27,8 @@ class LiteCache(_asyncpg.Pool):
     Important: schema respect is public, this project didn't need that feature.
     This can however be extended by making table name precede with `column_record.schema_name`
     and making appropriate changes in `self.pull`
+
+    TODO: There are more methods that can be implemented / overwritten
     """
 
     def __init__(
