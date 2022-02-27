@@ -11,11 +11,11 @@ class Database:
     async def confirm_tables(self):
 
         query = """
-                    CREATE TABLE IF NOT EXISTS prefixes (
-                    guild_id bigint NOT NULL,
-                    prefix text NOT NULL,
-                    CONSTRAINT prefixes_pkey PRIMARY KEY (guild_id)
-                    );
+                CREATE TABLE IF NOT EXISTS prefixes (
+                guild_id bigint NOT NULL,
+                prefix text NOT NULL,
+                CONSTRAINT prefixes_pkey PRIMARY KEY (guild_id)
+                );
                 """
 
         await self.bot.db.execute(query)
