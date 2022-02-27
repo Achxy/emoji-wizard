@@ -1,5 +1,4 @@
 from __future__ import annotations
-from pipes import Template
 
 import asyncpg as _asyncpg
 import sqlite3 as _sqlite3
