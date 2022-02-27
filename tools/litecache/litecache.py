@@ -3,8 +3,8 @@ from __future__ import annotations
 import asyncpg as _asyncpg
 import sqlite3 as _sqlite3
 
-import time
-import re
+import time as _time
+import re as _re
 from enum import Enum as _Enum
 from .queries import Queries as _Queries
 from string import Template as _Template
@@ -68,7 +68,7 @@ class LiteCache(_asyncpg.Pool):
 
     async def pull(self):
         print("Collecting tables...")
-        t_start = time.perf_counter()
+        t_start = _time.perf_counter()
 
         await super().execute(_Queries.CLONE.value)
         all_tables: list[_Record] = await super().fetch(
@@ -78,10 +78,10 @@ class LiteCache(_asyncpg.Pool):
             lambda x: x["generate_create_table_statement"], all_tables
         )
         for table_reconstruction_sql in all_tables:
-            table_name = re.search(
+            table_name = _re.search(
                 r"(?<=create\stable\s)\w{1,}",
                 table_reconstruction_sql,
-                flags=re.IGNORECASE,
+                flags=_re.IGNORECASE,
             ).group()
             print(f"Cloning table {table_name}...")
             self._cursor.execute(table_reconstruction_sql)
@@ -100,7 +100,7 @@ class LiteCache(_asyncpg.Pool):
             )
             print(f"Cloned table {table_name}, {len(table_items)} rows")
         self._lite_con.commit()
-        print(f"Collected tables in {time.perf_counter() - t_start} seconds")
+        print(f"Collected tables in {_time.perf_counter() - t_start} seconds")
 
     async def execute(self, query: str, *args, timeout: float = None) -> str:
         self._cursor.execute(query, args)
