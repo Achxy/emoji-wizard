@@ -4,6 +4,10 @@ __all__: tuple[str] = ("Queries",)
 
 
 class Queries(_Enum):
+    """
+    Holds commonly used queries for the litecache
+    This is the equivalent of reading `clone.sql` or the associated `.sql` file
+    """
 
     CLONE = """
 CREATE OR REPLACE FUNCTION public.generate_create_table_statement(p_table_name character varying)
