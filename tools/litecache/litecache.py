@@ -8,7 +8,7 @@ import re as _re
 from .queries import Queries as _Queries
 from string import Template as _Template
 from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
-from typing import Any, Iterator
+from typing import Any, Iterator, Union
 
 
 __all__: tuple[str, str] = (
@@ -43,7 +43,7 @@ class LiteCache(_asyncpg.Pool):
         connection_class=_connection.Connection,
         record_class=_protocol.Record,
         **connect_kwargs,
-    ):
+    ) -> None:
 
         super().__init__(
             dsn=dsn,
@@ -62,7 +62,7 @@ class LiteCache(_asyncpg.Pool):
         self._lite_con = _sqlite3.connect(":memory:")
         self._cursor = self._lite_con.cursor()
 
-    async def pull(self):
+    async def pull(self) -> None:
         print("Collecting tables...")
         # Start the timer to see how long this takes
         t_start = _time.perf_counter()
@@ -71,14 +71,12 @@ class LiteCache(_asyncpg.Pool):
         # the query for this is stored in `.queries` as Enum
         await super().execute(_Queries.CLONE.value)
         # Get the constituent query from fetching with that function
-        all_tables: list[_Record] = await super().fetch(
+        all_tables: Union[list[_Record], Iterator[str]] = await super().fetch(
             "SELECT * FROM generate_create_table_statement('.*');"
         )
         # Convert the list of `asyncpg.Record` into list of str
         # The sole column is generate_create_table_statement
-        all_tables: Iterator[str] = map(
-            lambda x: x["generate_create_table_statement"], all_tables
-        )
+        all_tables = map(lambda x: x["generate_create_table_statement"], all_tables)
         for table_reconstruction_sql in all_tables:
             # NOTE: This regex relies on the fact that we assume public
             # This is specific for this project.
@@ -86,7 +84,9 @@ class LiteCache(_asyncpg.Pool):
                 r"(?<=create\stable\s)\w{1,}",
                 table_reconstruction_sql,
                 flags=_re.IGNORECASE,
-            ).group()
+            )  # type: ignore
+            # This will never be None
+
             print(f"Cloning table {table_name}...")
             # See if a similarly named table exists
             # If it does then drop it
@@ -117,16 +117,39 @@ class LiteCache(_asyncpg.Pool):
         print(f"Collected tables in {_time.perf_counter() - t_start} seconds")
 
     async def execute(self, query: str, *args, timeout: float = None) -> str:
+        """
+        Execute an SQL command (or commands).
+
+        Pool performs this operation using one of its connections.  Other than
+        that, it behaves identically to
+        :meth:`Connection.execute() <asyncpg.connection.Connection.execute>`.
+        This executes the identical query on the sqlite3 cache to preserve being synchronised
+
+        Args:
+            query (str): The query to be executed
+            timeout (float, optional): timeout in seconds. Defaults to None.
+
+        Returns:
+            str: Status of the last SQL command that was performed on the remote database.
+        """
         self._cursor.execute(query, args)
         r = await super().execute(query, *args, timeout=timeout)
         self._lite_con.commit()
         return r
 
-    async def executemany(self, command: str, args, *, timeout: float = None):
+    async def executemany(self, command: str, args, *, timeout: float = None) -> None:
+        """
+        Execute an SQL command for each sequence of arguments in args.
+        atomic operation, which means that either all executions succeed, or none at all
+
+        Args:
+            command (str): The query to be executed
+            args (Iterable): An iterable of arguments to be passed to the query for execution
+            timeout (float, optional): timeout in seconds. Defaults to None.
+        """
         self._cursor.executemany(command, args)
-        r = await super().executemany(command, args, timeout=timeout)
+        await super().executemany(command, args, timeout=timeout)
         self._lite_con.commit()
-        return r
 
     def fetch(self, query: str, *args) -> list[Any]:
         return self._cursor.execute(query, args).fetchall()
