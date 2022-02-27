@@ -25,7 +25,7 @@ class LiteCache(_asyncpg.Pool):
     When the instance of the class is awaited, tables from the remote psql
     database are pulled into the in-memory sqlite database.
     Important: schema respect is public, this project didn't need that feature.
-    This can be extended by name with `column_record.schema_name`
+    This can however be extended by making table name precede with `column_record.schema_name`
     and making appropriate changes in `self.pull`
     """
 
@@ -64,30 +64,48 @@ class LiteCache(_asyncpg.Pool):
 
     async def pull(self):
         print("Collecting tables...")
+        # Start the timer to see how long this takes
         t_start = _time.perf_counter()
 
+        # Create the function to get these values
+        # the query for this is stored in `.queries` as Enum
         await super().execute(_Queries.CLONE.value)
+        # Get the constituent query from fetching with that function
         all_tables: list[_Record] = await super().fetch(
             "SELECT * FROM generate_create_table_statement('.*');"
         )
+        # Convert the list of `asyncpg.Record` into list of str
+        # The sole column is generate_create_table_statement
         all_tables: Iterator[str] = map(
             lambda x: x["generate_create_table_statement"], all_tables
         )
         for table_reconstruction_sql in all_tables:
+            # NOTE: This regex relies on the fact that we assume public
+            # This is specific for this project.
             table_name = _re.search(
                 r"(?<=create\stable\s)\w{1,}",
                 table_reconstruction_sql,
                 flags=_re.IGNORECASE,
             ).group()
             print(f"Cloning table {table_name}...")
+            # See if a similarly named table exists
+            # If it does then drop it
+            self._cursor.execute(
+                _Template("DROP TABLE IF EXISTS $a").substitute(a=table_name)
+            )
+            # Cast the table structure
             self._cursor.execute(table_reconstruction_sql)
+            # Get all the data for the associated table from the remote database
             table_items = await super().fetch(
                 _Template("SELECT * FROM $a;").substitute(a=table_name)
             )
+            # Convert `asyncpg.Record` -> tuple for passing it into sqlite3
             table_items = tuple(map(tuple, table_items))
+            # Check if there is anything to insert into the sqlite3 db
             if not table_items:
                 print(f"Table {table_name} is empty, skipping...")
                 continue
+            # That is the case, insert values into the sqlite3 db
             self._cursor.executemany(
                 _Template("INSERT INTO $a VALUES ($b);").substitute(
                     a=table_name, b=", ".join(["?"] * len(table_items[0]))
