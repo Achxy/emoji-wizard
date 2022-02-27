@@ -155,9 +155,28 @@ class LiteCache(_asyncpg.Pool):
         self._lite_con.commit()
 
     def fetch(self, query: str, *args) -> list[Any]:
+        """
+        Fetch rows from local cache.
+        As such, this is a synchronous operation.
+
+        Args:
+            query (str): The query to be executed
+
+        Returns:
+            list[Any]: List of rows returned by the query
+        """
         return self._cursor.execute(query, args).fetchall()
 
     def fetchone(self, query, *args) -> Optional[Any]:
+        """
+        Fetch the first row from local cache.
+        As such, this is a synchronous operation.
+
+        Args:
+            query (str): The query to be executed
+
+        Returns:
+            Optional[Any]: The first row returned by the query, or None if no rows were found"""
         return self._cursor.execute(query, args).fetchone()
 
     def __await__(self):
