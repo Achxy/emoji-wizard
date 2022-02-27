@@ -82,11 +82,11 @@ class LiteCache(_asyncpg.Pool):
         for table_reconstruction_sql in all_tables:
             # NOTE: This regex relies on the fact that we assume public
             # This is specific for this project.
-            table_name = _re.search(
+            table_name = _re.search(  # type: ignore
                 r"(?<=create\stable\s)\w{1,}",
                 table_reconstruction_sql,
                 flags=_re.IGNORECASE,
-            )  # type: ignore
+            ).group(0)
             # This will never be None
 
             print(f"Cloning table {table_name}...")
