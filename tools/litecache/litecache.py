@@ -8,7 +8,7 @@ import re as _re
 from .queries import Queries as _Queries
 from string import Template as _Template
 from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
-from typing import Any, Iterator, Union
+from typing import Any, Iterator, Iterable, Union
 
 
 __all__: tuple[str, str] = (
@@ -132,12 +132,15 @@ class LiteCache(_asyncpg.Pool):
         Returns:
             str: Status of the last SQL command that was performed on the remote database.
         """
+        # NOTE: sqlite takes in Iterable[Any] but asyncpg takes in a variadic
         self._cursor.execute(query, args)
         r = await super().execute(query, *args, timeout=timeout)
         self._lite_con.commit()
         return r
 
-    async def executemany(self, command: str, args, *, timeout: float = None) -> None:
+    async def executemany(
+        self, command: str, args: Iterable[Iterable[Any]], *, timeout: float = None
+    ) -> None:
         """
         Execute an SQL command for each sequence of arguments in args.
         atomic operation, which means that either all executions succeed, or none at all
