@@ -8,7 +8,7 @@ import re as _re
 from .queries import Queries as _Queries
 from string import Template as _Template
 from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
-from typing import Any, Iterator, Iterable, Union
+from typing import Any, Iterator, Iterable, Union, Optional
 
 
 __all__: tuple[str, str] = (
@@ -157,7 +157,7 @@ class LiteCache(_asyncpg.Pool):
     def fetch(self, query: str, *args) -> list[Any]:
         return self._cursor.execute(query, args).fetchall()
 
-    def fetchone(self, query, *args) -> tuple:
+    def fetchone(self, query, *args) -> Optional[Any]:
         return self._cursor.execute(query, args).fetchone()
 
     def __await__(self):
