@@ -8,7 +8,7 @@ import re as _re
 from .queries import Queries as _Queries
 from string import Template as _Template
 from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
-from typing import Any, Iterator, Iterable, Union, Optional
+from typing import Any, Iterator, Iterable, Union
 
 
 __all__: tuple[str, str] = (
@@ -65,6 +65,10 @@ class LiteCache(_asyncpg.Pool):
         self._cursor = self._lite_con.cursor()
 
     async def pull(self) -> None:
+        """
+        Casts the remote database into local sqlite database
+        If the table is already present in the local cache, prexisting data is overwritten
+        """
         print("Collecting tables...")
         # Start the timer to see how long this takes
         t_start = _time.perf_counter()
@@ -169,7 +173,7 @@ class LiteCache(_asyncpg.Pool):
         """
         return self._cursor.execute(query, args).fetchall()
 
-    def fetchone(self, query, *args) -> Optional[Any]:
+    def fetchone(self, query, *args) -> Any:
         """
         Fetch the first row from local cache.
         As such, this is a synchronous operation.
@@ -178,7 +182,7 @@ class LiteCache(_asyncpg.Pool):
             query (str): The query to be executed
 
         Returns:
-            Optional[Any]: The first row returned by the query, or None if no rows were found"""
+            Any: The first row returned by the query, or None if no rows were found"""
         return self._cursor.execute(query, args).fetchone()
 
     def __await__(self):
@@ -191,5 +195,8 @@ def create_caching_pool(*args, **kwargs) -> LiteCache:
     """
     Returns an instance of LiteCache with the provided arguments and keyword arguments.
     Similar to asyncpg's create_pool
+
+    Returns:
+        LiteCache: An instance of LiteCache class with the provided arguments and keyword arguments
     """
     return LiteCache(*args, **kwargs)
