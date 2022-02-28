@@ -119,3 +119,9 @@ $BODY$
 ALTER FUNCTION public.generate_create_table_statement(character varying)
   OWNER TO postgres;
     """
+
+    COLLECT_TABLE_NAMES = """
+    SELECT TABLE_NAME
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_TYPE = 'BASE TABLE'
+    """
