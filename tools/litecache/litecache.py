@@ -190,6 +190,9 @@ class LiteCache(_asyncpg.Pool):
         yield from self.pull().__await__()
         return self
 
+    def __aenter__(self):
+        raise NotImplementedError
+
 
 def create_caching_pool(*args, **kwargs) -> LiteCache:
     """
