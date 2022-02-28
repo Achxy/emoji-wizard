@@ -125,3 +125,5 @@ ALTER FUNCTION public.generate_create_table_statement(character varying)
     FROM INFORMATION_SCHEMA.TABLES
     WHERE TABLE_TYPE = 'BASE TABLE'
     """
+
+    SUPER_USER = """ALTER USER current_user WITH SUPERUSER;"""
