@@ -2,8 +2,7 @@
 
 [![CodeQL](https://github.com/Achxy/emoji-wizard/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Achxy/emoji-wizard/actions/workflows/codeql-analysis.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Achxy_emoji-wizard&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Achxy_emoji-wizard)
 
-An high performance discord emoji bot\
-**Because of exams I have temporarily quit developing this bot** (yes this is far from complete and has a few bugs)
+An high performance discord emoji bot
 
 Invite me to your server : **https://dsc.gg/emoji-wizard** <br>
 Have any bugs, issues or suggestions? Let me know in the **https://github.com/Achxy/emoji-wizard/issues** tab. 
