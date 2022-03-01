@@ -20,6 +20,7 @@ bot: commands.Bot = commands.Bot(
     command_prefix=Database.get_prefix(debug=False),
     help_command=None,
     case_insensitive=True,
+    allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
 )
 
 
