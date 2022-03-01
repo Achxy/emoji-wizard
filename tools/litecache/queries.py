@@ -128,5 +128,6 @@ ALTER FUNCTION public.generate_create_table_statement(character varying)
 
     SUPER_USER = """ALTER USER current_user WITH SUPERUSER;"""
     GRANT_ALL_PRIVILEGES = (
-        """GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA PUBLIC TO current_user;"""
+        """GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA PUBLIC TO postgres;"""
     )
+    GRANT_POSTGRES = """GRANT postgres TO CURRENT_USER;"""
