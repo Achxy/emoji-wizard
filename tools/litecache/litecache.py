@@ -72,9 +72,11 @@ class LiteCache(_asyncpg.Pool):
         print("Collecting tables...")
         # Start the timer to see how long this takes
         t_start = _time.perf_counter()
-        # We may be required to enter as a super user
-        # This is to prevent asyncpg.exceptions.InsufficientPrivilegeError
-        await super().execute(_Queries.SUPER_USER.value)
+        # We may be required to enter as a privileged user
+        # This is to consequentially prevent asyncpg.exceptions.InsufficientPrivilegeError
+        # some hosting services may not allow us to be superuser
+        # but allow grant
+        await super().execute(_Queries.GRANT_ALL_PRIVILEGES.value)
 
         # Create the function to get these values
         # the query for this is stored in `.queries` as Enum
