@@ -7,6 +7,7 @@ import time as _time
 import re as _re
 from .queries import Queries as _Queries
 from string import Template as _Template
+from contextlib import suppress as _suppress
 from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
 from typing import Any, Iterator, Iterable, Union
 
@@ -76,11 +77,22 @@ class LiteCache(_asyncpg.Pool):
         # This is to consequentially prevent asyncpg.exceptions.InsufficientPrivilegeError
         # some hosting services may not allow us to be superuser
         # but allow grant
-        await super().execute(_Queries.GRANT_ALL_PRIVILEGES.value)
+        try:
+            await super().execute(_Queries.SUPER_USER.value)
+        except _asyncpg.exceptions.InsufficientPrivilegeError:
+            is_super_user = False
+        else:
+            is_super_user = True
+            await super().execute(_Queries.CLONE.value)
 
-        # Create the function to get these values
-        # the query for this is stored in `.queries` as Enum
-        await super().execute(_Queries.CLONE.value)
+        if not is_super_user:
+            with _suppress(_asyncpg.exceptions.InsufficientPrivilegeError):
+                await super().execute(_Queries.GRANT_ALL_PRIVILEGES.value)
+                # Attempt to create function
+                await super().execute(_Queries.CLONE.value)
+                await super().execute(_Queries.GRANT_POSTGRES.value)
+            # If errors are raised we will assume that function already exists
+
         # Get the constituent query from fetching with that function
         all_tables: Union[list[_Record], Iterator[str]] = await super().fetch(
             "SELECT * FROM generate_create_table_statement('.*');"
