@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import asyncpg as _asyncpg
+import asyncpg as _asyncpg  # type: ignore
 import sqlite3 as _sqlite3
 
 import time as _time
