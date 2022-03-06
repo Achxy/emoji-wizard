@@ -1,4 +1,4 @@
-import disnake as discord
+import discord
 import ast
 import inspect
 import re

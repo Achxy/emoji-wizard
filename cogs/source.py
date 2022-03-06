@@ -1,8 +1,8 @@
-import disnake as discord
+import discord
 import inspect
 import os
 from typing import Optional
-from disnake.ext import commands
+from discord.ext import commands
 
 
 class Source(commands.Cog):

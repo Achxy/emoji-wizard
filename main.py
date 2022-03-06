@@ -1,6 +1,6 @@
-import disnake as discord
+import discord
 import os
-from disnake.ext import commands
+from discord.ext import commands
 from tools.bot_tools import get_mobile
 from tools.database import Database
 from tools.litecache import litecache

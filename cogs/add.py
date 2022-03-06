@@ -1,7 +1,7 @@
-import disnake as discord
-from disnake import PartialEmoji
+import discord
+from discord import PartialEmoji
 from typing import Callable
-from disnake.ext import commands
+from discord.ext import commands
 from tools.bot_tools import static_vacancy, animated_vacancy, page_index
 
 
