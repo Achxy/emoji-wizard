@@ -7,7 +7,7 @@ CheckFunc: TypeAlias = Callable[[commands.Context], bool]
 
 
 class EnhancedCheck:
-    def __init__(self, func: CheckFunc) -> None:
+    def __init__(self: CK, func: CheckFunc) -> None:
         self.__caller: CheckFunc = func
 
     @staticmethod
