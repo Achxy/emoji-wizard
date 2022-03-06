@@ -1,6 +1,6 @@
-import disnake as discord
-from disnake import Emoji
-from disnake.ext import commands
+import discord
+from discord import Emoji
+from discord.ext import commands
 
 
 class Rename(commands.Cog):

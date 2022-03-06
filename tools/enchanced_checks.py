@@ -1,5 +1,5 @@
 from __future__ import annotations
-from disnake.ext import commands
+from discord.ext import commands
 from typing import Callable, TypeVar, TypeAlias
 
 CK = TypeVar("CK", bound="EnhancedCheck")

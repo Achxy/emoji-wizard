@@ -1,6 +1,6 @@
-import disnake as discord
-from disnake import Emoji
-from disnake.ext import commands
+import discord
+from discord import Emoji
+from discord.ext import commands
 from typing import Callable
 from tools.bot_tools import page_index
 

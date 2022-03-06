@@ -1,6 +1,6 @@
-import disnake as discord
-from disnake.ui import View, Button
-from disnake.ext import commands
+import discord
+from discord.ui import View, Button
+from discord.ext import commands
 
 
 class Invite(commands.Cog):
