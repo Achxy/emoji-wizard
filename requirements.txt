@@ -1,2 +1,2 @@
-disnake==2.3.*
+git+https://github.com/Rapptz/discord.py
 asyncpg==0.25.0
