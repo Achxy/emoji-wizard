@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-import asyncpg as _asyncpg  # type: ignore
-import sqlite3 as _sqlite3
-
-import time as _time
 import re as _re
-from .queries import Queries as _Queries
-from string import Template as _Template
+import sqlite3 as _sqlite3
+import time as _time
 from contextlib import suppress as _suppress
-from asyncpg import connection as _connection, protocol as _protocol, Record as _Record
-from typing import Any, Iterator, Iterable, Union
+from string import Template as _Template
+from typing import Any, Iterable, Iterator, Union
 
+import asyncpg as _asyncpg  # type: ignore
+from asyncpg import Record as _Record
+from asyncpg import connection as _connection
+from asyncpg import protocol as _protocol
+
+from .queries import Queries as _Queries
 
 __all__: tuple[str, str] = (
     "LiteCache",

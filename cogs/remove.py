@@ -1,7 +1,9 @@
+from typing import Callable
+
 import discord
 from discord import Emoji
 from discord.ext import commands
-from typing import Callable
+
 from tools.bot_tools import page_index
 
 

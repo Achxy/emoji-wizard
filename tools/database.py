@@ -1,5 +1,6 @@
-from discord.ext import commands
 import time
+
+from discord.ext import commands
 
 DEFAULT_PREFIX = "?"
 

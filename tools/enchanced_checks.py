@@ -1,6 +1,8 @@
 from __future__ import annotations
+
+from typing import Callable, TypeAlias, TypeVar
+
 from discord.ext import commands
-from typing import Callable, TypeVar, TypeAlias
 
 CK = TypeVar("CK", bound="EnhancedCheck")
 CheckFunc: TypeAlias = Callable[[commands.Context], bool]

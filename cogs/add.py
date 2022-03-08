@@ -1,8 +1,10 @@
+from typing import Callable
+
 import discord
 from discord import PartialEmoji
-from typing import Callable
 from discord.ext import commands
-from tools.bot_tools import static_vacancy, animated_vacancy, page_index
+
+from tools.bot_tools import animated_vacancy, page_index, static_vacancy
 
 
 class Add(commands.Cog):

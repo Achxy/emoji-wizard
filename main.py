@@ -1,10 +1,11 @@
-import discord
 import os
+
+import discord
 from discord.ext import commands
+
 from tools.bot_tools import get_mobile
 from tools.database import Database
 from tools.litecache import litecache
-
 
 discord.gateway.DiscordWebSocket.identify = (  # type: ignore
     get_mobile()

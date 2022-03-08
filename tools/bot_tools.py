@@ -1,9 +1,9 @@
-import discord
 import ast
 import inspect
 import re
 from typing import Callable, Generator, Sequence
 
+import discord
 
 __all__ = (
     "static_vacancy",

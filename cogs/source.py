@@ -1,7 +1,8 @@
-import discord
 import inspect
 import os
 from typing import Optional
+
+import discord
 from discord.ext import commands
 
 
