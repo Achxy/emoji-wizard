@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands
 
 from tools.database import Database
-from tools.litecache import litecache
 
 
 extensions = {
@@ -19,12 +18,6 @@ bot: commands.Bot = commands.Bot(
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
     intents=discord.Intents.all(),
 )
-
-
-async def _create_cached_db_pool():
-    bot.db = await litecache.create_caching_pool(dsn=os.getenv("DATABASE_URL"))
-    print("Successfully connected to the database")
-    bot.tools = Database(bot)
 
 
 @bot.event
@@ -49,5 +42,4 @@ for ext in extensions:
     print()
 
 
-bot.loop.run_until_complete(_create_cached_db_pool())
 bot.run(os.getenv("DISCORD_TOKEN"))
