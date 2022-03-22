@@ -1,0 +1,7 @@
+[bot]
+prefix = ["?"]
+case_insensitive = true
+[logging]
+log_level = "INFO"
+log_file = ["logs/discord.log"]
+log_webhook = []
