@@ -181,7 +181,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         journal: dict[_KT, _VT] = {}
         for row in await self.__pool.fetch(query):
             journal[row[self.__key]] = row[self.__value]
-        self.__main_cache = {**journal}
+        self.__main_cache = {**journal}  # Deep copy
         del journal
         self.__is_ready = True
         # __is_ready isn't fully representative of whether the cache is ready
