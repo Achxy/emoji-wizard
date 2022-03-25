@@ -150,14 +150,33 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
     @_checkup(check_pool=True, check_pull_done=False)
     async def wait_until_ready(self) -> Awaitable[Literal[True]]:
+        """
+        An awaitable that will block until the CachingPod is ready to be used
+        This internally is Asyncio.Event.wait() where the event is set when the CachingPod is ready
+
+        Returns:
+            Awaitable[Literal[True]]: Expression will evaluate to True once the CachingPod is ready
+        """
         return self.__wait.wait()
 
     @_event_lock()
     @_checkup(check_pull_done=False, check_pool=True)
-    async def pull(self):
+    async def pull(self) -> None:
+        """
+        Pulls the data from the database and stores it in the cache
 
-        if self.__pool is None:
-            raise RuntimeError("No database connection")
+        Returns:
+            None
+        Preconditions:
+            Pool is present
+        Raises:
+            ConnectionError: A connection pool is not present
+            ValueError: If the key is administered as a primary key but isn't a primary key
+
+        """
+        if self.__pool is None:  # Pool is never None if we're here (see _checkup)
+            # This is to satisfy static linters
+            raise ConnectionError("No database connection")
 
         if self.__ensure_key_is_primary:
             query = """
@@ -184,7 +203,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
             )
 
             if self.__key not in primaries:
-                raise RuntimeError(f"{self.__key} is not a primary key")
+                raise ValueError(f"{self.__key} is not a primary key")
 
         query = f"SELECT {self.__key}, {self.__value} FROM {self.__table}"
         journal: dict[_KT, _VT] = {}
