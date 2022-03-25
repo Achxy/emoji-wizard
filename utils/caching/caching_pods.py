@@ -9,8 +9,14 @@ from typing import Concatenate, Final, Generator, Iterable, Literal, TypeVar
 from asyncpg import Pool
 
 from .events import EventDispatchers
-from .hints import (CPT, AsyncDestination, AsyncOuterDecoratorHint, P, R,
-                    SyncOuterDecoratorHint)
+from .hints import (
+    CPT,
+    AsyncDestination,
+    AsyncOuterDecoratorHint,
+    P,
+    R,
+    SyncOuterDecoratorHint,
+)
 
 __all__ = ("CachingPod",)
 
