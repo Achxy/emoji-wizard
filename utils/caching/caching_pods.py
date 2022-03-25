@@ -196,14 +196,29 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         return default
 
     async def activate(self, pool: Pool | Awaitable[Pool]) -> None:
-        if self.__pool is not None:
-            raise RuntimeError("Pool has already been set")
-
         """
-        An sort of important note:
+        To assign a connection pool to the caching pod
+        only if a connection pool isn't only present
+
+        Raises:
+            RuntimeError: A connection is already present
+            TypeError: Provided pool isn't an instance of asyncpg.Pool,
+                       Awaiting didn't resolve to an instance of asyncpg.Pool
+                       or the provided object isn't awaitable at all
+
+        Returns:
+            None
+
+        Example:
+            >>> async def main():
+            >>>     pool = await asyncpg.create_pool(...)
+            >>>     cache = CachingPod(...) # pool is not set
+            >>>     await cache.activate(pool) # pool is now set
+
+        An sort of important dev note:
             An asyncio.Pool object is awaitable by behaviour
             But we also want to accept awaitables which return Pool
-            
+
             using the await syntax internally calls __await__
             Pool's __await__ calls _async__init__
             This, well, initializes the pool
@@ -222,6 +237,9 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
                 _async__init__ returns None if the pool is already initialized
                 else it returns the pool instance
         """
+
+        if self.__pool is not None:
+            raise RuntimeError("Pool has already been set")
 
         invalid_type_exc: TypeError = TypeError(
             (
