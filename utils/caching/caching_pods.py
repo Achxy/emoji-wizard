@@ -151,7 +151,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
             raise RuntimeError("No database connection")
 
         if self.__ensure_key_is_primary:
-            query = f"""
+            query = """
                     SELECT
                         column_name as PRIMARYKEYCOLUMN
 
