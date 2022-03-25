@@ -105,7 +105,6 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
     def __destinations__(self) -> AsyncDestination:
         """
         A property which returns the destinations
-        Modifications can be made to being passed as reference
         This is not the part of Public API
         This overrides the abstract property of EventDispatchers
 
