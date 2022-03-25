@@ -6,7 +6,16 @@ import inspect, sys
 from asyncpg import Pool
 
 from collections.abc import MutableMapping, Awaitable, Callable, Mapping  # TODO:
-from typing import Literal, TypeVar, ParamSpec, Concatenate, Final, Any
+from typing import (
+    Literal,
+    TypeVar,
+    ParamSpec,
+    Concatenate,
+    Final,
+    Any,
+    Generator,
+    Iterable,
+)
 from .hints import (
     P,
     R,
@@ -191,6 +200,19 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
     @_checkup(check_pull_done=True)
     def get(self, key: _KT, default: R = None) -> _VT | R:
+        """
+        Gets a value from the cache.
+        unlike the __getitem__ method, this method will not raise an error if the key is not found
+        and instead will return the default value
+        this is similar to the behavior of the dict.get method
+
+        Args:
+            key (_KT): The key to get the value from
+            default (R, optional): The value to return instead if key is not found. Defaults to None.
+
+        Returns:
+            _VT | R: The value associated with the key or the default value if the key is not found
+        """
         if key in self.__main_cache:
             return self.__main_cache[key]
         return default
@@ -200,14 +222,17 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         To assign a connection pool to the caching pod
         only if a connection pool isn't only present
 
+        Args:
+            pool: The connection pool to assign to the caching pod
+
+        Returns:
+            None
+
         Raises:
             RuntimeError: A connection is already present
             TypeError: Provided pool isn't an instance of asyncpg.Pool,
                        Awaiting didn't resolve to an instance of asyncpg.Pool
                        or the provided object isn't awaitable at all
-
-        Returns:
-            None
 
         Example:
             >>> async def main():
@@ -274,47 +299,138 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
     @_checkup(check_pull_done=True)
     def __getitem__(self, key) -> _VT:
+        """
+        Returns the value associated with the key
+
+        Args:
+            key (str): Key to look up
+
+        Returns:
+            Value associated with the key
+
+        Raises:
+            KeyError: Key not found in the cache
+
+        Example:
+            >>> cache["key"]
+            "value"
+        """
         return self.__main_cache[key]
 
     @_checkup(check_pull_done=True)
-    def __iter__(self):
+    def __iter__(self) -> Iterable[_KT]:
+        """
+        An iterable of keys in the cache
+
+        Returns:
+            Iterable[_KT]: Iterable of keys present in the cache
+        """
         return iter(self.__main_cache)
 
     @_checkup(check_pull_done=True)
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the number of key-value pairs in the cache
+
+        Returns:
+            int: number depicting the number of key-value pairs in the cache
+        """
         return len(self.__main_cache)
 
     @_checkup(check_pull_done=False, check_pool=True)
-    def __await__(self):
+    def __await__(self: CPT) -> Generator[Awaitable[None], None, CPT]:
+        """
+        await instance to complete `pull` and return itself
+
+        Returns:
+            CachingPod: Same instance that was awaited
+
+        Yields:
+            Generator[Awaitable[None], None, CachingPod]:
+                YieldType: Awaitable that completes `pull`
+                SendType: None
+                ReturnType: CachingPod
+        """
         yield from self.pull().__await__()
         return self
 
     @_checkup(check_pull_done=True)
     def __str__(self) -> str:
+        """
+        Returns a string representation of the cache
+        This calls the __str__ method of the underlying cache
+        roughly equivalent to:
+            >>> str(self.__main_cache)
+        The return string is reformatted using `pprint.pformat`
+
+        Returns:
+            str: String representation of the cache (pretty formatted)
+        """
         return pformat(self.__main_cache)
 
     @property
     @_checkup(check_pull_done=False, check_pool=False)
     def pool(self) -> Pool | None:
+        """
+        Returns the connection pool associated with the caching pod
+        that is currently active, this is None if no pool is active
+
+        Returns:
+            Optional Pool: The connection pool associated with the caching pod
+        """
         return self.__pool
 
     @property
     @_checkup(check_pull_done=True)
     def raw_cache(self) -> dict[_KT, _VT]:
+        """
+        Returns the raw cache that is being used
+        Though this is a property with no setter,
+        the return is a reference than a deep copy of the cache
+
+        Returns:
+            dict[_KT, _VT]: The raw cache
+        """
         return self.__main_cache
 
     @property
     def key(self) -> str:
+        """
+        Returns the key column name
+
+        Returns:
+            str: key name
+        """
         return self.__key
 
     @property
     def value(self) -> str:
+        """
+        Returns the value column name
+
+        Returns:
+            str: column name
+        """
         return self.__value
 
     @property
     def table(self) -> str:
+        """
+        Returns the table name associated with the cache
+
+        Returns:
+            str: Table name
+        """
         return self.__table
 
     @property
     def is_ready(self) -> bool:
+        """
+        Property to check if the cache is ready to be used
+        Value of this property may change during runtime
+
+        Returns:
+            bool: True if the cache is ready to be used
+                  False otherwise
+        """
         return self.__is_ready and self.__has_started and self.__wait.is_set()
