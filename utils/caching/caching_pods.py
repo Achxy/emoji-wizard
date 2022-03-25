@@ -223,7 +223,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
                 else it returns the pool instance
         """
 
-        invalid_type_exc = TypeError(
+        invalid_type_exc: TypeError = TypeError(
             (
                 "pool must be an instance asyncpg.Pool "
                 "or a awaitable which returns "
@@ -232,7 +232,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         )
 
         try:
-            resultant_pool = await pool
+            resultant_pool: Pool | None = await pool
         except TypeError as active_type_exc:
             raise invalid_type_exc from active_type_exc
 
