@@ -212,6 +212,8 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
         Returns:
             _VT | R: The value associated with the key or the default value if the key is not found
+        Preconditions:
+            Pull is done
         """
         if key in self.__main_cache:
             return self.__main_cache[key]
@@ -308,6 +310,9 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         Returns:
             Value associated with the key
 
+        Preconditions:
+            Pull is done
+
         Raises:
             KeyError: Key not found in the cache
 
@@ -324,6 +329,8 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
         Returns:
             Iterable[_KT]: Iterable of keys present in the cache
+        Preconditions:
+            Pull is done
         """
         return iter(self.__main_cache)
 
@@ -334,6 +341,8 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
         Returns:
             int: number depicting the number of key-value pairs in the cache
+        Preconditions:
+            Pull is done
         """
         return len(self.__main_cache)
 
@@ -344,6 +353,9 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
         Returns:
             CachingPod: Same instance that was awaited
+
+        Preconditions:
+            Pool is present
 
         Yields:
             Generator[Awaitable[None], None, CachingPod]:
@@ -365,11 +377,12 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
         Returns:
             str: String representation of the cache (pretty formatted)
+        Preconditions:
+            Pull is done
         """
         return pformat(self.__main_cache)
 
     @property
-    @_checkup(check_pull_done=False, check_pool=False)
     def pool(self) -> Pool | None:
         """
         Returns the connection pool associated with the caching pod
@@ -390,6 +403,8 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
         Returns:
             dict[_KT, _VT]: The raw cache
+        Preconditions:
+            Pull is done
         """
         return self.__main_cache
 
