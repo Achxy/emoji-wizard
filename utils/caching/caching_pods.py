@@ -222,25 +222,34 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
                 _async__init__ returns None if the pool is already initialized
                 else it returns the pool instance
         """
-        resultant_pool = await pool
+
+        invalid_type_exc = TypeError(
+            (
+                "pool must be an instance asyncpg.Pool "
+                "or a awaitable which returns "
+                f"an instance of asyncpg.Pool, got {type(pool)}"
+            )
+        )
+
+        try:
+            resultant_pool = await pool
+        except TypeError as active_type_exc:
+            raise invalid_type_exc from active_type_exc
+
         if isinstance(resultant_pool, Pool):
             self.__pool = resultant_pool
             await self._dispatch("on_activate", resultant_pool)
             return
-        elif resultant_pool is not None:
+
+        if resultant_pool is not None:
             # It is a awaitable which neither returns a Pool nor None
             raise TypeError(
                 f"Expected awaitable to return type 'Pool' got {type(resultant_pool)}"
             )
 
         if not isinstance(pool, Pool):
-            raise TypeError(
-                (
-                    "pool must be an instance asyncpg.Pool "
-                    "or a awaitable which returns "
-                    f"an instance of asyncpg.Pool, got {type(pool)}"
-                )
-            )
+            # Not a Pool and not a awaitable
+            raise invalid_type_exc
 
         self.__pool = pool
         await self._dispatch("on_activate", pool)
