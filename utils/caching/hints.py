@@ -1,13 +1,5 @@
-from typing import (
-    ParamSpec,
-    TypeAlias,
-    Callable,
-    Awaitable,
-    Any,
-    TYPE_CHECKING,
-    Concatenate,
-    TypeVar,
-)
+from typing import (TYPE_CHECKING, Any, Awaitable, Callable, Concatenate,
+                    ParamSpec, TypeAlias, TypeVar)
 
 if TYPE_CHECKING:
     from caching_pods import CachingPod

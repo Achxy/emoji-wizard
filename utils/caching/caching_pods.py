@@ -2,30 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import functools
-import inspect, sys
+from collections.abc import Awaitable, Callable, Mapping
+from pprint import pformat
+from typing import Concatenate, Final, Generator, Iterable, Literal, TypeVar
+
 from asyncpg import Pool
 
-from collections.abc import MutableMapping, Awaitable, Callable, Mapping  # TODO:
-from typing import (
-    Literal,
-    TypeVar,
-    ParamSpec,
-    Concatenate,
-    Final,
-    Any,
-    Generator,
-    Iterable,
-)
-from .hints import (
-    P,
-    R,
-    CPT,
-    AsyncDestination,
-    AsyncOuterDecoratorHint,
-    SyncOuterDecoratorHint,
-)
-from pprint import pformat
 from .events import EventDispatchers
+from .hints import (CPT, AsyncDestination, AsyncOuterDecoratorHint, P, R,
+                    SyncOuterDecoratorHint)
 
 __all__ = ("CachingPod",)
 
@@ -35,7 +20,7 @@ _VT = TypeVar("_VT")
 
 
 class CachingPod(Mapping[_KT, _VT], EventDispatchers):
-
+    # TODO: Make this MutableMapping, making changes to the database as well
     __slots__: tuple[str, ...] = (
         "__pool",
         "__main_cache",

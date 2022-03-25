@@ -5,7 +5,6 @@ from discord.ext import commands
 
 from tools.database import Database
 
-
 extensions = {
     "cogs": "⚙️",
 }  # It's the emoji bot, what else would you expect?

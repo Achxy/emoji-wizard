@@ -1,8 +1,9 @@
-import asyncio
-from typing import Any, Callable
-import inspect
 import abc
-from .hints import AsyncDestination, CoroFunc, CFT
+import asyncio
+import inspect
+from typing import Any, Callable
+
+from .hints import CFT, AsyncDestination, CoroFunc
 
 __all__: tuple[str] = ("EventDispatchers",)
 
