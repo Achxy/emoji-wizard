@@ -128,9 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-
-# Some tests I do
-t_*.*
-
 # vscode preferences
 .vscode
+
+# Private test files
+tests/
