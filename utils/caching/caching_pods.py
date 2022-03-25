@@ -64,6 +64,27 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         pool: Pool | None = None,
         ensure_key_is_primary: bool = True,
     ) -> None:
+        """
+        Initialize the CachingPod, this can be used with a CachingPod for more control
+        or can be used as a stand alone application
+
+        Args:
+            table (str): The table in the database to of which to cache
+            key (str): The key name used get cached data
+            value (str): The value that should be stored
+            insert (str): Query that should be used to insert a new value
+            update (str): Query that should be used to update an existing value
+            delete (str): Query that should be used to delete an existing value
+            pool (Pool | None, optional): A asyncpg.Pool that depicts a connection to the database
+                                          This not being provided will render most of the methods
+                                          of the CachingPod unusable.
+                                          Pool is not required to be provided if used in CachingCluster
+            ensure_key_is_primary (bool, optional): Raises error if the provided key is not primary key
+                                                    in the provided table. Defaults to True.
+        Warning:
+        !   All queries are assumed to trusted and sanitized
+        !   Queries are NOT sanitized internally
+        """
         # Pool will be finalized if it's not None
         self.__pool: Pool | None = pool
         self.__main_cache: dict[_KT, _VT] = {}
@@ -82,6 +103,15 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
 
     @property
     def __destinations__(self) -> AsyncDestination:
+        """
+        A property which returns the destinations
+        Modifications can be made to being passed as reference
+        This is not the part of Public API
+        This overrides the abstract property of EventDispatchers
+
+        Returns:
+            AsyncDestination: dict with str key containing list of async functions
+        """
         return self.__dispatch_destinations
 
     @staticmethod
