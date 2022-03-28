@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from .mixins import NonDunderMutableMappingMixin
 from collections.abc import Awaitable, Callable
 from pprint import pformat
 from typing import Concatenate, Final, Generator, Iterable, Literal, TypeVar
@@ -18,6 +17,7 @@ from .hints import (
     R,
     SyncOuterDecoratorHint,
 )
+from .mixins import NonDunderMutableMappingMixin
 
 __all__ = ("CachingPod",)
 

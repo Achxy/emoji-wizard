@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import abc
 from enum import Enum as _Enum
-from typing import Iterable, TypeVar, Generic, Any
+from typing import Any, Generic, Iterable, TypeVar
 
 __all__: tuple[str] = ("NonDunderMutableMappingMixin",)
 
