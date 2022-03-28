@@ -54,8 +54,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         pool: Pool | None = None,
     ) -> None:
         """
-        Initialize the CachingPod, this can be used with a CachingPod for more control
-        or can be used as a stand alone application
 
         Args:
             table (str): The table in the database to of which to cache
