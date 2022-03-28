@@ -26,7 +26,8 @@ _VT = TypeVar("_VT")
 
 
 class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
-    # TODO: Make copilot write rest of the docs lol
+    # TODO: Figure out a way to safely paramterize things that aren't parameters
+    # Like table names etc...
     __slots__: tuple[str, ...] = (
         "__pool",
         "__main_cache",
@@ -358,17 +359,9 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
             >>> await cache.get("key")
             'value'
         """
-        presence_in_cache: bool = key in self.__main_cache
-
-        if presence_in_cache:
-            # Update in database
-            query = (
-                f"UPDATE {self.__table} SET {self.__value} = $1 WHERE {self.__key} = $2"
-            )
-        else:
-            # Insert in database
-            query = f"INSERT INTO {self.__table} ({self.__value}, {self.__key}) VALUES ($1, $2)"
-
+        query = f"""INSERT INTO {self.__table} ({self.__key}, {self.__value}) VALUES ($1, $2)
+                    ON DUPLICATE KEY UPDATE {self.__value} = $2;
+                 """
         await self.__pool.execute(query, value, key)  # type: ignore never None if pull is done
         self.__main_cache[key] = value
 
