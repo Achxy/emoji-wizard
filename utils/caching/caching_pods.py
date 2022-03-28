@@ -343,29 +343,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         await self._dispatch("on_activate", pool)
 
     @_checkup(check_pull_done=True)
-    def __getitem__(self, key) -> _VT:
-        """
-        Returns the value associated with the key
-
-        Args:
-            key (str): Key to look up
-
-        Returns:
-            Value associated with the key
-
-        Preconditions:
-            Pull is done
-
-        Raises:
-            KeyError: Key not found in the cache
-
-        Example:
-            >>> cache["key"]
-            "value"
-        """
-        return self.__main_cache[key]
-
-    @_checkup(check_pull_done=True)
     def __iter__(self) -> Iterable[_KT]:
         """
         An iterable of keys in the cache
