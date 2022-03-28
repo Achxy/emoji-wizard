@@ -51,10 +51,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         table: str,
         key: str,
         value: str,
-        # create: str,
-        # insert: str,
-        # update: str,
-        # delete: str,
         pool: Pool | None = None,
     ) -> None:
         """
@@ -83,13 +79,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         self.__key: Final[str] = key
         self.__value: Final[str] = value
         self.__table: Final[str] = table
-        # TODO: Implement `insert` and `update` and `delete`
-        """
-        self.__create: Final[str] = create
-        self.__insert: Final[str] = insert
-        self.__update: Final[str] = update
-        self.__delete: Final[str] = delete
-        """
         self.__dispatch_destinations: AsyncDestination = {}
         self.__wait: Final[asyncio.Event] = asyncio.Event()
         self.__has_started: bool = False
