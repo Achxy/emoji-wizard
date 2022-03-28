@@ -27,7 +27,7 @@ _VT = TypeVar("_VT")
 
 
 class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
-
+    # TODO: Make copilot write rest of the docs lol
     __slots__: tuple[str, ...] = (
         "__pool",
         "__main_cache",
