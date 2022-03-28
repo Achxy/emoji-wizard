@@ -213,27 +213,6 @@ class NonDunderMutableMappingMixin(Generic[_KT, _VT], metaclass=abc.ABCMeta):
         for k in self.__iter__():
             self.delete(k)
 
-    def update(self, other: NonDunderMutableMappingMixin) -> None:
-        """
-        Updates the mapping with the items from the other mapping.
-        This internally `set` method and `items` in the other mapping.
-
-        Examples:
-            >>> m = NonDunderMutableMappingMixin()
-            >>> m.set("a", 1)
-            >>> m.set("b", 2)
-            >>> m.set("c", 3)
-            >>> n = NonDunderMutableMappingMixin()
-            >>> n.set("d", 4)
-            >>> n.set("e", 5)
-            >>> n.set("f", 6)
-            >>> m.update(n)
-            >>> list(m.items())
-            [('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6)]
-        """
-        for k, v in other.items():
-            self.set(k, v)
-
     def setdefault(self, key: _KT, default: Any = None) -> None:
         """
         Sets the key to the default value if the key is not present.
