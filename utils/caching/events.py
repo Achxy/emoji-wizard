@@ -17,7 +17,7 @@ class EventDispatchers:
 
     def add_listener(self, event: str, func: CoroFunc) -> None:
         if not inspect.iscoroutinefunction(func):
-            raise TypeError(f"Function must return a coroutine")
+            raise TypeError("Function must return a coroutine")
 
         if event not in self.__destinations__:
             self.__destinations__[event] = []
