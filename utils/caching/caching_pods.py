@@ -183,6 +183,14 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
             ConnectionError: A connection pool is not present
             ValueError: If the key is administered as a primary key but isn't a primary key
 
+        Example:
+            >>> cp = CachingPod(...)
+            >>> cp.is_ready
+            False
+            >>> await cp.pull()
+            >>> cp.is_ready
+            True
+
         """
         if self.__pool is None:  # Pool is never None if we're here (see _checkup)
             # This is to satisfy static linters
