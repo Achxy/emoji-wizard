@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from collections.abc import Awaitable, Callable, Mapping
+from string import Template
+from collections.abc import Awaitable, Callable, MutableMapping
 from pprint import pformat
 from typing import Concatenate, Final, Generator, Iterable, Literal, TypeVar
 
@@ -25,14 +26,15 @@ _KT = TypeVar("_KT")
 _VT = TypeVar("_VT")
 
 
-class CachingPod(Mapping[_KT, _VT], EventDispatchers):
-    # TODO: Make this MutableMapping, making changes to the database as well
+class CachingPod(MutableMapping[_KT, _VT], EventDispatchers):
+
     __slots__: tuple[str, ...] = (
         "__pool",
         "__main_cache",
         "__key",
         "__value",
         "__table",
+        "__create",
         "__insert",
         "__update",
         "__delete",
@@ -49,6 +51,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         table: str,
         key: str,
         value: str,
+        create: str,
         insert: str,
         update: str,
         delete: str,
@@ -83,6 +86,7 @@ class CachingPod(Mapping[_KT, _VT], EventDispatchers):
         self.__value: Final[str] = value
         self.__table: Final[str] = table
         # TODO: Implement `insert` and `update` and `delete`
+        self.__create: Final[str] = create
         self.__insert: Final[str] = insert
         self.__update: Final[str] = update
         self.__delete: Final[str] = delete
