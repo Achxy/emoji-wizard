@@ -53,18 +53,21 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
         pool: Pool | None = None,
     ) -> None:
         """
-
         Args:
-            table (str): The table in the database to of which to cache
-            key (str): The key name used get cached data
-            value (str): The value that should be stored
-            insert (str): Query that should be used to insert a new value
-            update (str): Query that should be used to update an existing value
-            delete (str): Query that should be used to delete an existing value
-            pool (Pool | None, optional): A asyncpg.Pool that depicts a connection to the database
-                                          This not being provided will render most of the methods
-                                          of the CachingPod unusable.
-                                          Pool is not required to be provided if used in CachingCluster
+            table (str):
+                -------
+                The table in the database which is desired to be cached
+            key (str):
+                -------
+                Column name which will be used as the key in the cache
+                This must be a primary key
+            value (str):
+                -------
+                Column name which will be used as the value in the cache
+            pool (Pool | None, optional):
+                -------
+                The connection pool to use for the caching pod
+                If None, then the pool must be set later using the `activate` method
 
         Warning:
         !   All queries are assumed to trusted and sanitized
