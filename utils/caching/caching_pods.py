@@ -12,9 +12,9 @@ from .hints import (
     CPT,
     AsyncDestination,
     AsyncOuterDecoratorHint,
+    SyncOuterDecoratorHint,
     P,
     R,
-    SyncOuterDecoratorHint,
 )
 from .mixins import NonDunderMutableMappingMixin, EventDispatchersMixin
 
@@ -320,8 +320,18 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
 
         Returns:
             _VT | R: The value associated with the key or the default value if the key is not found
+
         Preconditions:
             Pull is done
+
+        Example:
+            >>> cache = await CachingPod(...)
+            >>> await cache.get("key") # Assumes key is not in the cache
+            None
+            >>> await cache.get("key", "default") # Assumes key is not in the cache
+            'default'
+            >>> await cache.get("key_is_present") # Assumes key is in the cache
+            'value_of_key_is_present'
         """
         if key in self.__main_cache:
             return self.__main_cache[key]
@@ -329,6 +339,20 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
 
     @_checkup(check_pull_done=True)
     async def set(self, key: _KT, value: _VT) -> None:
+        """
+        Sets a value in the cache and inserts / updates it in the database
+        This is a coroutine
+
+        Args:
+            key (_KT): The key to set the value for
+            value (_VT): The value to be set associated with the key
+
+        Example:
+            >>> cache = await CachingPod(...)
+            >>> await cache.set("key", "value")
+            >>> await cache.get("key")
+            'value'
+        """
         presence_in_cache: bool = key in self.__main_cache
 
         if presence_in_cache:
@@ -345,6 +369,21 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
 
     @_checkup(check_pull_done=True)
     async def delete(self, key: _KT) -> None:
+        """
+        Deletes a key from the cache and deletes it from the database
+        This is a coroutine function
+
+        Args:
+            key (_KT): The key and it's associated value to be deleted
+
+        Example:
+            >>> cache = await CachingPod(...)
+            >>> list(cache.keys())
+            ['foo', 'bar']
+            >>> await cache.delete("foo")
+            >>> list(cache.keys())
+            ['bar']
+        """
         await self.__pool.execute(  # type: ignore never None if pull is done
             f"DELETE FROM {self.__table} WHERE {self.__key} = $1", key
         )
