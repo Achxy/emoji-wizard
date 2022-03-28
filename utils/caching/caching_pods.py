@@ -173,7 +173,7 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         return innner
 
     @_checkup(check_pool=True, check_pull_done=False)
-    async def wait_until_ready(self) -> Awaitable[Literal[True]]:
+    async def wait_until_ready(self) -> Callable[[], Awaitable[Literal[True]]]:
         """
         An awaitable that will block until the CachingPod is ready to be used
         This internally is Asyncio.Event.wait() where the event is set when the CachingPod is ready
@@ -181,7 +181,7 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         Returns:
             Awaitable[Literal[True]]: Expression will evaluate to True once the CachingPod is ready
         """
-        return self.__wait.wait()
+        return self.__wait.wait
 
     @_event_lock()
     @_checkup(check_pull_done=False, check_pool=True)
@@ -242,7 +242,7 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         await self._dispatch("on_pull", None)
 
     @_checkup(check_pull_done=True)
-    def get(self, key: _KT, default: R = None) -> _VT | R:
+    async def get(self, key: _KT, default: R = None) -> _VT | R:
         """
         Gets a value from the cache.
         unlike the __getitem__ method, this method will not raise an error if the key is not found
