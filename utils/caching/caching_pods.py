@@ -56,7 +56,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         # update: str,
         # delete: str,
         pool: Pool | None = None,
-        ensure_key_is_primary: bool = True,
     ) -> None:
         """
         Initialize the CachingPod, this can be used with a CachingPod for more control
@@ -73,8 +72,7 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
                                           This not being provided will render most of the methods
                                           of the CachingPod unusable.
                                           Pool is not required to be provided if used in CachingCluster
-            ensure_key_is_primary (bool, optional): Raises error if the provided key is not primary key
-                                                    in the provided table. Defaults to True.
+
         Warning:
         !   All queries are assumed to trusted and sanitized
         !   Queries are NOT sanitized internally
@@ -92,7 +90,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         self.__update: Final[str] = update
         self.__delete: Final[str] = delete
         """
-        self.__ensure_key_is_primary: Final[bool] = ensure_key_is_primary
         self.__dispatch_destinations: AsyncDestination = {}
         self.__wait: Final[asyncio.Event] = asyncio.Event()
         self.__has_started: bool = False
@@ -204,32 +201,31 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
             # This is to satisfy static linters
             raise ConnectionError("No database connection")
 
-        if self.__ensure_key_is_primary:
-            query = """
-                    SELECT
-                        column_name as PRIMARYKEYCOLUMN
+        query = """
+                SELECT
+                    column_name as PRIMARYKEYCOLUMN
 
-                    FROM
-                        INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
+                FROM
+                    INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
 
-                    INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU
-                        ON TC.CONSTRAINT_TYPE = 'PRIMARY KEY'
-                        AND TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME
-                        AND KU.table_name= $1
+                INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU
+                    ON TC.CONSTRAINT_TYPE = 'PRIMARY KEY'
+                    AND TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME
+                    AND KU.table_name= $1
 
-                    ORDER BY
-                        KU.TABLE_NAME,
-                        KU.ORDINAL_POSITION;
-                    """
-            primaries: list[str] = list(
-                map(
-                    lambda x: x["primarykeycolumn"],
-                    await self.__pool.fetch(query, self.__table),
-                )
+                ORDER BY
+                    KU.TABLE_NAME,
+                    KU.ORDINAL_POSITION;
+                """
+        primaries: list[str] = list(
+            map(
+                lambda x: x["primarykeycolumn"],
+                await self.__pool.fetch(query, self.__table),
             )
+        )
 
-            if self.__key not in primaries:
-                raise ValueError(f"{self.__key} is not a primary key")
+        if self.__key not in primaries:
+            raise ValueError(f"{self.__key} is not a primary key")
 
         query = f"SELECT {self.__key}, {self.__value} FROM {self.__table}"
         journal: dict[_KT, _VT] = {}
@@ -345,11 +341,8 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         return default
 
     @_checkup(check_pull_done=True)
-    async def set(self, key: _KT, value: _VT, renew: bool = False) -> None:
+    async def set(self, key: _KT, value: _VT) -> None:
         presence_in_cache: bool = key in self.__main_cache
-
-        if self.__ensure_key_is_primary and presence_in_cache and not renew:
-            raise ValueError(f"{key} is already in the cache")
 
         if presence_in_cache:
             # Update in database
