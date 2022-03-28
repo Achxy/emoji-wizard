@@ -167,8 +167,9 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
         This internally is Asyncio.Event.wait() where the event is set when the CachingPod is ready
 
         Returns:
-            Callable[[], Awaitable[Literal[True]]]: When called and awaited will evaluate
-                                                    to True once the CachingPod is ready
+            Callable[[], Awaitable[Literal[True]]]:
+                When called and awaited will evaluate
+                to True once the CachingPod is ready
         """
         return self.__wait.wait
 
