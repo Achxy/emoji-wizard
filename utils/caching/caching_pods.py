@@ -246,7 +246,7 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
         Example:
             >>> async def main():
             >>>     pool = await asyncpg.create_pool(...)
-            >>>     cache = CachingPod(...) # pool is not set
+            >>>     cache = CachingPod(..., pool=None) # pool is not set
             >>>     await cache.activate(pool) # pool is now set
 
         An sort of important dev note:
