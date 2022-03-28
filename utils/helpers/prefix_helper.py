@@ -17,7 +17,6 @@ class PrefixHelper(CachingPod[int, list[str]]):
         *,
         default_prefixes: Literal[_Sentinel.MISSING] | list[str] = _Sentinel.MISSING,
     ) -> list[str]:
-        ...
         """
         Get the prefixes for the guild
         default_prefixes are extended to the existing prefixes (regardless of whether they are in the cache)
@@ -42,3 +41,21 @@ class PrefixHelper(CachingPod[int, list[str]]):
             default_prefixes
         ) if default_prefixes is not _Sentinel.MISSING else None
         return ret
+
+    async def ensure_table(self) -> None:
+        """
+        Create the table for storing prefixes if it doesn't exist
+        This is a coroutine function
+
+        Example:
+            >>> await PrefixHelper.ensure_table()
+            >>> # Actually that's it :D
+        """
+        query = """
+                CREATE TABLE IF NOT EXISTS prefixes (
+                guild_id bigint NOT NULL,
+                prefix text NOT NULL,
+                CONSTRAINT prefixes_pkey PRIMARY KEY (guild_id)
+                );
+                """
+        self.pool.execute(query) if self.pool else None
