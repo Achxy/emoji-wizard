@@ -241,35 +241,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         # for user-serviceable is_ready, see the `is_ready` property
         await self._dispatch("on_pull", None)
 
-    @_checkup(check_pull_done=True)
-    async def get(self, key: _KT, default: R = None) -> _VT | R:
-        """
-        Gets a value from the cache.
-        unlike the __getitem__ method, this method will not raise an error if the key is not found
-        and instead will return the default value
-        this is similar to the behavior of the dict.get method
-
-        Args:
-            key (_KT): The key to get the value from
-            default (R, optional): The value to return instead if key is not found. Defaults to None.
-
-        Returns:
-            _VT | R: The value associated with the key or the default value if the key is not found
-        Preconditions:
-            Pull is done
-        """
-        if key in self.__main_cache:
-            return self.__main_cache[key]
-        return default
-
-    @_checkup(check_pull_done=True)
-    async def set(self, key: _KT, value: _VT) -> None:
-        self.__main_cache[key] = value
-
-    @_checkup(check_pull_done=True)
-    async def delete(self, key: _KT) -> None:
-        del self.__main_cache[key]
-
     async def activate(self, pool: Pool | Awaitable[Pool]) -> None:
         """
         To assign a connection pool to the caching pod
@@ -349,6 +320,35 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
 
         self.__pool = pool
         await self._dispatch("on_activate", pool)
+
+    @_checkup(check_pull_done=True)
+    async def get(self, key: _KT, default: R = None) -> _VT | R:
+        """
+        Gets a value from the cache.
+        unlike the __getitem__ method, this method will not raise an error if the key is not found
+        and instead will return the default value
+        this is similar to the behavior of the dict.get method
+
+        Args:
+            key (_KT): The key to get the value from
+            default (R, optional): The value to return instead if key is not found. Defaults to None.
+
+        Returns:
+            _VT | R: The value associated with the key or the default value if the key is not found
+        Preconditions:
+            Pull is done
+        """
+        if key in self.__main_cache:
+            return self.__main_cache[key]
+        return default
+
+    @_checkup(check_pull_done=True)
+    async def set(self, key: _KT, value: _VT) -> None:
+        self.__main_cache[key] = value
+
+    @_checkup(check_pull_done=True)
+    async def delete(self, key: _KT) -> None:
+        del self.__main_cache[key]
 
     @_checkup(check_pull_done=True)
     def __iter__(self) -> Iterable[_KT]:
