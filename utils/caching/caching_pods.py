@@ -8,7 +8,6 @@ from typing import Concatenate, Final, Generator, Iterable, Literal, TypeVar
 
 from asyncpg import Pool
 
-from .events import EventDispatchers
 from .hints import (
     CPT,
     AsyncDestination,
@@ -17,7 +16,7 @@ from .hints import (
     R,
     SyncOuterDecoratorHint,
 )
-from .mixins import NonDunderMutableMappingMixin
+from .mixins import NonDunderMutableMappingMixin, EventDispatchersMixin
 
 __all__ = ("CachingPod",)
 
@@ -26,7 +25,7 @@ _KT = TypeVar("_KT")
 _VT = TypeVar("_VT")
 
 
-class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
+class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
     # TODO: Make copilot write rest of the docs lol
     __slots__: tuple[str, ...] = (
         "__pool",

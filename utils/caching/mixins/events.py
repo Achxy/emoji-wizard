@@ -3,12 +3,12 @@ import asyncio
 import inspect
 from typing import Any, Callable
 
-from .hints import CFT, AsyncDestination, CoroFunc
+from ..hints import CFT, AsyncDestination, CoroFunc
 
-__all__: tuple[str] = ("EventDispatchers",)
+__all__: tuple[str] = ("EventDispatchersMixin",)
 
 
-class EventDispatchers:
+class EventDispatchersMixin(metaclass=abc.ABCMeta):
     __slots__: tuple[()] = ()
 
     @abc.abstractproperty
