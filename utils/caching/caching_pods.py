@@ -51,10 +51,10 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         table: str,
         key: str,
         value: str,
-        create: str,
-        insert: str,
-        update: str,
-        delete: str,
+        # create: str,
+        # insert: str,
+        # update: str,
+        # delete: str,
         pool: Pool | None = None,
         ensure_key_is_primary: bool = True,
     ) -> None:
@@ -86,10 +86,12 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         self.__value: Final[str] = value
         self.__table: Final[str] = table
         # TODO: Implement `insert` and `update` and `delete`
+        """
         self.__create: Final[str] = create
         self.__insert: Final[str] = insert
         self.__update: Final[str] = update
         self.__delete: Final[str] = delete
+        """
         self.__ensure_key_is_primary: Final[bool] = ensure_key_is_primary
         self.__dispatch_destinations: AsyncDestination = {}
         self.__wait: Final[asyncio.Event] = asyncio.Event()
@@ -343,11 +345,29 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
         return default
 
     @_checkup(check_pull_done=True)
-    async def set(self, key: _KT, value: _VT) -> None:
+    async def set(self, key: _KT, value: _VT, renew: bool = False) -> None:
+        presence_in_cache: bool = key in self.__main_cache
+
+        if self.__ensure_key_is_primary and presence_in_cache and not renew:
+            raise ValueError(f"{key} is already in the cache")
+
+        if presence_in_cache:
+            # Update in database
+            query = (
+                f"UPDATE {self.__table} SET {self.__value} = $1 WHERE {self.__key} = $2"
+            )
+        else:
+            # Insert in database
+            query = f"INSERT INTO {self.__table} ({self.__value}, {self.__key}) VALUES ($1, $2)"
+
+        await self.__pool.execute(query, value, key)  # type: ignore never None if pull is done
         self.__main_cache[key] = value
 
     @_checkup(check_pull_done=True)
     async def delete(self, key: _KT) -> None:
+        await self.__pool.execute(  # type: ignore never None if pull is done
+            f"DELETE FROM {self.__table} WHERE {self.__key} = $1", key
+        )
         del self.__main_cache[key]
 
     @_checkup(check_pull_done=True)
