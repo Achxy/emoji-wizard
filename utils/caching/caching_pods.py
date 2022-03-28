@@ -262,6 +262,14 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
             return self.__main_cache[key]
         return default
 
+    @_checkup(check_pull_done=True)
+    async def set(self, key: _KT, value: _VT) -> None:
+        self.__main_cache[key] = value
+
+    @_checkup(check_pull_done=True)
+    async def delete(self, key: _KT) -> None:
+        del self.__main_cache[key]
+
     async def activate(self, pool: Pool | Awaitable[Pool]) -> None:
         """
         To assign a connection pool to the caching pod
