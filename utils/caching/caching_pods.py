@@ -293,7 +293,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
 
         if isinstance(resultant_pool, Pool):
             self.__pool = resultant_pool
-            await self._dispatch("on_activate", resultant_pool)
             return
 
         if resultant_pool is not None:
@@ -307,7 +306,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
             raise invalid_type_exc
 
         self.__pool = pool
-        await self._dispatch("on_activate", pool)
 
     @_checkup(check_pull_done=True)
     async def get(self, key: _KT, default: R = None) -> _VT | R:
