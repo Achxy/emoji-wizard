@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from string import Template
-from collections.abc import Awaitable, Callable, MutableMapping
+from .mixins import NonDunderMutableMappingMixin
+from collections.abc import Awaitable, Callable
 from pprint import pformat
 from typing import Concatenate, Final, Generator, Iterable, Literal, TypeVar
 
@@ -26,7 +26,7 @@ _KT = TypeVar("_KT")
 _VT = TypeVar("_VT")
 
 
-class CachingPod(MutableMapping[_KT, _VT], EventDispatchers):
+class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchers):
 
     __slots__: tuple[str, ...] = (
         "__pool",
