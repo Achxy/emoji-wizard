@@ -228,7 +228,6 @@ class CachingPod(NonDunderMutableMappingMixin[_KT, _VT], EventDispatchersMixin):
         # __is_ready isn't fully representative of whether the cache is ready
         # much rather than internal check to see if the pull has been done
         # for user-serviceable is_ready, see the `is_ready` property
-        await self._dispatch("on_pull", None)
 
     async def activate(self, pool: Pool | Awaitable[Pool]) -> None:
         """
