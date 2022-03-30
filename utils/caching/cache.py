@@ -9,6 +9,7 @@ class AbstractBaseCache(ABC, Mapping):
         self.fetch = fetch
         self.set = write
         self.pool = pool
+        self.default = []
         self.main_cache = {}
 
     @abstractmethod

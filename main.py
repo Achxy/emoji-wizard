@@ -30,5 +30,11 @@ async def main(bot):
 
 bot = EmojiBot(command_prefix=get_prefix, intents=discord.Intents.all())
 
+
+@bot.command()
+async def prefix(ctx):
+    return await ctx.send(bot.prefix[ctx.guild.id])
+
+
 if __name__ == "__main__":
     asyncio.run(main(bot))
