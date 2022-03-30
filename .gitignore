@@ -129,8 +129,8 @@ dmypy.json
 .pyre/
 
 
-# Some tests I do
-t_*.*
+# Some private test files
+tests/
 
 # vscode preferences
 .vscode
