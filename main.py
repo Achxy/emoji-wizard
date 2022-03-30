@@ -1,53 +1,34 @@
 import os
 
-import discord
+import discord, asyncpg, asyncio
 from discord.ext import commands
-
-from tools.database import Database
-from tools.litecache import litecache
+from utils.caching.prefix_util import PrefixHelper
 
 
-extensions = {
-    "cogs": "⚙️",
-}  # It's the emoji bot, what else would you expect?
+def get_prefix(bot, message):
+    return bot.prefix[message.guild.id]
 
 
-bot: commands.Bot = commands.Bot(
-    command_prefix=Database.get_prefix(debug=False),
-    help_command=None,
-    case_insensitive=True,
-    allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
-    intents=discord.Intents.all(),
-)
+class EmojiBot(commands.Bot):
+    __slots__: tuple[str, str] = ("prefix", "pool")
+
+    async def on_ready(self):
+        print(f"Successfully logged in as {self.user}")
 
 
-async def _create_cached_db_pool():
-    bot.db = await litecache.create_caching_pool(dsn=os.getenv("DATABASE_URL"))
-    print("Successfully connected to the database")
-    bot.tools = Database(bot)
+async def main(bot):
+    async with bot:
+        bot.pool = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
+        bot.prefix = await PrefixHelper(
+            fetch="SELECT * FROM prefixes",
+            write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
+            pool=bot.pool,
+        )
+        print(bot.prefix)
+        await bot.start(os.getenv("DISCORD_TOKEN"))
 
 
-@bot.event
-async def on_ready():
-    print(f"Successfully logged in as {bot.user}")
+bot = EmojiBot(command_prefix=get_prefix, intents=discord.Intents.all())
 
-
-# Get all the python files from the cogs folder
-# and add them as cogs with bot.load_extension
-print("            -           ")  # This is just for the formatting
-for ext in extensions:
-    print(f"Getting extensions from {ext}", end=f"\n{'-' * 10}\n")
-    for filename in os.listdir(f"./{ext}"):
-        # Check if the file is a python file
-        if filename.endswith(".py"):
-            # Print the filename
-            print(f"Adding {filename} from {ext} {extensions[ext]} ...", end="")
-            # Load the cog after stripping the .py
-            bot.load_extension(f"{ext}.{filename[:-3]}")
-            # Give the user a nice 'Done' message to make them happy
-            print("Done")
-    print()
-
-
-bot.loop.run_until_complete(_create_cached_db_pool())
-bot.run(os.getenv("DISCORD_TOKEN"))
+if __name__ == "__main__":
+    asyncio.run(main(bot))
