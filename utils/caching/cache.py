@@ -12,13 +12,13 @@ _VT = TypeVar("_VT")
 class BaseCache(Mapping[_KT, _VT]):
     def __init__(self, *, fetch: str, write: str, pool: Pool):
         self.fetch: str = fetch
-        self.set: str = write
+        self.write: str = write
         self.pool: Pool = pool
         self.default: list[str] = []
         self.main_cache: dict[_KT, _VT] = {}
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.fetch}, {self.set})"
+        return f"{self.__class__.__name__}({self.fetch}, {self.write})"
 
     def __str__(self) -> str:
         return pformat(self.main_cache)
@@ -47,5 +47,5 @@ class BaseCache(Mapping[_KT, _VT]):
         self.main_cache = {**journal}
 
     async def update(self, key: _KT, value: _VT) -> None:
-        await self.pool.execute(self.set, key, value)
+        await self.pool.execute(self.write, key, value)
         self.main_cache[key] = value
