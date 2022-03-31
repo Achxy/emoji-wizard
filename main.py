@@ -8,7 +8,7 @@ import asyncpg
 from discord import Intents, Message
 from discord.ext import commands
 
-from utils.caching.prefix_util import PrefixHelper
+from utils import PrefixHelper
 
 
 def get_prefix(bot: EmojiBot, message: Message):
