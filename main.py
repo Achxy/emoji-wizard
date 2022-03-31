@@ -7,6 +7,7 @@ import asyncpg
 from discord import Intents, Message
 from discord.ext import commands
 
+from tools import findenv
 from utils import PrefixHelper
 
 
@@ -29,13 +30,32 @@ def get_prefix(_bot: EmojiBot, message: Message) -> list[str]:
 
 
 class EmojiBot(commands.Bot):
+    """
+    The main bot class, this is a subclass of the commands.Bot
+    This class is slotted and does not have a __dict__ attribute
+    """
+
     __slots__: tuple[str, str] = ("prefix", "pool")
 
     async def on_ready(self) -> None:
+        """
+        Called when the client is done preparing the data received from Discord
+        Usually after login is successful and the `Client.guilds` and co. are filled up
+        This can be called multiple times
+        """
         print(f"Successfully logged in as {self.user}")
 
 
-async def main(_bot) -> None:
+async def main(_bot: EmojiBot) -> None:
+    """
+    The main function assignes values to some of bot's slotted attributes
+    Caller of this function is gated to case where the module is executed
+    as the main script
+    ie, __name__ resolves to __main__
+
+    Args:
+        _bot (EmojiBot): commands.Bot instance or subclass instance
+    """
     async with _bot:
         _bot.pool = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
         _bot.prefix = await PrefixHelper(
@@ -44,7 +64,7 @@ async def main(_bot) -> None:
             pool=_bot.pool,
         )
         print(_bot.prefix)
-        await _bot.start(os.getenv("DISCORD_TOKEN"))
+        await _bot.start(findenv("DISCORD_TOKEN"))
 
 
 bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
