@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from pprint import pformat
-from typing import Awaitable, Generator, Iterator, TypeVar, Final
+from typing import Awaitable, Final, Generator, Iterator, TypeVar
 
 from asyncpg import Pool, Record
 
