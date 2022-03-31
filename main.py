@@ -11,8 +11,8 @@ from discord.ext import commands
 from utils import PrefixHelper
 
 
-def get_prefix(bot: EmojiBot, message: Message):
-    return bot.prefix(bot, message)
+def get_prefix(_bot: EmojiBot, message: Message):
+    return _bot.prefix(bot, message)
 
 
 class EmojiBot(commands.Bot):
