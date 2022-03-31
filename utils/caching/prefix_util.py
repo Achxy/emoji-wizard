@@ -37,7 +37,7 @@ class _Sentinel(Enum):
     MISSING = object()
 
 
-class PrefixHelper(BaseCache):
+class PrefixHelper(BaseCache[int, list[str]]):
     """
     A helper class for prefixes.
     This is inherited from BaseCache where the cache logic is implemented.
@@ -78,7 +78,10 @@ class PrefixHelper(BaseCache):
         Returns:
             list[str]: list of strings which are cached prefixes
         """
-        ret = self.get(message.guild.id if message.guild else _Sentinel.MISSING, [])
+        if message.guild is None:
+            return self.default
+
+        ret = self.get(message.guild.id, [])
         ret = ret if isinstance(ret, list) else [ret]
 
         return ret + self.default
