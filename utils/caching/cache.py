@@ -17,7 +17,7 @@ class BaseCache(Mapping[_KT, _VT]):
         self.default: list[str] = []
         self.main_cache: dict[_KT, _VT] = {}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.fetch}, {self.set})"
 
     def __str__(self) -> str:
