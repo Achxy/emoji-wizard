@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 import asyncio
+from typing import Final
 
 import asyncpg
 from discord import Intents, Message
@@ -25,6 +26,9 @@ from discord.ext import commands
 
 from tools import findenv
 from utils import PrefixHelper
+
+
+DEFAULT_PREFIX: Final[list[str]] = ["?"]
 
 
 def get_prefix(_bot: EmojiBot, message: Message) -> list[str]:
@@ -81,6 +85,7 @@ async def main(_bot: EmojiBot) -> None:
                 "ON CONFLICT (guild_id) DO UPDATE SET prefix = $2"
             ),
             pool=_bot.pool,
+            default=DEFAULT_PREFIX,
         )
         print(_bot.prefix)
         await _bot.start(findenv("DISCORD_TOKEN"))

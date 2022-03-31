@@ -17,8 +17,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from enum import Enum
+from typing import TYPE_CHECKING, Literal
 
+from asyncpg import Pool
 from discord import Message
 
 from .cache import BaseCache
@@ -26,7 +28,13 @@ from .cache import BaseCache
 if TYPE_CHECKING:
     from ...main import EmojiBot
 
-_MISSING = object()
+
+class _Sentinel(Enum):
+    """
+    Single member enum for sentinel value
+    """
+
+    MISSING = object()
 
 
 class PrefixHelper(BaseCache):
@@ -34,6 +42,28 @@ class PrefixHelper(BaseCache):
     A helper class for prefixes.
     This is inherited from BaseCache where the cache logic is implemented.
     """
+
+    def __init__(
+        self,
+        *,
+        fetch: str,
+        write: str,
+        pool: Pool,
+        default: Literal[_Sentinel.MISSING] | list[str] = _Sentinel.MISSING,
+    ):
+        """
+        Constructing this class is in a similar fashion to that of `BaseCache`
+        however, a new keyword argument `default` is added to specify the
+        default value to be expected to the cache result.
+
+        Args:
+            fetch (str): SQL query to fetch the data from the database
+            write (str): SQL query to write the data to the database
+            pool (Pool): An instance of `asyncpg.Pool`
+            default (list[str]): A list of default prefixes to be used
+        """
+        self.default = default if default is not _Sentinel.MISSING else []
+        super().__init__(fetch=fetch, write=write, pool=pool)
 
     def __call__(self, bot: EmojiBot, message: Message) -> list[str]:
         """
@@ -48,7 +78,7 @@ class PrefixHelper(BaseCache):
         Returns:
             list[str]: list of strings which are cached prefixes
         """
-        ret = self.get(message.guild.id if message.guild else _MISSING, [])
+        ret = self.get(message.guild.id if message.guild else _Sentinel.MISSING, [])
         ret = ret if isinstance(ret, list) else [ret]
 
         return ret + self.default
