@@ -37,9 +37,6 @@ class BaseCache(Mapping[_KT, _VT]):
         values
         items
         get
-
-    Args:
-        Mapping (_type_): _description_
     """
 
     def __init__(self, *, fetch: str, write: str, pool: Pool):
