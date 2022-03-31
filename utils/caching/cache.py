@@ -42,4 +42,3 @@ class AbstractBaseCache(ABC, Mapping):
             k, v = val
             journal[k] = v
         self.main_cache = {**journal}
-        del response, journal
