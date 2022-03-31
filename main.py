@@ -1,12 +1,13 @@
 from __future__ import annotations
+
+import asyncio
 import os
 from typing import Final
 
-import discord
 import asyncpg
-import asyncio
-from discord import Message
+from discord import Intents, Message
 from discord.ext import commands
+
 from utils.caching.prefix_util import PrefixHelper
 
 
@@ -33,9 +34,7 @@ async def main(bot) -> None:
         await bot.start(os.getenv("DISCORD_TOKEN"))
 
 
-bot: Final[EmojiBot] = EmojiBot(
-    command_prefix=get_prefix, intents=discord.Intents.all()
-)
+bot: Final[EmojiBot] = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
 
 
 @bot.command()
