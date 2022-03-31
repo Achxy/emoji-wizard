@@ -100,8 +100,8 @@ class BaseCache(Mapping[_KT, _VT]):
         response: list[Record] = await self.__pool.fetch(self.__fetch)
         journal: dict[_KT, _VT] = {}
         for val in response:
-            k, v = val
-            journal[k] = v
+            key, val = val
+            journal[key] = val
         self.__main_cache = {**journal}
 
     async def update(self, key: _KT, value: _VT) -> None:
