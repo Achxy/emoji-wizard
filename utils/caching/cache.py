@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from pprint import pformat
-from typing import Awaitable, Generator, Iterator, TypeVar
+from typing import Awaitable, Generator, Iterator, TypeVar, Final
 
 from asyncpg import Pool, Record
 
@@ -11,26 +11,26 @@ _VT = TypeVar("_VT")
 
 class BaseCache(Mapping[_KT, _VT]):
     def __init__(self, *, fetch: str, write: str, pool: Pool):
-        self.fetch: str = fetch
-        self.write: str = write
-        self.pool: Pool = pool
+        self.__fetch: Final[str] = fetch
+        self.__write: Final[str] = write
+        self.__pool: Final[Pool] = pool
         self.default: list[str] = []
-        self.main_cache: dict[_KT, _VT] = {}
+        self.__main_cache: dict[_KT, _VT] = {}
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.fetch}, {self.write})"
+        return f"{self.__class__.__name__}({self.__fetch}, {self.__write})"
 
     def __str__(self) -> str:
-        return pformat(self.main_cache)
+        return pformat(self.__main_cache)
 
     def __getitem__(self, __k: _KT, /) -> _VT:
-        return self.main_cache[__k]
+        return self.__main_cache[__k]
 
     def __len__(self) -> int:
-        return len(self.main_cache)
+        return len(self.__main_cache)
 
     def __iter__(self) -> Iterator[_KT]:
-        return iter(self.main_cache)
+        return iter(self.__main_cache)
 
     def __await__(
         self: _CT,
@@ -39,13 +39,29 @@ class BaseCache(Mapping[_KT, _VT]):
         return self
 
     async def pull(self) -> None:
-        response: list[Record] = await self.pool.fetch(self.fetch)
+        response: list[Record] = await self.__pool.fetch(self.__fetch)
         journal: dict[_KT, _VT] = {}
         for val in response:
             k, v = val
             journal[k] = v
-        self.main_cache = {**journal}
+        self.__main_cache = {**journal}
 
     async def update(self, key: _KT, value: _VT) -> None:
-        await self.pool.execute(self.write, key, value)
-        self.main_cache[key] = value
+        await self.__pool.execute(self.__write, key, value)
+        self.__main_cache[key] = value
+
+    @property
+    def fetch_query(self) -> str:
+        return self.__fetch
+
+    @property
+    def write_query(self) -> str:
+        return self.__write
+
+    @property
+    def pool(self) -> Pool:
+        return self.__pool
+
+    @property
+    def raw_cache(self) -> dict[_KT, _VT]:
+        return self.__main_cache
