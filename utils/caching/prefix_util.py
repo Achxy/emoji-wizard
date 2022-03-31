@@ -30,7 +30,24 @@ _MISSING = object()
 
 
 class PrefixHelper(BaseCache):
+    """
+    A helper class for prefixes.
+    This is inherited from BaseCache where the cache logic is implemented.
+    """
+
     def __call__(self, bot: EmojiBot, message: Message) -> list[str]:
+        """
+        This can be either passed directly into `commands.Bot` constructor
+        as the `command_prefix` argument or abstracted into a another helper
+        function for finer control.
+
+        Args:
+            bot (EmojiBot): An instance of `EmojiBot`
+            message (Message): An instance of `discord.Message`
+
+        Returns:
+            list[str]: list of strings which are cached prefixes
+        """
         ret = self.get(message.guild.id if message.guild else _MISSING, [])
         ret = ret if isinstance(ret, list) else [ret]
 
