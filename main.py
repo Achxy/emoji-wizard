@@ -78,7 +78,7 @@ async def main(_bot: EmojiBot) -> None:
     """
     async with _bot:
         # Due to a bug in pylint, https://github.com/PyCQA/pylint/issues/3683
-        # Modified constructors with new keyword arguments are properly detected
+        # Modified constructors with new keyword arguments are not properly detected
         _bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
         _bot.prefix = await PrefixHelper(  # pylint: disable=unexpected-keyword-arg
             fetch="SELECT * FROM prefixes",
