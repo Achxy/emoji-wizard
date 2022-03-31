@@ -27,7 +27,6 @@ from discord.ext import commands
 from tools import findenv
 from utils import PrefixHelper
 
-
 DEFAULT_PREFIX: Final[list[str]] = ["?"]
 
 

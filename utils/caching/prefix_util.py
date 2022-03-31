@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Literal, TypeVar, Generator, Awaitable
+from typing import TYPE_CHECKING, Awaitable, Generator, Literal, TypeVar
 
 from asyncpg import Pool
 from discord import Message
