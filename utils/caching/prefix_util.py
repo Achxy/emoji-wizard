@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, TypeVar, Generator, Awaitable
 
 from asyncpg import Pool
 from discord import Message
@@ -27,6 +27,9 @@ from .cache import BaseCache
 
 if TYPE_CHECKING:
     from ...main import EmojiBot
+
+
+_PT = TypeVar("_PT", bound="PrefixHelper")
 
 
 class _Sentinel(Enum):
@@ -85,3 +88,22 @@ class PrefixHelper(BaseCache[int, list[str]]):
         ret = ret if isinstance(ret, list) else [ret]
 
         return ret + self.default
+
+    async def ensure_table_exists(self) -> None:
+        """
+        Calling this executes the SQL query to create the table for storing
+        prefixes if it does not exist already in the database.
+        """
+        query: str = """
+                CREATE TABLE IF NOT EXISTS prefixes (
+                    guild_id bigint NOT NULL,
+                    prefix text NOT NULL,
+                    CONSTRAINT prefixes_pkey PRIMARY KEY (guild_id)
+                );
+                """
+        self.pool.execute(query)
+
+    def __await__(self: _PT) -> Generator[Awaitable[None], None, _PT]:
+        yield from self.pull().__await__()
+        yield from self.ensure_table_exists().__await__()
+        return self
