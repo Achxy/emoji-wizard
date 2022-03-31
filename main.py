@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import os
-from typing import Final
 
 import asyncpg
 from discord import Intents, Message
@@ -48,7 +47,7 @@ async def main(_bot) -> None:
         await _bot.start(os.getenv("DISCORD_TOKEN"))
 
 
-bot: Final[EmojiBot] = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
+bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
 
 
 @bot.command()
