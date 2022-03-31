@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from asyncpg import Pool
 from collections.abc import Mapping
 from pprint import pformat
+
+from asyncpg import Pool
 
 
 class AbstractBaseCache(ABC, Mapping):

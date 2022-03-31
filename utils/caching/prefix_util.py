@@ -1,5 +1,8 @@
+import os
+
+import asyncpg
+
 from .cache import AbstractBaseCache
-import asyncpg, os
 
 _MISSING = object()
 

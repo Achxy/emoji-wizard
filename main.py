@@ -1,10 +1,9 @@
-import asyncio
 import os
 
-import asyncpg
 import discord
+import asyncpg
+import asyncio
 from discord.ext import commands
-
 from utils.caching.prefix_util import PrefixHelper
 
 
