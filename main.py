@@ -11,7 +11,21 @@ from discord.ext import commands
 from utils import PrefixHelper
 
 
-def get_prefix(_bot: EmojiBot, message: Message):
+def get_prefix(_bot: EmojiBot, message: Message) -> list[str]:
+    """
+    The callable which can be passed into commands.Bot
+    constructor as the command_prefix kwarg.
+
+    Internally this gets the `prefix` attribute of the the bot
+    which is a `PrefixHelper` instance.
+
+    Args:
+        _bot (EmojiBot): commands.Bot instance or subclass instance
+        message (Message): discord.Message object.
+
+    Returns:
+        list[str]: The prefixes for the guild, along with the defaults
+    """
     return _bot.prefix(bot, message)
 
 
