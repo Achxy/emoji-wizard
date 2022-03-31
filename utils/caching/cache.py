@@ -6,7 +6,7 @@ from asyncpg import Pool
 
 
 class AbstractBaseCache(ABC, Mapping):
-    def __init__(self, *, fetch, write, pool):
+    def __init__(self, *, fetch, write, pool: Pool):
         self.fetch = fetch
         self.set = write
         self.pool = pool
@@ -43,3 +43,7 @@ class AbstractBaseCache(ABC, Mapping):
             k, v = val
             journal[k] = v
         self.main_cache = {**journal}
+
+    async def update(self, key, value):
+        await self.pool.execute(self.set, key, value)
+        self.main_cache[key] = value
