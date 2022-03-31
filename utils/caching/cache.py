@@ -96,6 +96,7 @@ class BaseCache(Mapping[_KT, _VT]):
     async def pull(self) -> None:
         """
         Pulls the data from the database and stores it in the cache
+        The existing cached values (if any) is overwritten
         """
         response: list[Record] = await self.__pool.fetch(self.__fetch)
         journal: dict[_KT, _VT] = {}
