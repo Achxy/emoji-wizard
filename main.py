@@ -1,24 +1,27 @@
+from __future__ import annotations
 import os
+from typing import Final
 
 import discord
 import asyncpg
 import asyncio
+from discord import Message
 from discord.ext import commands
 from utils.caching.prefix_util import PrefixHelper
 
 
-def get_prefix(bot, message):
-    return bot.prefix[message.guild.id]
+def get_prefix(bot: EmojiBot, message: Message):
+    return bot.prefix(bot, message)
 
 
 class EmojiBot(commands.Bot):
     __slots__: tuple[str, str] = ("prefix", "pool")
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         print(f"Successfully logged in as {self.user}")
 
 
-async def main(bot):
+async def main(bot) -> None:
     async with bot:
         bot.pool = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
         bot.prefix = await PrefixHelper(
@@ -30,7 +33,9 @@ async def main(bot):
         await bot.start(os.getenv("DISCORD_TOKEN"))
 
 
-bot = EmojiBot(command_prefix=get_prefix, intents=discord.Intents.all())
+bot: Final[EmojiBot] = EmojiBot(
+    command_prefix=get_prefix, intents=discord.Intents.all()
+)
 
 
 @bot.command()

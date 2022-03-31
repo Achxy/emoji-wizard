@@ -2,12 +2,12 @@ import os
 
 import asyncpg
 
-from .cache import AbstractBaseCache
+from .cache import BaseCache
 
 _MISSING = object()
 
 
-class PrefixHelper(AbstractBaseCache):
+class PrefixHelper(BaseCache):
     def __call__(self, bot, message) -> list[str]:
 
         return (
