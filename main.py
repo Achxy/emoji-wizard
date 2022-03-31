@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import os
 
 import asyncpg
 from discord import Intents, Message
@@ -57,10 +56,13 @@ async def main(_bot: EmojiBot) -> None:
         _bot (EmojiBot): commands.Bot instance or subclass instance
     """
     async with _bot:
-        _bot.pool = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
+        _bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
         _bot.prefix = await PrefixHelper(
             fetch="SELECT * FROM prefixes",
-            write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
+            write=(
+                "INSERT INTO prefixes VALUES ($1, $2) "
+                "ON CONFLICT (guild_id) DO UPDATE SET prefix = $2"
+            ),
             pool=_bot.pool,
         )
         print(_bot.prefix)
