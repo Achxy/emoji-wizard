@@ -22,16 +22,16 @@ class EmojiBot(commands.Bot):
         print(f"Successfully logged in as {self.user}")
 
 
-async def main(bot) -> None:
-    async with bot:
-        bot.pool = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
-        bot.prefix = await PrefixHelper(
+async def main(_bot) -> None:
+    async with _bot:
+        _bot.pool = await asyncpg.create_pool(dsn=os.getenv("DATABASE_URL"))
+        _bot.prefix = await PrefixHelper(
             fetch="SELECT * FROM prefixes",
             write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
-            pool=bot.pool,
+            pool=_bot.pool,
         )
-        print(bot.prefix)
-        await bot.start(os.getenv("DISCORD_TOKEN"))
+        print(_bot.prefix)
+        await _bot.start(os.getenv("DISCORD_TOKEN"))
 
 
 bot: Final[EmojiBot] = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
