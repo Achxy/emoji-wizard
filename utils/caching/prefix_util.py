@@ -14,7 +14,7 @@ _MISSING = object()
 
 class PrefixHelper(BaseCache):
     def __call__(self, bot: EmojiBot, message: Message) -> list[str]:
+        ret = self.get(message.guild.id if message.guild else _MISSING, [])
+        ret = ret if isinstance(ret, list) else [ret]
 
-        return (
-            self.get(message.guild.id if message.guild else _MISSING, []) + self.default
-        )
+        return ret + self.default
