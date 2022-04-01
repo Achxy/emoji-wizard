@@ -43,7 +43,6 @@ class BaseCache(Mapping[_KT, _VT]):
         "__fetch",
         "__write",
         "__pool",
-        "default",
         "__main_cache",
     )
 
@@ -61,7 +60,6 @@ class BaseCache(Mapping[_KT, _VT]):
         self.__fetch: Final[str] = fetch
         self.__write: Final[str] = write
         self.__pool: Final[Pool] = pool
-        self.default: list[str] = []
         self.__main_cache: dict[_KT, _VT] = {}
 
     def __repr__(self) -> str:
