@@ -27,7 +27,6 @@ class Meta(commands.Cog):
     async def ping(self, ctx):
         """
         Sends an embed with the bot's latency
-        but really this command is just used to test the bot's responsiveness
         """
         embed = discord.Embed(
             title="Pong! 🏓",
