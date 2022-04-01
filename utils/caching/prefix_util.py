@@ -46,6 +46,8 @@ class PrefixHelper(BaseCache[int, list[str]]):
     This is inherited from BaseCache where the cache logic is implemented.
     """
 
+    __slots__: tuple[str] = ("default",)
+
     def __init__(
         self,
         *,
