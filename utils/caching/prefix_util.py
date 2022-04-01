@@ -18,7 +18,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Awaitable, Callable, Generator, Literal, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Awaitable,
+    Callable,
+    Final,
+    Generator,
+    Literal,
+    TypeAlias,
+    TypeVar,
+)
 
 from asyncpg import Pool
 from discord import Message
@@ -31,13 +40,17 @@ if TYPE_CHECKING:
 
 _PT = TypeVar("_PT", bound="PrefixHelper")
 
+PassIntoBase: TypeAlias = Callable[
+    [list[str]], Callable[[EmojiBot, Message], list[str]]
+]
+
 
 class _Sentinel(Enum):
     """
     Single member enum for sentinel value
     """
 
-    MISSING = object()
+    MISSING: Final = object()
 
 
 class PrefixHelper(BaseCache[int, list[str]]):
@@ -55,9 +68,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
         write: str,
         pool: Pool,
         default: Literal[_Sentinel.MISSING] | list[str] = _Sentinel.MISSING,
-        pass_into: Callable[
-            [list[str]], Callable[[EmojiBot, Message], list[str]]
-        ] = lambda x: lambda bot, msg: x,
+        pass_into: PassIntoBase = lambda x: lambda bot, msg: x,
     ):
         """
         Constructing this class is in a similar fashion to that of `BaseCache`
@@ -75,8 +86,8 @@ class PrefixHelper(BaseCache[int, list[str]]):
                 and returns a list of prefixes.
                 This is primarily targeted for use with `commands.when_mentioned_or`
         """
-        self.default = default if default is not _Sentinel.MISSING else []
-        self.pass_into = pass_into
+        self.default: list[str] = default if default is not _Sentinel.MISSING else []
+        self.pass_into: PassIntoBase = pass_into
         super().__init__(fetch=fetch, write=write, pool=pool)
 
     def __call__(self, bot: EmojiBot, message: Message) -> list[str]:
