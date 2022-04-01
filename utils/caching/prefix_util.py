@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Awaitable, Generator, Literal, TypeVar
+from typing import TYPE_CHECKING, Awaitable, Callable, Generator, Literal, TypeVar
 
 from asyncpg import Pool
 from discord import Message
@@ -46,7 +46,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
     This is inherited from BaseCache where the cache logic is implemented.
     """
 
-    __slots__: tuple[str] = ("default",)
+    __slots__: tuple[str, str] = ("default", "pass_into")
 
     def __init__(
         self,
@@ -55,6 +55,9 @@ class PrefixHelper(BaseCache[int, list[str]]):
         write: str,
         pool: Pool,
         default: Literal[_Sentinel.MISSING] | list[str] = _Sentinel.MISSING,
+        pass_into: Callable[
+            [list[str]], Callable[[EmojiBot, Message], list[str]]
+        ] = lambda x: lambda bot, msg: x,
     ):
         """
         Constructing this class is in a similar fashion to that of `BaseCache`
@@ -66,8 +69,14 @@ class PrefixHelper(BaseCache[int, list[str]]):
             write (str): SQL query to write the data to the database
             pool (Pool): An instance of `asyncpg.Pool`
             default (list[str]): A list of default prefixes to be used
+            pass_into (Callable[[list[str]], Callable[[EmojiBot, Message], list[str]]]):
+                A function which takes in a list of prefixes and returns a function
+                which takes in an instance of `EmojiBot` and an instance of `discord.Message`
+                and returns a list of prefixes.
+                This is primarily targeted for use with `commands.when_mentioned_or`
         """
         self.default = default if default is not _Sentinel.MISSING else []
+        self.pass_into = pass_into
         super().__init__(fetch=fetch, write=write, pool=pool)
 
     def __call__(self, bot: EmojiBot, message: Message) -> list[str]:
@@ -83,13 +92,17 @@ class PrefixHelper(BaseCache[int, list[str]]):
         Returns:
             list[str]: list of strings which are cached prefixes
         """
+        # NOTE: It is be better to write `self.pass_into` twice
+        # than making a common base for both return case
+        # this is better because the callable will get the exact
+        # values that we return than some mock base
         if message.guild is None:
-            return self.default
+            return self.pass_into(self.default)(bot, message)
 
         ret: list[str] = self.get(message.guild.id, [])
         ret = ret if isinstance(ret, list) else [ret]
 
-        return ret + self.default
+        return self.pass_into(ret + self.default)(bot, message)
 
     async def ensure_table_exists(self) -> None:
         """
