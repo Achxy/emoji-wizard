@@ -39,6 +39,14 @@ class BaseCache(Mapping[_KT, _VT]):
         get
     """
 
+    __slots__: tuple[str, ...] = (
+        "__fetch",
+        "__write",
+        "__pool",
+        "default",
+        "__main_cache",
+    )
+
     def __init__(self, *, fetch: str, write: str, pool: Pool):
         """
         Initialize the `BaseCache` instance.
