@@ -101,9 +101,9 @@ class PrefixHelper(BaseCache[int, list[str]]):
                     CONSTRAINT prefixes_pkey PRIMARY KEY (guild_id)
                 );
                 """
-        self.pool.execute(query)
+        await self.pool.execute(query)
 
     def __await__(self: _PT) -> Generator[Awaitable[None], None, _PT]:
-        yield from self.pull().__await__()
         yield from self.ensure_table_exists().__await__()
+        yield from self.pull().__await__()
         return self
