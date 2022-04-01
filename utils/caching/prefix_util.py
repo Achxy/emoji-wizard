@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 _PT = TypeVar("_PT", bound="PrefixHelper")
 
 PassIntoBase: TypeAlias = Callable[
-    [list[str]], Callable[[EmojiBot, Message], list[str]]
+    [list[str]], Callable[["EmojiBot", Message], list[str]]
 ]
 
 
