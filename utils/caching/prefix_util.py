@@ -84,7 +84,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
         if message.guild is None:
             return self.default
 
-        ret = self.get(message.guild.id, [])
+        ret: list[str] = self.get(message.guild.id, [])
         ret = ret if isinstance(ret, list) else [ret]
 
         return ret + self.default
