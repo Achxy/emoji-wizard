@@ -77,10 +77,7 @@ async def main(_bot: EmojiBot) -> None:
         _bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
         _bot.prefix = await PrefixHelper(
             fetch="SELECT * FROM prefixes",
-            write=(
-                "INSERT INTO prefixes VALUES ($1, $2) "
-                "ON CONFLICT (guild_id) DO UPDATE SET prefix = $2"
-            ),
+            write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
             pool=_bot.pool,
             default=DEFAULT_PREFIX,
             pass_into=commands.when_mentioned_or,
