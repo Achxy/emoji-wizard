@@ -29,7 +29,7 @@ from typing import (
     TypeAlias,
     TypeVar,
 )
-
+from typing_extensions import Unpack
 from asyncpg import Pool
 from discord import Message
 
@@ -40,7 +40,9 @@ if TYPE_CHECKING:
 
 
 _PT = TypeVar("_PT", bound="PrefixHelper")
-PassIntoBase: TypeAlias = Callable[..., Callable[["EmojiBot", Message], list[str]]]
+PassIntoBase: TypeAlias = Callable[
+    [Unpack[tuple[str, ...]]], Callable[["EmojiBot", Message], list[str]]
+]
 
 
 class _Sentinel(Enum):

@@ -74,10 +74,8 @@ async def main(_bot: EmojiBot) -> None:
         _bot (EmojiBot): an instance of `EmojiBot`
     """
     async with _bot:
-        # Due to a bug in pylint, https://github.com/PyCQA/pylint/issues/3683
-        # Modified constructors with new keyword arguments are not properly detected
         _bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
-        _bot.prefix = await PrefixHelper(  # pylint: disable=unexpected-keyword-arg
+        _bot.prefix = await PrefixHelper(
             fetch="SELECT * FROM prefixes",
             write=(
                 "INSERT INTO prefixes VALUES ($1, $2) "

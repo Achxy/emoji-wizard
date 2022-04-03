@@ -1,0 +1,6 @@
+[MASTER]
+persistent = yes
+suggestion-mode = yes
+
+[FORMAT]
+max-line-length = 120
