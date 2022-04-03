@@ -68,12 +68,10 @@ class EmojiBot(commands.Bot):
 async def main(_bot: EmojiBot) -> None:
     """
     The main function assignes values to some of bot's slotted attributes
-    Caller of this function is gated to case where the module is executed
-    as the main script
-    ie, __name__ resolves to __main__
+    And starts the bot
 
     Args:
-        _bot (EmojiBot): commands.Bot instance or subclass instance
+        _bot (EmojiBot): an instance of `EmojiBot`
     """
     async with _bot:
         # Due to a bug in pylint, https://github.com/PyCQA/pylint/issues/3683
