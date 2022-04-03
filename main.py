@@ -87,6 +87,7 @@ async def main(_bot: EmojiBot) -> None:
             ),
             pool=_bot.pool,
             default=DEFAULT_PREFIX,
+            pass_into=commands.when_mentioned_or,
         )
         print(_bot.prefix)
         await _bot.start(findenv("DISCORD_TOKEN"))

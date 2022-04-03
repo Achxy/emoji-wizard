@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from enum import Enum
+from pprint import pformat
 from typing import (
     TYPE_CHECKING,
     Awaitable,
@@ -39,10 +40,7 @@ if TYPE_CHECKING:
 
 
 _PT = TypeVar("_PT", bound="PrefixHelper")
-
-PassIntoBase: TypeAlias = Callable[
-    [list[str]], Callable[["EmojiBot", Message], list[str]]
-]
+PassIntoBase: TypeAlias = Callable[..., Callable[["EmojiBot", Message], list[str]]]
 
 
 class _Sentinel(Enum):
@@ -68,7 +66,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
         write: str,
         pool: Pool,
         default: Literal[_Sentinel.MISSING] | list[str] = _Sentinel.MISSING,
-        pass_into: PassIntoBase = lambda x: lambda bot, msg: x,
+        pass_into: PassIntoBase = lambda *x: lambda bot, msg: list(x),
     ):
         """
         Constructing this class is in a similar fashion to that of `BaseCache`
@@ -80,8 +78,8 @@ class PrefixHelper(BaseCache[int, list[str]]):
             write (str): SQL query to write the data to the database
             pool (Pool): An instance of `asyncpg.Pool`
             default (list[str]): A list of default prefixes to be used
-            pass_into (Callable[[list[str]], Callable[[EmojiBot, Message], list[str]]]):
-                A function which takes in a list of prefixes and returns a function
+            pass_into:
+                A function which takes in a varadic of prefixes (str) and returns a function
                 which takes in an instance of `EmojiBot` and an instance of `discord.Message`
                 and returns a list of prefixes.
                 This is primarily targeted for use with `commands.when_mentioned_or`
@@ -108,12 +106,22 @@ class PrefixHelper(BaseCache[int, list[str]]):
         # this is better because the callable will get the exact
         # values that we return than some mock base
         if message.guild is None:
-            return self.pass_into(self.default)(bot, message)
+            return self.pass_into(*self.default)(bot, message)
 
         ret: list[str] = self.get(message.guild.id, [])
         ret = ret if isinstance(ret, list) else [ret]
 
-        return self.pass_into(ret + self.default)(bot, message)
+        return self.pass_into(*self.default, *ret)(bot, message)
+
+    def __repr__(self) -> str:
+        return (
+            f"<PrefixHelper(fetch={self.fetch_query}, write={self.write_query}, "
+            "pool={self.pool!r}), default={self.default!r}, pass_into={self.pass_into!r}>"
+        )
+
+    def __str__(self) -> str:
+        default = self.default
+        return pformat(self.raw_cache) + f"\n{default = }"
 
     async def ensure_table_exists(self) -> None:
         """
