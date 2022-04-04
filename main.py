@@ -45,7 +45,7 @@ def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
     Returns:
         list[str]: The prefixes for the guild, along with the defaults
     """
-    return target_bot.prefix(bot, message)
+    return target_bot.prefix(target_bot, message)
 
 
 class EmojiBot(commands.Bot):
