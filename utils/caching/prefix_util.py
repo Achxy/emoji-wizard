@@ -25,6 +25,7 @@ from typing import (
     Callable,
     Final,
     Generator,
+    Iterable,
     Literal,
     TypeAlias,
     TypeVar,
@@ -70,7 +71,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
         fetch: str,
         write: str,
         pool: Pool,
-        default: Literal[_Sentinel.MISSING] | list[str] = _Sentinel.MISSING,
+        default: Literal[_Sentinel.MISSING] | Iterable[str] = _Sentinel.MISSING,
         pass_into: PassIntoBase = lambda *x: lambda bot, msg: list(x),
     ):
         """
@@ -89,7 +90,9 @@ class PrefixHelper(BaseCache[int, list[str]]):
                 and returns a list of prefixes.
                 This is primarily targeted for use with `commands.when_mentioned_or`
         """
-        self.default: list[str] = default if default is not _Sentinel.MISSING else []
+        self.default: tuple[str, ...] = (
+            tuple(default) if default is not _Sentinel.MISSING else ()
+        )
         self.pass_into: PassIntoBase = pass_into
         super().__init__(fetch=fetch, write=write, pool=pool)
 
