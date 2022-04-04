@@ -30,7 +30,7 @@ from utils import PrefixHelper
 DEFAULT_PREFIX: Final[list[str]] = ["?"]
 
 
-def get_prefix(_bot: EmojiBot, message: Message) -> list[str]:
+def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
     """
     The callable which can be passed into commands.Bot
     constructor as the command_prefix kwarg.
@@ -39,13 +39,13 @@ def get_prefix(_bot: EmojiBot, message: Message) -> list[str]:
     which is a `PrefixHelper` instance.
 
     Args:
-        _bot (EmojiBot): commands.Bot instance or subclass instance
+        target_bot (EmojiBot): commands.Bot instance or subclass instance
         message (Message): discord.Message object.
 
     Returns:
         list[str]: The prefixes for the guild, along with the defaults
     """
-    return _bot.prefix(bot, message)
+    return target_bot.prefix(bot, message)
 
 
 class EmojiBot(commands.Bot):
@@ -65,25 +65,25 @@ class EmojiBot(commands.Bot):
         print(f"Successfully logged in as {self.user}")
 
 
-async def main(_bot: EmojiBot) -> None:
+async def main(target_bot: EmojiBot) -> None:
     """
     The main function assignes values to some of bot's slotted attributes
     And starts the bot
 
     Args:
-        _bot (EmojiBot): an instance of `EmojiBot`
+        target_bot (EmojiBot): an instance of `EmojiBot`
     """
-    async with _bot:
-        _bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
-        _bot.prefix = await PrefixHelper(
+    async with target_bot:
+        target_bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
+        target_bot.prefix = await PrefixHelper(
             fetch="SELECT * FROM prefixes",
             write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
-            pool=_bot.pool,
+            pool=target_bot.pool,
             default=DEFAULT_PREFIX,
             pass_into=commands.when_mentioned_or,
         )
-        print(_bot.prefix)
-        await _bot.start(findenv("DISCORD_TOKEN"))
+        print(target_bot.prefix)
+        await target_bot.start(findenv("DISCORD_TOKEN"))
 
 
 bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
