@@ -121,7 +121,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
     def __repr__(self) -> str:
         return (
             f"<PrefixHelper(fetch={self.fetch_query}, write={self.write_query}, "
-            "pool={self.pool!r}), default={self.default!r}, pass_into={self.pass_into!r}>"
+            f"pool={self.pool!r}), default={self.default!r}, pass_into={self.pass_into!r}>"
         )
 
     def __str__(self) -> str:
