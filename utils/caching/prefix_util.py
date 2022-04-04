@@ -29,20 +29,23 @@ from typing import (
     TypeAlias,
     TypeVar,
 )
-from typing_extensions import Unpack
+
 from asyncpg import Pool
 from discord import Message
 
 from .cache import BaseCache
 
 if TYPE_CHECKING:
+    from typing_extensions import Unpack
+
     from ...main import EmojiBot
+
+    PassIntoBase: TypeAlias = Callable[
+        [Unpack[tuple[str, ...]]], Callable[["EmojiBot", Message], list[str]]
+    ]
 
 
 _PT = TypeVar("_PT", bound="PrefixHelper")
-PassIntoBase: TypeAlias = Callable[
-    [Unpack[tuple[str, ...]]], Callable[["EmojiBot", Message], list[str]]
-]
 
 
 class _Sentinel(Enum):
