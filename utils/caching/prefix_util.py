@@ -19,15 +19,14 @@ from __future__ import annotations
 
 from enum import Enum
 from pprint import pformat
-from typing import Awaitable, Final, Generator, Iterable, Literal, TypeVar
+from typing import Awaitable, Final, Generator, Iterable, Literal
 
 from asyncpg import Pool
 from discord import Message
 from typeshack import EmojiBot, PassIntoBase
+from typing_extensions import Self
 
 from .cache import BaseCache
-
-_PT = TypeVar("_PT", bound="PrefixHelper")
 
 
 class _Sentinel(Enum):
@@ -126,7 +125,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
                 """
         await self.pool.execute(query)
 
-    def __await__(self: _PT) -> Generator[Awaitable[None], None, _PT]:
+    def __await__(self) -> Generator[Awaitable[None], None, Self]:
         yield from self.ensure_table_exists().__await__()
         yield from self.pull().__await__()
         return self
