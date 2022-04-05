@@ -99,7 +99,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
 
     def __repr__(self) -> str:
         return (
-            f"<PrefixHelper(fetch={self.fetch_query}, write={self.write_query}, "
+            f"<{self.__class__.__name__}(fetch={self.fetch_query}, write={self.write_query}, "
             f"pool={self.pool!r}), default={self.default!r}, pass_into={self.pass_into!r}>"
         )
 
