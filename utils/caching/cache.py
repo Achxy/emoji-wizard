@@ -20,8 +20,8 @@ from pprint import pformat
 from typing import Awaitable, Final, Generator, Iterator, TypeVar
 
 from asyncpg import Pool, Record
+from typing_extensions import Self
 
-_CT = TypeVar("_CT", bound="BaseCache")
 _KT = TypeVar("_KT")
 _VT = TypeVar("_VT")
 
@@ -78,8 +78,8 @@ class BaseCache(Mapping[_KT, _VT]):
         return iter(self.__main_cache)
 
     def __await__(
-        self: _CT,
-    ) -> Generator[Awaitable[None], None, _CT]:
+        self,
+    ) -> Generator[Awaitable[None], None, Self]:
         """
         An generator which yields a coroutine
         and then returns the same instance once finished
@@ -88,7 +88,7 @@ class BaseCache(Mapping[_KT, _VT]):
             _type_: The same instance that was awaited
 
         Yields:
-            Generator[Awaitable[None], None, _CT]:
+            Generator[Awaitable[None], None, Self]:
                 YieldType: Awaitable which returns None
                 SendType: None
                 ReturnType: The same instance that was awaited
