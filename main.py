@@ -91,7 +91,7 @@ bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
 
 @bot.command()
 async def prefix(ctx):
-    return await ctx.send(bot.prefix[ctx.guild.id])
+    return await ctx.send(bot.prefix(bot, ctx.message))
 
 
 if __name__ == "__main__":
