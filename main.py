@@ -27,7 +27,7 @@ from discord.ext import commands
 from tools import findenv
 from utils import PrefixHelper
 
-DEFAULT_PREFIX: Final[tuple[str, ...]] = ("!", "wiz")
+DEFAULT_PREFIX: Final[tuple[str, ...]] = ("!", "wiz ")
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
