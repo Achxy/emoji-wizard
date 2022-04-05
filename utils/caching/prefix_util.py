@@ -19,32 +19,13 @@ from __future__ import annotations
 
 from enum import Enum
 from pprint import pformat
-from typing import (
-    TYPE_CHECKING,
-    Awaitable,
-    Callable,
-    Final,
-    Generator,
-    Iterable,
-    Literal,
-    TypeAlias,
-    TypeVar,
-)
+from typing import Awaitable, Final, Generator, Iterable, Literal, TypeVar
 
 from asyncpg import Pool
 from discord import Message
+from typeshack import EmojiBot, PassIntoBase
 
 from .cache import BaseCache
-
-if TYPE_CHECKING:
-    from typing_extensions import Unpack
-
-    from ...main import EmojiBot
-
-    PassIntoBase: TypeAlias = Callable[
-        [Unpack[tuple[str, ...]]], Callable[["EmojiBot", Message], list[str]]
-    ]
-
 
 _PT = TypeVar("_PT", bound="PrefixHelper")
 
