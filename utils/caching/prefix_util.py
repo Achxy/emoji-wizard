@@ -89,10 +89,6 @@ class PrefixHelper(BaseCache[int, list[str]]):
         Returns:
             list[str]: list of strings which are cached prefixes
         """
-        # NOTE: It is be better to write `self.pass_into` twice
-        # than making a common base for both return case
-        # this is better because the callable will get the exact
-        # values that we return than some mock base
         if message.guild is None:
             return self.pass_into(*self.default)(bot, message)
 
