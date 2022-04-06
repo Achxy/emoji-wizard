@@ -102,7 +102,7 @@ async def main(target_bot: EmojiBot) -> None:
         await target_bot.start(findenv("DISCORD_TOKEN"))
 
 
-bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=INTENTS)
+bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=INTENTS, case_insensitive=True)
 
 
 @bot.command()
