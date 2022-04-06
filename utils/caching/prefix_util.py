@@ -23,10 +23,10 @@ from typing import Awaitable, Final, Generator, Iterable, Literal
 
 from asyncpg import Pool
 from discord import Message
-from typeshack import EmojiBot, PassIntoBase
 from typing_extensions import Self
 
 from .cache import BaseCache
+from .typeshack import EmojiBot, PassIntoBase
 
 
 class _Sentinel(Enum):
@@ -70,9 +70,7 @@ class PrefixHelper(BaseCache[int, list[str]]):
                 and returns a list of prefixes.
                 This is primarily targeted for use with `commands.when_mentioned_or`
         """
-        self.default: tuple[str, ...] = (
-            tuple(default) if default is not _Sentinel.MISSING else ()
-        )
+        self.default: tuple[str, ...] = tuple(default) if default is not _Sentinel.MISSING else ()
         self.pass_into: PassIntoBase = pass_into
         super().__init__(fetch=fetch, write=write, pool=pool)
 
