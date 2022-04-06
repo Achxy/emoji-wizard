@@ -1,3 +1,23 @@
+[tool.poetry]
+name = "emoji-wizard"
+version = "0.1.0"
+description = "An high performance discord emoji bot"
+authors = ["Achxy"]
+license = "GNU AFFERO GENERAL PUBLIC LICENSE"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+"discord.py" = {git = "https://github.com/Rapptz/discord.py"}
+asyncpg = "0.25.0"
+psutil = "5.9.0"
+typing_extensions = "4.1.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.black]
 line-length = 110
 
