@@ -1,53 +1,98 @@
-import os
+"""
+EmojiWizard is a project licensed under GNU Affero General Public License.
+Copyright (C) 2022-present  Achxy
 
-import discord
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+from __future__ import annotations
+
+import asyncio
+from typing import Final
+
+import asyncpg
+from discord import Intents, Message
 from discord.ext import commands
 
-from tools.database import Database
-from tools.litecache import litecache
+from tools import findenv
+from utils import PrefixHelper
+
+DEFAULT_PREFIX: Final[tuple[str, ...]] = ("!", "wiz ")
 
 
-extensions = {
-    "cogs": "⚙️",
-}  # It's the emoji bot, what else would you expect?
+def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
+    """
+    The callable which can be passed into commands.Bot
+    constructor as the command_prefix kwarg.
+
+    Internally this gets the `prefix` attribute of the the bot
+    which is a `PrefixHelper` instance.
+
+    Args:
+        target_bot (EmojiBot): commands.Bot instance or subclass instance
+        message (Message): discord.Message object.
+
+    Returns:
+        list[str]: The prefixes for the guild, along with the defaults
+    """
+    return target_bot.prefix(target_bot, message)
 
 
-bot: commands.Bot = commands.Bot(
-    command_prefix=Database.get_prefix(debug=False),
-    help_command=None,
-    case_insensitive=True,
-    allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=True),
-    intents=discord.Intents.all(),
-)
+class EmojiBot(commands.Bot):
+    """
+    The main bot class, this is a subclass of the commands.Bot
+    This class is slotted and does not have a __dict__ attribute
+    """
+
+    __slots__: tuple[str, str] = ("prefix", "pool")
+
+    async def on_ready(self) -> None:
+        """
+        Called when the client is done preparing the data received from Discord
+        Usually after login is successful and the `Client.guilds` and co. are filled up
+        This can be called multiple times
+        """
+        print(f"Successfully logged in as {self.user}")
 
 
-async def _create_cached_db_pool():
-    bot.db = await litecache.create_caching_pool(dsn=os.getenv("DATABASE_URL"))
-    print("Successfully connected to the database")
-    bot.tools = Database(bot)
+async def main(target_bot: EmojiBot) -> None:
+    """
+    The main function assignes values to some of bot's slotted attributes
+    And starts the bot
+
+    Args:
+        target_bot (EmojiBot): an instance of `EmojiBot`
+    """
+    async with target_bot:
+        target_bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
+        target_bot.prefix = await PrefixHelper(
+            fetch="SELECT * FROM prefixes",
+            write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
+            pool=target_bot.pool,
+            default=DEFAULT_PREFIX,
+            pass_into=commands.when_mentioned_or,
+        )
+        print(target_bot.prefix)
+        await target_bot.start(findenv("DISCORD_TOKEN"))
 
 
-@bot.event
-async def on_ready():
-    print(f"Successfully logged in as {bot.user}")
+bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
 
 
-# Get all the python files from the cogs folder
-# and add them as cogs with bot.load_extension
-print("            -           ")  # This is just for the formatting
-for ext in extensions:
-    print(f"Getting extensions from {ext}", end=f"\n{'-' * 10}\n")
-    for filename in os.listdir(f"./{ext}"):
-        # Check if the file is a python file
-        if filename.endswith(".py"):
-            # Print the filename
-            print(f"Adding {filename} from {ext} {extensions[ext]} ...", end="")
-            # Load the cog after stripping the .py
-            bot.load_extension(f"{ext}.{filename[:-3]}")
-            # Give the user a nice 'Done' message to make them happy
-            print("Done")
-    print()
+@bot.command()
+async def prefix(ctx):
+    return await ctx.send(bot.prefix(bot, ctx.message))
 
 
-bot.loop.run_until_complete(_create_cached_db_pool())
-bot.run(os.getenv("DISCORD_TOKEN"))
+if __name__ == "__main__":
+    asyncio.run(main(bot))
