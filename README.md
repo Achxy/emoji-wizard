@@ -1,6 +1,7 @@
 # emoji-wizard
 
-[![Pylint](https://github.com/Achxy/emoji-wizard/actions/workflows/pylint.yml/badge.svg)](https://github.com/Achxy/emoji-wizard/actions/workflows/pylint.yml)
+[![Pylint](https://github.com/Achxy/emoji-wizard/actions/workflows/pylint.yml/badge.svg)](https://github.com/Achxy/emoji-wizard/actions/workflows/pylint.yml) 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **You are looking at an much newer version of EmojiWizard that hasn't been fully built. To see the old but working implementation of this checkout the [`legacy`](https://github.com/Achxy/emoji-wizard/tree/legacy) branch**
 
