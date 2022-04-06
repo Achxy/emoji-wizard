@@ -2,3 +2,4 @@ git+https://github.com/Rapptz/discord.py
 asyncpg==0.25.0
 psutil==5.9.0
 typing_extensions==4.1.0
+python-dotenv==0.20.0
