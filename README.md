@@ -2,6 +2,8 @@
 
 [![CodeQL](https://github.com/Achxy/emoji-wizard/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Achxy/emoji-wizard/actions/workflows/codeql-analysis.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Achxy_emoji-wizard&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Achxy_emoji-wizard)
 
+**You are looking at an much newer version of EmojiWizard that hasn't been fully built. To see the old but working implementation of this checkout the [`legacy`](https://github.com/Achxy/emoji-wizard/tree/legacy) branch**
+
 An high performance discord emoji bot
 
 Invite me to your server : **https://dsc.gg/emoji-wizard** <br>
