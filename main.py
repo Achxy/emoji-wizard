@@ -28,6 +28,22 @@ from tools import findenv
 from utils import PrefixHelper
 
 DEFAULT_PREFIX: Final[tuple[str, ...]] = ("!", "wiz ")
+INTENTS: Final[Intents] = Intents(
+    guilds=True,
+    members=True,
+    bans=False,
+    emojis_and_stickers=True,
+    integrations=False,
+    webhooks=False,
+    invites=False,
+    voice_states=False,
+    presences=False,
+    messages=True,
+    reactions=True,
+    typing=False,
+    message_content=True,
+    guild_scheduled_events=False,
+)
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
@@ -86,7 +102,7 @@ async def main(target_bot: EmojiBot) -> None:
         await target_bot.start(findenv("DISCORD_TOKEN"))
 
 
-bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=Intents.all())
+bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=INTENTS)
 
 
 @bot.command()
