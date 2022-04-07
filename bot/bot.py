@@ -17,36 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
-import asyncio
-from typing import Final
-
-import asyncpg
-from discord import Intents, Message
+from asyncpg import Pool
+from discord import Message
 from discord.ext import commands
-from discord.mentions import AllowedMentions
-
-from tools import findenv
-from utils import PrefixHelper
-
-DEFAULT_PREFIX: Final[tuple[str, ...]] = ("!", "wiz ")
-INTENTS: Final[Intents] = Intents(
-    guilds=True,
-    members=True,
-    bans=False,
-    emojis_and_stickers=True,
-    integrations=False,
-    webhooks=False,
-    invites=False,
-    voice_states=False,
-    presences=False,
-    messages=True,
-    reactions=True,
-    typing=False,
-    message_content=True,
-    guild_scheduled_events=False,
-)
-ALLOWED_MENTIONS: Final[AllowedMentions] = AllowedMentions.none()
-ALLOWED_MENTIONS.replied_user = True
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
@@ -75,6 +48,10 @@ class EmojiBot(commands.Bot):
 
     __slots__: tuple[str, str] = ("prefix", "pool")
 
+    def __init__(self, *args, pool: Pool, **kwargs) -> None:
+        self.pool: Pool = pool
+        super().__init__(*args, **kwargs)
+
     async def on_ready(self) -> None:
         """
         Called when the client is done preparing the data received from Discord
@@ -82,38 +59,3 @@ class EmojiBot(commands.Bot):
         This can be called multiple times
         """
         print(f"Successfully logged in as {self.user}")
-
-
-async def main(target_bot: EmojiBot) -> None:
-    """
-    The main function assignes values to some of bot's slotted attributes
-    And starts the bot
-
-    Args:
-        target_bot (EmojiBot): an instance of `EmojiBot`
-    """
-    async with target_bot:
-        target_bot.pool = await asyncpg.create_pool(dsn=findenv("DATABASE_URL"))
-        target_bot.prefix = await PrefixHelper(
-            fetch="SELECT * FROM prefixes",
-            write="INSERT INTO prefixes VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET prefix = $2",
-            pool=target_bot.pool,
-            default=DEFAULT_PREFIX,
-            pass_into=commands.when_mentioned_or,
-        )
-        print(target_bot.prefix)
-        await target_bot.start(findenv("DISCORD_TOKEN"))
-
-
-bot: EmojiBot = EmojiBot(
-    command_prefix=get_prefix, intents=INTENTS, case_insensitive=True, allowed_mentions=ALLOWED_MENTIONS
-)
-
-
-@bot.command()
-async def prefix(ctx):
-    return await ctx.send(bot.prefix(bot, ctx.message))
-
-
-if __name__ == "__main__":
-    asyncio.run(main(bot))
