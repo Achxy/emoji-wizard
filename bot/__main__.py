@@ -23,7 +23,10 @@ from main_bot import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
 
 
-async def main():
+async def main() -> None:
+    """
+    Instantiates `EmojiBot` and starts it.
+    """
     bot: EmojiBot = EmojiBot(
         command_prefix=DEFAULT_PREFIX,  # TODO:
         allowed_mentions=ALLOWED_MENTIONS,
