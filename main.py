@@ -23,6 +23,7 @@ from typing import Final
 import asyncpg
 from discord import Intents, Message
 from discord.ext import commands
+from discord.mentions import AllowedMentions
 
 from tools import findenv
 from utils import PrefixHelper
@@ -44,6 +45,8 @@ INTENTS: Final[Intents] = Intents(
     message_content=True,
     guild_scheduled_events=False,
 )
+ALLOWED_MENTIONS: Final[AllowedMentions] = AllowedMentions.none()
+ALLOWED_MENTIONS.replied_user = True
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
@@ -102,7 +105,9 @@ async def main(target_bot: EmojiBot) -> None:
         await target_bot.start(findenv("DISCORD_TOKEN"))
 
 
-bot: EmojiBot = EmojiBot(command_prefix=get_prefix, intents=INTENTS, case_insensitive=True)
+bot: EmojiBot = EmojiBot(
+    command_prefix=get_prefix, intents=INTENTS, case_insensitive=True, allowed_mentions=ALLOWED_MENTIONS
+)
 
 
 @bot.command()
