@@ -1,4 +1,4 @@
-# emoji-wizard
+# [EmojiWizard](https://github.com/Achxy/emoji-wizard)
 
 [![Pylint](https://github.com/Achxy/emoji-wizard/actions/workflows/pylint.yml/badge.svg)](https://github.com/Achxy/emoji-wizard/actions/workflows/pylint.yml)
 [![GitHub license](https://img.shields.io/github/license/Achxy/emoji-wizard?color=light%20green)](https://github.com/Achxy/emoji-wizard/blob/main/LICENSE)
