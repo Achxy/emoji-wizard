@@ -15,3 +15,23 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import asyncio
+
+import asyncpg
+import tools
+from main_bot import EmojiBot
+from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
+
+
+async def main():
+    bot: EmojiBot = EmojiBot(
+        command_prefix=DEFAULT_PREFIX,  # TODO:
+        allowed_mentions=ALLOWED_MENTIONS,
+        intents=INTENTS,
+        pool=await asyncpg.create_pool(tools.findenv("DATABASE_URL")),
+    )
+    await bot.start(tools.findenv("DISCORD_TOKEN"))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

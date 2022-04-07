@@ -23,7 +23,7 @@ from typing_extensions import Unpack
 __all__: tuple[str, str] = ("PassIntoBase", "EmojiBot")
 
 if TYPE_CHECKING:
-    from ...bot import EmojiBot
+    from ...main_bot import EmojiBot
 else:
     EmojiBot = TypeVar("EmojiBot")
 
