@@ -15,6 +15,16 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from .misc import findenv
+from typing import TYPE_CHECKING, Callable, TypeAlias, TypeVar
 
-__all__: tuple[str] = ("findenv",)
+from discord import Message
+from typing_extensions import Unpack
+
+__all__: tuple[str, str] = ("PassIntoBase", "EmojiBot")
+
+if TYPE_CHECKING:
+    from ...core import EmojiBot
+else:
+    EmojiBot = TypeVar("EmojiBot")
+
+PassIntoBase: TypeAlias = Callable[[Unpack[tuple[str, ...]]], Callable[[EmojiBot, Message], list[str]]]

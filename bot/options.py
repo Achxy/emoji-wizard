@@ -15,16 +15,33 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from typing import TYPE_CHECKING, Callable, TypeAlias, TypeVar
+from typing import Final
 
-from discord import Message
-from typing_extensions import Unpack
+from discord import AllowedMentions, Intents
 
-__all__: tuple[str, str] = ("PassIntoBase", "EmojiBot")
+__all__: Final[tuple[str, ...]] = (
+    "DEFAULT_PREFIX",
+    "INTENTS",
+    "ALLOWED_MENTIONS",
+)
 
-if TYPE_CHECKING:
-    from ...main import EmojiBot
-else:
-    EmojiBot = TypeVar("EmojiBot")
 
-PassIntoBase: TypeAlias = Callable[[Unpack[tuple[str, ...]]], Callable[[EmojiBot, Message], list[str]]]
+DEFAULT_PREFIX: Final[tuple[str, ...]] = ("!", "wiz ")
+INTENTS: Final[Intents] = Intents(
+    guilds=True,
+    members=True,
+    bans=False,
+    emojis_and_stickers=True,
+    integrations=False,
+    webhooks=False,
+    invites=False,
+    voice_states=False,
+    presences=False,
+    messages=True,
+    reactions=True,
+    typing=False,
+    message_content=True,
+    guild_scheduled_events=False,
+)
+ALLOWED_MENTIONS: Final[AllowedMentions] = AllowedMentions.none()
+ALLOWED_MENTIONS.replied_user = True
