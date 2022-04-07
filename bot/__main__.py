@@ -19,7 +19,7 @@ import asyncio
 
 import asyncpg
 import tools
-from main_bot import EmojiBot
+from core import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
 
 
