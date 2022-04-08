@@ -60,6 +60,7 @@ class EmojiBot(commands.Bot):
                 (
                     "manually providing command_prefix is not necessary "
                     "you should only provide default_prefix and have prefixes cached automatically"
+                    "from the database"
                 )
             )
         self.pool: Pool = pool
