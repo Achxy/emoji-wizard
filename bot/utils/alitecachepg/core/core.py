@@ -16,11 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import sqlite3
-from typing import ClassVar
 from string import Template
+from typing import ClassVar
+
 import asyncpg
 from asyncpg import connection, protocol
-
 from queries import Queries
 
 
