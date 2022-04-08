@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import sqlite3
 from typing import ClassVar
-
+from string import Template
 import asyncpg
 from asyncpg import connection, protocol
 
@@ -83,10 +83,15 @@ class ALiteCache(asyncpg.Pool):
             )
             self.__cur.execute(table_creator[0]["generate_create_table_statement"])
 
-            remote_contents = await super().fetch(f"SELECT * FROM {table_name}")
+            remote_contents = await super().fetch(
+                Template("SELECT * FROM $table_name").substitute(table_name=table_name)
+            )
             if not remote_contents:
                 continue
-            local_query = f"INSERT INTO {table_name} VALUES ({','.join(['?'] * len(remote_contents[0]))});"
+            remote_content_length = ", ".join(["?"] * len(remote_contents[0]))
+            local_query = Template("INSERT INTO $table_name VALUES (vacants);").substitute(
+                table_name=table_name, vacants=remote_content_length
+            )
             self.__cur.executemany(local_query, remote_contents)
 
         self.__con.commit()
