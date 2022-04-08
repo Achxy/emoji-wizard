@@ -1,11 +1,8 @@
-import asyncio
-import re
 from typing import ClassVar
 import asyncpg
 import sqlite3
 from asyncpg import protocol, connection
 from .queries import Queries
-from .helpers import textualize
 
 
 class ALiteCache(asyncpg.Pool):
@@ -93,12 +90,6 @@ class ALiteCache(asyncpg.Pool):
     async def fetch(self, query: str, *args, timeout: float | None = None):
         await self.do_pull_if_not_complete()
         return self.cur.execute(query, args).fetchall()
-
-    async def fetchval(
-        self, command: str, *args, column=0, timeout: float | None = None
-    ):
-        await self.do_pull_if_not_complete()
-        return self.cur.execute(command, args).fetchall()[column]
 
     async def fetchrow(self, query: str, *args, timeout: float | None = None):
         await self.do_pull_if_not_complete()
