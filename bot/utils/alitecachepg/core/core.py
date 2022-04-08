@@ -94,17 +94,17 @@ class ALiteCache(asyncpg.Pool):
 
     async def execute(self, query: str, *args, timeout: float | None = None):
         await self.do_pull_if_not_complete()
-        r = await super().execute(query, *args, timeout=timeout)  # type: ignore
+        ret = await super().execute(query, *args, timeout=timeout)  # type: ignore
         self.cur.execute(query, args)
         self.con.commit()
-        return r
+        return ret
 
     async def executemany(self, command: str, args, *, timeout: float | None = None):
         await self.do_pull_if_not_complete()
-        r = await super().executemany(command, args, timeout=timeout)  # type: ignore
+        ret = await super().executemany(command, args, timeout=timeout)  # type: ignore
         self.cur.executemany(command, args)
         self.con.commit()
-        return r
+        return ret
 
     async def fetch(self, query: str, *args, timeout: float | None = None):
         await self.do_pull_if_not_complete()
