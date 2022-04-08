@@ -21,6 +21,12 @@ import asyncpg
 import tools
 from core import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
+import os
+
+
+if os.name == "nt":
+    # Prevent noisy exits on Windows
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def main() -> None:
@@ -29,6 +35,7 @@ async def main() -> None:
     """
     bot: EmojiBot = EmojiBot(
         command_prefix=DEFAULT_PREFIX,  # TODO:
+        default_prefix=DEFAULT_PREFIX,  # TODO:
         allowed_mentions=ALLOWED_MENTIONS,
         intents=INTENTS,
         pool=await asyncpg.create_pool(tools.findenv("DATABASE_URL")),
