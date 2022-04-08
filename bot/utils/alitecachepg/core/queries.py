@@ -19,6 +19,11 @@ from enum import Enum
 
 
 class Queries(Enum):
+    """
+    An class inherited from `enum.Enum` which contains
+    commonly used queries.
+    """
+
     CLONER = """\
 CREATE OR REPLACE FUNCTION public.generate_create_table_statement(p_table_name character varying)
   RETURNS SETOF text AS
