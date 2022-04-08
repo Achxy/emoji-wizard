@@ -101,10 +101,6 @@ class PrefixHelper(BaseCache[int, list[str]]):
             f"pool={self.pool!r}), default={self.default!r}, pass_into={self.pass_into!r}>"
         )
 
-    def __str__(self) -> str:
-        default = self.default
-        return pformat(self.raw_cache) + f"\n{default = }"
-
     async def ensure_table_exists(self) -> None:
         """
         Calling this executes the SQL query to create the table for storing
