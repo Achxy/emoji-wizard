@@ -21,12 +21,6 @@ import asyncpg
 import tools
 from core import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
-import os
-
-
-if os.name == "nt":
-    # Prevent noisy exits on Windows
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def main() -> None:
