@@ -17,13 +17,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
-from typing import Final
+from typing import Final, Iterable
 
 from asyncpg import Pool
 from discord import Message
 from discord.ext import commands
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
+
+MISSING = object()
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
@@ -52,7 +54,14 @@ class EmojiBot(commands.Bot):
 
     __slots__: tuple[str, str] = ("prefix", "pool")
 
-    def __init__(self, *args, pool: Pool, **kwargs) -> None:
+    def __init__(self, *args, pool: Pool, default_prefix: Iterable[str], **kwargs) -> None:
+        if kwargs.get("command_prefix", MISSING) is not MISSING:
+            raise ValueError(
+                (
+                    "manually providing command_prefix is not necessary "
+                    "you should only provide default_prefix and have prefixes cached automatically"
+                )
+            )
         self.pool: Pool = pool
         super().__init__(*args, **kwargs)
 
