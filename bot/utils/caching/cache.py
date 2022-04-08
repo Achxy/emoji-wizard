@@ -15,65 +15,70 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from __future__ import annotations
 from collections.abc import Mapping
 from pprint import pformat
-from typing import Awaitable, Final, Generator, Iterator, TypeVar
-
+import asyncio
+from typing import Awaitable, Callable, Concatenate, Generator, Iterator, Literal, ParamSpec, TypeVar
+import abc
 from asyncpg import Pool, Record
 from typing_extensions import Self
+
 
 _KT = TypeVar("_KT")
 _VT = TypeVar("_VT")
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
-class BaseCache(Mapping[_KT, _VT]):
+
+class BaseCache(Mapping[_KT, _VT], abc.ABC):
     """
-    An builder class which implements the Mapping interface
-    Mixin methods:
-        __contains__ (in)
-        __eq__ (==)
-        __ne__ (!=)
-        keys
-        values
-        items
-        get
+    An abstract builder class which implements the Mapping interface
     """
 
-    __slots__: tuple[str, ...] = (
-        "__fetch",
-        "__write",
-        "__pool",
-        "__main_cache",
-    )
+    def __init__(self):
+        self.__event = asyncio.Event()
+        self.__event.clear()
+        self.__main_cache: dict[_KT, _VT] = {}
+        self.__populated: bool = False
 
-    def __init__(self, *, fetch: str, write: str, pool: Pool):
+    @staticmethod
+    def raise_if_not_ready(
+        func: Callable[Concatenate[BaseCache, P], R]
+    ) -> Callable[Concatenate[BaseCache, P], R]:
         """
-        Initialize the `BaseCache` instance.
-        Provided `Pool` must be fully initialized
-        before passing it into this constructor.
+        A decorator which raises a RuntimeError if the cache is not populated yet
 
         Args:
-            fetch (str): SQL query to fetch the data from the database
-            write (str): SQL query to write the data to the database
-            pool (Pool): An instance of `asyncpg.Pool`
+            func (Callable[P, R]): The function to decorate
+
+        Returns:
+            Callable[Concatenate[BaseCache, P], R]:
+                The decorated function,
+                with the same signature as the original function
         """
-        self.__fetch: Final[str] = fetch
-        self.__write: Final[str] = write
-        self.__pool: Final[Pool] = pool
-        self.__main_cache: dict[_KT, _VT] = {}
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.__fetch}, {self.__write})"
+        def wrapper(self: BaseCache, *args: P.args, **kwargs: P.kwargs) -> R:
+            if not self.has_populated:
+                raise RuntimeError("Cache is not populated yet")
+            return func(self, *args, **kwargs)
 
+        return wrapper
+
+    @raise_if_not_ready
     def __str__(self) -> str:
         return pformat(self.__main_cache)
 
+    @raise_if_not_ready
     def __getitem__(self, __k: _KT, /) -> _VT:
         return self.__main_cache[__k]
 
+    @raise_if_not_ready
     def __len__(self) -> int:
         return len(self.__main_cache)
 
+    @raise_if_not_ready
     def __iter__(self) -> Iterator[_KT]:
         return iter(self.__main_cache)
 
@@ -96,31 +101,32 @@ class BaseCache(Mapping[_KT, _VT]):
         yield from self.pull().__await__()
         return self
 
+    async def wait_until_ready(self) -> Literal[True]:
+        """
+        This can be awaited to wait until the cache is ready
+
+        Returns:
+            Literal[True]: Always returns True
+        """
+        return await self.__event.wait()
+
     async def pull(self) -> None:
         """
         Pulls the data from the database and stores it in the cache
         The existing cached values (if any) is overwritten
         """
-        response: list[Record] = await self.__pool.fetch(self.__fetch)
+        self.__event.clear()
+        response: list[Record] = await self.pool.fetch(self.fetch_query)
         journal: dict[_KT, _VT] = {}
         for val in response:
             key, val = val
             journal[key] = val
         self.__main_cache = {**journal}
-
-    async def update(self, key: _KT, value: _VT) -> None:
-        """
-        Updates the value of the key in the database
-        and then in the cache
-
-        Args:
-            key (_KT): The key to update
-            value (_VT): The value to update
-        """
-        await self.__pool.execute(self.__write, key, value)
-        self.__main_cache[key] = value
+        self.__event.set()
+        self.__populated = True
 
     @property
+    @abc.abstractmethod
     def fetch_query(self) -> str:
         """
         Returns the fetch query that was given to the constructor
@@ -128,19 +134,9 @@ class BaseCache(Mapping[_KT, _VT]):
         Returns:
             str: The fetch query
         """
-        return self.__fetch
 
     @property
-    def write_query(self) -> str:
-        """
-        Returns the write query that was given to the constructor
-
-        Returns:
-            str: The write query
-        """
-        return self.__write
-
-    @property
+    @abc.abstractmethod
     def pool(self) -> Pool:
         """
         Returns the pool that is currently in use
@@ -148,7 +144,6 @@ class BaseCache(Mapping[_KT, _VT]):
         Returns:
             Pool: An instance of `asyncpg.Pool`
         """
-        return self.__pool
 
     @property
     def raw_cache(self) -> dict[_KT, _VT]:
@@ -161,3 +156,13 @@ class BaseCache(Mapping[_KT, _VT]):
             dict[_KT, _VT]: The raw cache
         """
         return self.__main_cache
+
+    @property
+    def has_populated(self) -> bool:
+        """
+        Returns whether the cache has been populated
+
+        Returns:
+            bool: Whether the cache has been populated
+        """
+        return self.__populated
