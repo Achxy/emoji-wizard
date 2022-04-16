@@ -18,16 +18,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from asyncio import Lock
-from typing import Awaitable, Final, Generator, Iterable
+from enum import Enum
 from itertools import repeat
+from typing import Awaitable, Final, Generator, Iterable
 
 from asyncpg import Pool
-from enum import Enum
 from typing_extensions import Self
 
 from ...tools import load_query
 from .base import BaseCache
-
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
 
