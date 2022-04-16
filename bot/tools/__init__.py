@@ -15,6 +15,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from .misc_tools import findenv
+from .misc_tools import findenv, load_query
 
-__all__: tuple[str] = ("findenv",)
+__all__: tuple[str, ...] = (
+    "findenv",
+    "load_query",
+)
