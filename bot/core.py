@@ -17,16 +17,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
-from typing import Final
+from typing import Final, Iterable
 
 from asyncpg import Pool
 from discord import Message
 from discord.ext import commands
+from tools import load_query
+from utils.caching import PrefixCache
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
 
+FETCH_QUERY: Final[str] = load_query("./utils/caching/queries/fetch.sql")
 
-def get_prefix(target_bot: EmojiBot, message: Message) -> list[str]:
+
+def get_prefix(target_bot: EmojiBot, message: Message) -> Iterable[str]:
     """
     The callable which can be passed into commands.Bot
     constructor as the command_prefix kwarg.
@@ -54,6 +58,14 @@ class EmojiBot(commands.Bot):
 
     def __init__(self, *args, pool: Pool, **kwargs) -> None:
         self.pool: Pool = pool
+        self.prefix: PrefixCache = PrefixCache(
+            default=kwargs.pop("default_prefix"),
+            pool=self.pool,
+            fetch_query=FETCH_QUERY,
+            key="guild_id",
+            pass_into=commands.when_mentioned_or,
+            mix_with_default=True,
+        )
         super().__init__(*args, **kwargs)
 
     async def on_ready(self) -> None:
