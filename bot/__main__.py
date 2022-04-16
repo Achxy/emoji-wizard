@@ -28,7 +28,7 @@ async def main() -> None:
     Instantiates `EmojiBot` and starts it.
     """
     bot: EmojiBot = EmojiBot(
-        command_prefix=DEFAULT_PREFIX,  # TODO:
+        default_prefix=DEFAULT_PREFIX,
         allowed_mentions=ALLOWED_MENTIONS,
         intents=INTENTS,
         pool=await asyncpg.create_pool(tools.findenv("DATABASE_URL")),
