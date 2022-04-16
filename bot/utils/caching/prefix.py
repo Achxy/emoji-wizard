@@ -29,6 +29,9 @@ from ...tools import load_query
 from .base import BaseCache
 
 
+__all__: Final[tuple[str]] = ("PrefixCache",)
+
+
 CREATE_PREFIX_TABLE: Final[str] = load_query("./queries/create.sql")
 INSERT: Final[str] = load_query("./queries/insert.sql")
 REMOVE: Final[str] = load_query("./queries/remove.sql")
