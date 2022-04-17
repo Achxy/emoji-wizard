@@ -75,4 +75,4 @@ class EmojiBot(commands.Bot):
         Usually after login is successful and the `Client.guilds` and co. are filled up
         This can be called multiple times
         """
-        print(f"Successfully logged in as {self.user}")
+        logger.info("Successfully logged in as %s", self.user)
