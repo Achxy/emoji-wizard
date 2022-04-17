@@ -26,7 +26,6 @@ from discord.ext import commands
 from utils.caching import PrefixCache
 from utils.caching.queries import SELECT_ALL
 
-
 __all__: Final[tuple[str]] = ("EmojiBot",)
 
 logger = logging.getLogger(__name__)
