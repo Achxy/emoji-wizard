@@ -23,6 +23,7 @@ from asyncpg import Pool
 from discord import Message
 from discord.ext import commands
 from utils.caching import PrefixCache
+from utils.caching.queries import SELECT_ALL
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
 
@@ -58,7 +59,7 @@ class EmojiBot(commands.Bot):
         self.prefix: PrefixCache = PrefixCache(
             default=kwargs.pop("default_prefix"),
             pool=self.pool,
-            fetch_query="SELECT * FROM guild_prefixes",
+            fetch_query=SELECT_ALL,
             key="guild_id",
             pass_into=commands.when_mentioned_or,
             mix_with_default=True,
