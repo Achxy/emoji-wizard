@@ -26,9 +26,8 @@ from asyncpg import Pool
 from typing_extensions import Self
 
 from .base import BaseCache
-from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL  # pylint: disable=no-name-in-module
+from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL
 
-# TODO: Why is pylint complaining about the import?
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
 
