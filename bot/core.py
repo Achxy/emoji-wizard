@@ -58,10 +58,15 @@ class EmojiBot(commands.Bot):
     __slots__: tuple[str, str] = ("prefix", "pool")
 
     def __init__(self, *args, pool: Pool, **kwargs) -> None:
+        if "command_prefix" in kwargs:
+            raise ValueError("command_prefix need not be set manually, provide default_prefix instead")
+        if (default_prefix := kwargs.pop("default_prefix", None)) is None:
+            raise ValueError("default_prefix must be set")
+
         self.pool: Pool = pool
         self.prefix: PrefixCache = PrefixCache(
-            default=kwargs.pop("default_prefix"),
-            pool=self.pool,
+            default=default_prefix,
+            pool=pool,
             fetch_query=SELECT_ALL,
             key="guild_id",
             pass_into=commands.when_mentioned_or,
