@@ -16,11 +16,20 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import asyncio
+import logging
+import sys
 
 import asyncpg
 import tools
 from core import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
+
+# TODO: Perhaps a bit more extravagant logging.
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] [%(asctime)s] %(message)s",
+    handlers=[logging.StreamHandler(sys.stderr), logging.FileHandler("bot.log")],
+)
 
 
 async def main() -> None:

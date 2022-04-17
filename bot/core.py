@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
+import logging
 from typing import Final, Iterable
 
 from asyncpg import Pool
@@ -26,6 +27,8 @@ from utils.caching import PrefixCache
 from utils.caching.queries import SELECT_ALL
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
+
+logger = logging.getLogger(__name__)
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> Iterable[str]:
