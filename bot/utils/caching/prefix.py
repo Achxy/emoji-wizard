@@ -25,19 +25,10 @@ from typing import Awaitable, Final, Generator, Iterable
 from asyncpg import Pool
 from typing_extensions import Self
 
-from tools import load_query
-
-
 from .base import BaseCache
+from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
-
-
-CREATE_PREFIX_TABLE: Final[str] = load_query("/bot/utils/caching/queries/create.sql")
-INSERT: Final[str] = load_query("./queries/insert.sql")
-REMOVE: Final[str] = load_query("./queries/remove.sql")
-REMOVE_ALL: Final[str] = load_query("./queries/remove_all.sql")
-SELECT: Final[str] = load_query("./queries/select.sql")
 
 
 class _Sentinel(Enum):

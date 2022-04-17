@@ -21,7 +21,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-__all__: tuple[str, ...] = ("findenv", "load_query")
+
+__all__: tuple[str] = ("findenv",)
 
 
 def findenv(key: str, /) -> str:
@@ -50,20 +51,3 @@ def findenv(key: str, /) -> str:
             )
         )
     return ret
-
-
-def load_query(file_path: str) -> str:
-    """
-    Loads a query from a file
-
-    Args:
-        file_path (str): The path to the file
-
-    Returns:
-        str: The query
-    """
-    if not file_path.endswith(".sql"):
-        raise ResourceWarning("Given file path does not end with .sql")
-
-    with open(file_path, "r", encoding="UTF-8") as sql_query_file:
-        return sql_query_file.read()

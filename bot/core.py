@@ -22,12 +22,9 @@ from typing import Final, Iterable
 from asyncpg import Pool
 from discord import Message
 from discord.ext import commands
-from tools import load_query
 from utils.caching import PrefixCache
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
-
-FETCH_QUERY: Final[str] = load_query("./utils/caching/queries/fetch.sql")
 
 
 def get_prefix(target_bot: EmojiBot, message: Message) -> Iterable[str]:
@@ -61,12 +58,12 @@ class EmojiBot(commands.Bot):
         self.prefix: PrefixCache = PrefixCache(
             default=kwargs.pop("default_prefix"),
             pool=self.pool,
-            fetch_query=FETCH_QUERY,
+            fetch_query="SELECT * FROM guild_prefixes",
             key="guild_id",
             pass_into=commands.when_mentioned_or,
             mix_with_default=True,
         )
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs, command_prefix=get_prefix)
 
     async def on_ready(self) -> None:
         """
