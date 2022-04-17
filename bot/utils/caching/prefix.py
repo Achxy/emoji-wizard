@@ -25,13 +25,15 @@ from typing import Awaitable, Final, Generator, Iterable
 from asyncpg import Pool
 from typing_extensions import Self
 
-from ...tools import load_query
+from tools import load_query
+
+
 from .base import BaseCache
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
 
 
-CREATE_PREFIX_TABLE: Final[str] = load_query("./queries/create.sql")
+CREATE_PREFIX_TABLE: Final[str] = load_query("/bot/utils/caching/queries/create.sql")
 INSERT: Final[str] = load_query("./queries/insert.sql")
 REMOVE: Final[str] = load_query("./queries/remove.sql")
 REMOVE_ALL: Final[str] = load_query("./queries/remove_all.sql")
