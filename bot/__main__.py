@@ -35,6 +35,7 @@ logging.basicConfig(
 async def main() -> None:
     """
     Instantiates `EmojiBot` and starts it.
+    This is the main entry point for the bot.
     """
     bot: EmojiBot = EmojiBot(
         default_prefix=DEFAULT_PREFIX,
