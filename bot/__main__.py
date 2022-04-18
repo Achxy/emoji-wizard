@@ -28,7 +28,6 @@ from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS, LOGGING_FORMAT
 logging.basicConfig(
     level=logging.INFO,
     format=LOGGING_FORMAT,
-    handlers=[logging.StreamHandler(sys.stderr), logging.FileHandler("bot.log")],
 )
 
 
