@@ -20,10 +20,9 @@ from __future__ import annotations
 import asyncio
 import logging
 from pathlib import Path
-from typing import ClassVar, Coroutine, Final, Iterable
+from typing import ClassVar, Coroutine, Final
 
 from asyncpg import Pool
-from discord import Message
 from discord.ext import commands
 from utils.caching import PrefixCache
 from utils.caching.queries import SELECT_ALL
@@ -31,24 +30,6 @@ from utils.caching.queries import SELECT_ALL
 __all__: Final[tuple[str]] = ("EmojiBot",)
 
 logger = logging.getLogger(__name__)
-
-
-def get_prefix(target_bot: EmojiBot, message: Message) -> Iterable[str]:
-    """
-    The callable which can be passed into commands.Bot
-    constructor as the command_prefix kwarg.
-
-    Internally this gets the `prefix` attribute of the the bot
-    which is a `PrefixHelper` instance.
-
-    Args:
-        target_bot (EmojiBot): commands.Bot instance or subclass instance
-        message (Message): discord.Message object.
-
-    Returns:
-        list[str]: The prefixes for the guild, along with the defaults
-    """
-    return target_bot.prefix(target_bot, message)
 
 
 class EmojiBot(commands.Bot):
@@ -74,7 +55,7 @@ class EmojiBot(commands.Bot):
             pass_into=commands.when_mentioned_or,
             mix_with_default=True,
         )
-        super().__init__(*args, **kwargs, command_prefix=get_prefix)
+        super().__init__(*args, **kwargs, command_prefix=self.prefix)
 
     async def on_ready(self) -> None:
         """
