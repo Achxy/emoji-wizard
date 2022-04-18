@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from .base import BaseCache
 from .prefix import PrefixCache
 
+
 __all__: tuple[str, str] = (
     "PrefixCache",
     "BaseCache",
