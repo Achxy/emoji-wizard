@@ -17,13 +17,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from asyncio import Lock
-from pprint import pformat
 from collections.abc import Mapping
 from copy import deepcopy
+from pprint import pformat
 from typing import Awaitable, ClassVar, Generator, Hashable, Iterable
-import logging
+
 from asyncpg import Pool, Record
 from typing_extensions import Self
 

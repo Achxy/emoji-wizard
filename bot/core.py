@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from pathlib import Path
-from typing import Coroutine, Final, Iterable, ClassVar
+from typing import ClassVar, Coroutine, Final, Iterable
 
 from asyncpg import Pool
 from discord import Message

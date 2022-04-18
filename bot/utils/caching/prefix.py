@@ -19,11 +19,10 @@ from __future__ import annotations
 
 from asyncio import Lock
 from enum import Enum
-from asyncpg import Record
 from itertools import repeat
-from typing import Awaitable, Final, Generator, Iterable, ClassVar
+from typing import Awaitable, ClassVar, Final, Generator, Iterable
 
-from asyncpg import Pool
+from asyncpg import Pool, Record
 from typing_extensions import Self
 
 from .base import BaseCache

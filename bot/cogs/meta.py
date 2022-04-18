@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # TODO: Complete the cog
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from discord.ext import commands
