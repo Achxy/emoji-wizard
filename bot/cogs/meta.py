@@ -30,7 +30,7 @@ class Meta(commands.Cog):
 
     @commands.command()
     async def prefix(self, ctx: commands.Context) -> None:
-        await ctx.send(str(self.bot.prefix(self.bot, ctx.message)))
+        await ctx.send(str(self.bot.prefix))  # FIXME:
 
 
 async def setup(bot: commands.Bot) -> None:
