@@ -17,4 +17,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .misc import findenv
 
+
 __all__: tuple[str] = ("findenv",)
