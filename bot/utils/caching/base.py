@@ -63,7 +63,12 @@ class BaseCache(Mapping, ABC):
 
             self.__store__.clear()
             self.__store__.update(deepcopy(journal))
-            logger.info("Completed pulling data for %s", self.__class__.__name__)
+            logger.info(
+                "Completed pulling data for %s, held %s records in memory (%s in store)",
+                self.__class__.__name__,
+                len(resp),
+                len(self.__store__),
+            )
 
     @property
     @abstractmethod
