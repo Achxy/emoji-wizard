@@ -75,6 +75,14 @@ class PrefixCache(BaseCache):
         return self.pass_into(*ret)
 
     async def pull_for(self, guild_id: int) -> None:
+        """
+        Similar to `pull`, but only pulls for the specified guild.
+        This is useful for when you want to pull for a specific guild, rather
+        than populating the entire cache.
+
+        Args:
+            guild_id (int): The guild ID to pull for.
+        """
         async with self.__lock__:
             resp = await self.pool.fetch(SELECT, guild_id)
             self.__store[resp[self.__key]] = resp
