@@ -23,6 +23,7 @@ __all__: Final[tuple[str, ...]] = (
     "DEFAULT_PREFIX",
     "INTENTS",
     "ALLOWED_MENTIONS",
+    "EXTENSIONS",
 )
 
 
@@ -45,3 +46,5 @@ INTENTS: Final[Intents] = Intents(
 )
 ALLOWED_MENTIONS: Final[AllowedMentions] = AllowedMentions.none()
 ALLOWED_MENTIONS.replied_user = True
+
+EXTENSIONS: Final[tuple[str]] = ("cogs",)

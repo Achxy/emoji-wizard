@@ -15,3 +15,22 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from typing import TYPE_CHECKING
+
+from discord.ext import commands
+
+if TYPE_CHECKING:
+    from core import EmojiBot
+
+
+class Meta(commands.Cog):
+    def __init__(self, bot) -> None:
+        self.bot: "EmojiBot" = bot
+
+    @commands.command()
+    async def prefix(self, ctx: commands.Context) -> None:
+        await ctx.send(str(self.bot.prefix(self.bot, ctx.message)))
+
+
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Meta(bot))

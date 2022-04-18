@@ -18,13 +18,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Final, Iterable
 
 from asyncpg import Pool
 from discord import Message
 from discord.ext import commands
+from options import EXTENSIONS
 from utils.caching import PrefixCache
 from utils.caching.queries import SELECT_ALL
+
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
 
@@ -81,3 +84,6 @@ class EmojiBot(commands.Bot):
         This can be called multiple times
         """
         logger.info("Successfully logged in as %s", self.user)
+
+    async def setup_hook(self) -> None:
+        ...

@@ -24,7 +24,6 @@ import tools
 from core import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
 
-
 logging.basicConfig(
     level=logging.INFO,
     format="[%(levelname)s] [%(asctime)s] %(message)s",

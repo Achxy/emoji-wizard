@@ -28,7 +28,6 @@ from typing_extensions import Self
 from .base import BaseCache
 from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL
 
-
 __all__: Final[tuple[str]] = ("PrefixCache",)
 
 
