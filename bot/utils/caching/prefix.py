@@ -20,7 +20,7 @@ from __future__ import annotations
 from asyncio import Lock
 from enum import Enum
 from itertools import repeat
-from typing import Awaitable, Final, Generator, Iterable
+from typing import Awaitable, Final, Generator, Iterable, ClassVar
 
 from asyncpg import Pool
 from typing_extensions import Self
@@ -32,10 +32,22 @@ __all__: Final[tuple[str]] = ("PrefixCache",)
 
 
 class _Sentinel(Enum):
+    __slots__: ClassVar[tuple[()]] = ()
     MISSING = object()
 
 
 class PrefixCache(BaseCache):
+    __slots__: ClassVar[tuple[str, ...]] = (
+        "__pool",
+        "__fetch_query",
+        "__key",
+        "default",
+        "pass_into",
+        "__lock",
+        "mix_with_default",
+        "__store",
+    )
+
     def __init__(
         self, *, pool, fetch_query, key, default, pass_into, lock=None, mix_with_default=True
     ) -> None:
