@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from asyncio import Lock
+from pprint import pformat
 from collections.abc import Mapping
 from typing import Awaitable, ClassVar, Generator, Hashable, Iterable
 
@@ -43,6 +44,9 @@ class BaseCache(Mapping, ABC):
     def __await__(self) -> Generator[Awaitable[None], None, Self]:
         yield from self.pull().__await__()
         return self
+
+    def __str__(self) -> str:
+        return pformat(self.__store__)
 
     async def pull(self) -> None:
         async with self.__lock__:
