@@ -19,7 +19,6 @@ from typing import Final
 
 from discord import AllowedMentions, Intents
 
-
 __all__: Final[tuple[str, ...]] = (
     "DEFAULT_PREFIX",
     "INTENTS",

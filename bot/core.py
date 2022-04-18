@@ -17,16 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
-import logging
-from typing import Final, Iterable, Coroutine
 import asyncio
-from asyncpg import Pool
+import logging
 from pathlib import Path
+from typing import Coroutine, Final, Iterable
+
+from asyncpg import Pool
 from discord import Message
 from discord.ext import commands
 from utils.caching import PrefixCache
 from utils.caching.queries import SELECT_ALL
-
 
 __all__: Final[tuple[str]] = ("EmojiBot",)
 
