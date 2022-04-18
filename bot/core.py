@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from pathlib import Path
-from typing import Coroutine, Final, Iterable
+from typing import Coroutine, Final, Iterable, ClassVar
 
 from asyncpg import Pool
 from discord import Message
@@ -57,7 +57,7 @@ class EmojiBot(commands.Bot):
     This class is slotted and does not have a __dict__ attribute
     """
 
-    __slots__: tuple[str, str] = ("prefix", "pool")
+    __slots__: ClassVar[tuple[str, str]] = ("prefix", "pool")
 
     def __init__(self, *args, pool: Pool, **kwargs) -> None:
         if "command_prefix" in kwargs:
