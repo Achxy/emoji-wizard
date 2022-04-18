@@ -21,7 +21,6 @@ import logging
 from abc import ABC, abstractmethod
 from asyncio import Lock
 from collections.abc import Mapping
-from copy import deepcopy
 from pprint import pformat
 from typing import Awaitable, ClassVar, Generator, Hashable, Iterable
 
@@ -62,7 +61,7 @@ class BaseCache(Mapping, ABC):
                 journal.setdefault(item[self.key], []).append(item)
 
             self.__store__.clear()
-            self.__store__.update(deepcopy(journal))
+            self.__store__.update({**journal})
             logger.info(
                 "Completed pulling data for %s, held %s records in memory (%s in store)",
                 self.__class__.__name__,
