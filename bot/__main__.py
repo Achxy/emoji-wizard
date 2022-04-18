@@ -22,11 +22,12 @@ import sys
 import asyncpg
 import tools
 from core import EmojiBot
-from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
+from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS, LOGGING_FORMAT
+
 
 logging.basicConfig(
     level=logging.INFO,
-    format="[%(levelname)s] [%(asctime)s] %(message)s",
+    format=LOGGING_FORMAT,
     handlers=[logging.StreamHandler(sys.stderr), logging.FileHandler("bot.log")],
 )
 
