@@ -47,9 +47,9 @@ class BaseCache(Mapping, ABC):
     async def pull(self) -> None:
         async with self.__lock__:
             resp: list[Record] = await self.pool.fetch(self.query)
-            journal: dict[Hashable, Record] = {}
+            journal: dict[Hashable, list[Record]] = {}
             for item in resp:
-                journal[item[self.key]] = item
+                journal.setdefault(item[self.key], []).append(item)
 
             self.__store__.clear()
             self.__store__.update(journal)
