@@ -26,7 +26,7 @@ from asyncpg import Pool
 from typing_extensions import Self
 
 from .base import BaseCache
-from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL
+from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL, SELECT
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
 
@@ -73,6 +73,11 @@ class PrefixCache(BaseCache):
         if self.mix_with_default:
             return self.pass_into(*ret, *self.default)
         return self.pass_into(*ret)
+
+    async def pull_for(self, guild_id: int) -> None:
+        async with self.__lock__:
+            resp = await self.pool.fetch(SELECT, guild_id)
+            self.__store[resp[self.__key]] = resp
 
     async def ensure_table_exists(self) -> None:
         async with self.__lock__:
