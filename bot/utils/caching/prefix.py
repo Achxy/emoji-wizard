@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from asyncio import Lock
 from enum import Enum
+from asyncpg import Record
 from itertools import repeat
 from typing import Awaitable, Final, Generator, Iterable, ClassVar
 
@@ -84,8 +85,8 @@ class PrefixCache(BaseCache):
             guild_id (int): The guild ID to pull for.
         """
         async with self.__lock__:
-            resp = await self.pool.fetch(SELECT, guild_id)
-            self.__store[resp[self.__key]] = resp
+            resp: list[Record] = await self.pool.fetch(SELECT, guild_id)
+            self.__store[guild_id] = resp
 
     async def ensure_table_exists(self) -> None:
         async with self.__lock__:
