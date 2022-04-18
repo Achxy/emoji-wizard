@@ -22,11 +22,13 @@ from asyncio import Lock
 from pprint import pformat
 from collections.abc import Mapping
 from typing import Awaitable, ClassVar, Generator, Hashable, Iterable
-
+import logging
 from asyncpg import Pool, Record
 from typing_extensions import Self
 
 __all__: tuple[str] = ("BaseCache",)
+
+logger = logging.getLogger(__name__)
 
 
 class BaseCache(Mapping, ABC):
@@ -50,13 +52,16 @@ class BaseCache(Mapping, ABC):
 
     async def pull(self) -> None:
         async with self.__lock__:
+            logger.info("Pulling data for %s", self.__class__.__name__)
             resp: list[Record] = await self.pool.fetch(self.query)
+            logger.debug("Pulled data for %s: %s", self.__class__.__name__, resp)
             journal: dict[Hashable, list[Record]] = {}
             for item in resp:
                 journal.setdefault(item[self.key], []).append(item)
 
             self.__store__.clear()
             self.__store__.update(journal)
+            logger.info("Completed pulling data for %s", self.__class__.__name__)
 
     @property
     @abstractmethod
