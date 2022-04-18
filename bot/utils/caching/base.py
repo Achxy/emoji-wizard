@@ -21,6 +21,7 @@ from abc import ABC, abstractmethod
 from asyncio import Lock
 from pprint import pformat
 from collections.abc import Mapping
+from copy import deepcopy
 from typing import Awaitable, ClassVar, Generator, Hashable, Iterable
 import logging
 from asyncpg import Pool, Record
@@ -60,7 +61,7 @@ class BaseCache(Mapping, ABC):
                 journal.setdefault(item[self.key], []).append(item)
 
             self.__store__.clear()
-            self.__store__.update(journal)
+            self.__store__.update(deepcopy(journal))
             logger.info("Completed pulling data for %s", self.__class__.__name__)
 
     @property
