@@ -1,3 +1,3 @@
 DELETE FROM guild_prefixes
 WHERE guild_id = $1
-    AND prefix = $2;
+    AND guild_prefix = $2;

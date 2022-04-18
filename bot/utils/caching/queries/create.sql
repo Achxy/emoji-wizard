@@ -6,5 +6,5 @@
 
 CREATE TABLE IF NOT EXISTS guild_prefixes (
     guild_id BIGINT NOT NULL,
-    prefix VARCHAR(32) UNIQUE NOT NULL
+    guild_prefix VARCHAR(32) UNIQUE NOT NULL
 );
