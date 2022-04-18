@@ -15,16 +15,28 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from typing import TYPE_CHECKING, Callable, TypeAlias, TypeVar
+# TODO: Complete the cog
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-from discord import Message
-from typing_extensions import Unpack
-
-__all__: tuple[str, str] = ("PassIntoBase", "EmojiBot")
+from discord.ext import commands
 
 if TYPE_CHECKING:
-    from ...core import EmojiBot
-else:
-    EmojiBot = TypeVar("EmojiBot")
+    from core import EmojiBot
 
-PassIntoBase: TypeAlias = Callable[[Unpack[tuple[str, ...]]], Callable[[EmojiBot, Message], list[str]]]
+
+class Meta(commands.Cog):
+    def __init__(self, bot) -> None:
+        self.bot: EmojiBot = bot
+
+    @commands.group()
+    async def prefix(self, ctx: commands.Context) -> None:
+        ...
+
+    @prefix.command()
+    async def set(self, ctx: commands.Context, prefix: str) -> None:
+        await ctx.send(f"TODO: Set the prefix, got `{prefix}`")
+
+
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Meta(bot))

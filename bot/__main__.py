@@ -16,19 +16,26 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import asyncio
+import logging
 
 import asyncpg
 import tools
 from core import EmojiBot
-from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS
+from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS, LOGGING_FORMAT
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=LOGGING_FORMAT,
+)
 
 
 async def main() -> None:
     """
     Instantiates `EmojiBot` and starts it.
+    This is the main entry point for the bot.
     """
     bot: EmojiBot = EmojiBot(
-        command_prefix=DEFAULT_PREFIX,  # TODO:
+        default_prefix=DEFAULT_PREFIX,
         allowed_mentions=ALLOWED_MENTIONS,
         intents=INTENTS,
         pool=await asyncpg.create_pool(tools.findenv("DATABASE_URL")),
