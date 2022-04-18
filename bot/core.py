@@ -85,6 +85,9 @@ class EmojiBot(commands.Bot):
         logger.info("Successfully logged in as %s", self.user)
 
     async def setup_hook(self) -> None:
+        # Ready up prefix
+        await self.prefix
+        # Load extensions
         load_ext: list[Coroutine[None, None, None]] = []
         path = (Path(__file__).parent / "cogs").resolve()
 
