@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # TODO: Complete the cog
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from discord.ext import commands
@@ -26,11 +27,15 @@ if TYPE_CHECKING:
 
 class Meta(commands.Cog):
     def __init__(self, bot) -> None:
-        self.bot: "EmojiBot" = bot
+        self.bot: EmojiBot = bot
 
-    @commands.command()
+    @commands.group()
     async def prefix(self, ctx: commands.Context) -> None:
-        await ctx.send(str(self.bot.prefix))  # FIXME:
+        ...
+
+    @prefix.command()
+    async def set(self, ctx: commands.Context, prefix: str) -> None:
+        await ctx.send(f"TODO: Set the prefix, got `{prefix}`")
 
 
 async def setup(bot: commands.Bot) -> None:
