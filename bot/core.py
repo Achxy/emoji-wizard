@@ -18,13 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 import logging
-from pathlib import Path
-from typing import Final, Iterable
-
+from typing import Final, Iterable, Coroutine
+import asyncio
 from asyncpg import Pool
+from pathlib import Path
 from discord import Message
 from discord.ext import commands
-from options import EXTENSIONS
 from utils.caching import PrefixCache
 from utils.caching.queries import SELECT_ALL
 
@@ -86,4 +85,10 @@ class EmojiBot(commands.Bot):
         logger.info("Successfully logged in as %s", self.user)
 
     async def setup_hook(self) -> None:
-        ...
+        load_ext: list[Coroutine[None, None, None]] = []
+        path = (Path(__file__).parent / "cogs").resolve()
+
+        for ext in path.glob("**/*.py"):
+            load_ext.append(self.load_extension(f"cogs.{ext.stem}"))
+
+        await asyncio.gather(*load_ext)
