@@ -1,5 +1,4 @@
 *.sql linguist-detectable=true
 
 # Some SQL files may misleadingly appear as tsql, make it back to SQL
-# this can be set to psql if necessary and still be correct.
-*.sql linguist-language=psql
+*.sql linguist-language=sql
