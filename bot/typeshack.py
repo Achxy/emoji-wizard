@@ -31,3 +31,4 @@ if TYPE_CHECKING:
 else:
     EmojiBot = TypeVar("EmojiBot")
     PassIntoBase = TypeVar("PassIntoBase", bound=Callable)
+    Self = TypeVar("Self")
