@@ -94,24 +94,39 @@ class BaseCache(Mapping, ABC):
     @property
     @abstractmethod
     def pool(self) -> Pool:
-        ...
+        """
+        Returns:
+            Pool: An instance of `asyncpg.Pool`
+        """
 
     @property
     @abstractmethod
     def __lock__(self) -> Lock:
-        ...
+        """
+        Returns:
+            Lock: An instance of `asyncio.Lock`
+        """
 
     @property
     @abstractmethod
-    def __store__(self) -> dict:
-        ...
+    def __store__(self) -> dict[Hashable, Record]:
+        """
+        Returns:
+            dict[Hashable, Record]: A mapping of the key to the record
+        """
 
     @property
     @abstractmethod
     def query(self) -> str:
-        ...
+        """
+        Returns:
+            str: A query string to pull all the records from the database
+        """
 
     @property
     @abstractmethod
     def key(self) -> str:
-        ...
+        """
+        Returns:
+            str: The key that will be used as the key to the cache mapping
+        """
