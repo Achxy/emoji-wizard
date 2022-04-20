@@ -37,6 +37,10 @@ class _Sentinel(Enum):
 
 
 class PrefixCache(BaseCache):
+    """
+    Caches the prefixes for every guild available in the database.
+    """
+
     __slots__: ClassVar[tuple[str, ...]] = (
         "__pool",
         "__fetch_query",
