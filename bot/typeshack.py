@@ -15,13 +15,15 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from typing import TYPE_CHECKING, Callable, Iterable, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Callable, Iterable, TypeAlias, TypeVar, Final
 
 from discord import Message
 
+__all__: Final[tuple[str, ...]] = ("EmojiBot", "PassIntoBase", "Self")
+
 if TYPE_CHECKING:
     from core import EmojiBot
-    from typing_extensions import Unpack
+    from typing_extensions import Unpack, Self
 
     PassIntoBase: TypeAlias = Callable[
         [Unpack[tuple[str, ...]]], Callable[[EmojiBot, Message], Iterable[str]]
