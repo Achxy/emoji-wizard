@@ -68,6 +68,10 @@ class BaseCache(Mapping, ABC):
         return pformat(self.__store__)
 
     async def pull(self) -> None:
+        """
+        Pulls all the values from the database and stores them in the __store__
+        mapping, the key is the value of the key property.
+        """
         async with self.__lock__:
             logger.info("Pulling data for %s", self.__class__.__name__)
             resp: list[Record] = await self.pool.fetch(self.query)
