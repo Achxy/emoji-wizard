@@ -70,7 +70,7 @@ class PrefixCache(BaseCache):
     async def __call__(self, bot, message) -> Iterable[str]:
         try:
             prefixes = await self.get_prefix_for(message.guild.id)
-            logger.debug("Found prefix for %s: %s", message.guild.id, prefixes)
+            logger.debug("Found prefix for %s: %s, with default %s", message.guild.id, prefixes, self.default)
             return self.pass_into(*self.default, *prefixes)(bot, message)
         except KeyError:
             logger.debug("No prefix found for %s, using default", message.guild.id)
