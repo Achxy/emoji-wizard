@@ -106,6 +106,7 @@ class PrefixCache(BaseCache):
         """
         async with self.__lock__:
             await self.pool.execute(INSERT, guild_id, prefix)
+            await self.pull_for(guild_id)
 
     async def extend(self, guild_id: int, prefixes: Iterable[str]) -> None:
         """
@@ -117,6 +118,7 @@ class PrefixCache(BaseCache):
         """
         async with self.__lock__:
             await self.pool.executemany(INSERT, (repeat(guild_id), prefixes))
+            await self.pull_for(guild_id)
 
     async def remove(self, guild_id: int, prefix: str) -> None:
         """
@@ -128,6 +130,7 @@ class PrefixCache(BaseCache):
         """
         async with self.__lock__:
             await self.pool.execute(REMOVE, guild_id, prefix)
+            await self.pull_for(guild_id)
 
     async def clear(self, guild_id: int) -> None:
         """
@@ -138,6 +141,7 @@ class PrefixCache(BaseCache):
         """
         async with self.__lock__:
             await self.pool.execute(REMOVE_ALL, guild_id)
+            await self.pull_for(guild_id)
 
     @property
     def pool(self) -> Pool:
