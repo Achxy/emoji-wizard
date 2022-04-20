@@ -24,6 +24,7 @@ from typing import Awaitable, ClassVar, Final, Generator, Hashable, Iterable
 from asyncpg import Pool, Record
 from typeshack import PassIntoBase, Self
 
+from utils.benchmark import benchmark
 from .base import BaseCache
 from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL, SELECT
 
@@ -46,6 +47,7 @@ class PrefixCache(BaseCache):
         "__store",
     )
 
+    @benchmark(logger)
     def __init__(
         self,
         *,
@@ -62,11 +64,13 @@ class PrefixCache(BaseCache):
         self.pass_into: PassIntoBase = pass_into
         self.__store: dict[Hashable, Record] = {}
 
+    @benchmark(logger)
     def __await__(self) -> Generator[Awaitable[None], None, Self]:
         yield from self.ensure_table_exists().__await__()
         yield from self.pull().__await__()
         return self
 
+    @benchmark(logger)
     async def __call__(self, bot, message) -> Iterable[str]:
         try:
             prefixes = await self.get_prefix_for(message.guild.id)
@@ -76,6 +80,7 @@ class PrefixCache(BaseCache):
             logger.debug("No prefix found for %s, using default", message.guild.id)
             return self.pass_into(*self.default)(bot, message)
 
+    @benchmark(logger)
     async def pull_for(self, guild_id: int) -> None:
         """
         Similar to `pull`, but only pulls for the specified guild.
@@ -89,6 +94,7 @@ class PrefixCache(BaseCache):
         resp: list[Record] = await self.pool.fetch(SELECT, guild_id)
         self.__store[guild_id] = resp
 
+    @benchmark(logger)
     async def ensure_table_exists(self) -> None:
         """
         Execute the table create query on the pool
@@ -98,6 +104,7 @@ class PrefixCache(BaseCache):
         logger.debug("Ensuring prefix table exists")
         await self.pool.execute(CREATE_PREFIX_TABLE)
 
+    @benchmark(logger)
     async def append(self, guild_id: int, prefix: str) -> None:
         """
         Adds a prefix to the database and the cache.
@@ -110,6 +117,7 @@ class PrefixCache(BaseCache):
         await self.pull_for(guild_id)
         logger.debug("Added prefix %s to %s", prefix, guild_id)
 
+    @benchmark(logger)
     async def extend(self, guild_id: int, prefixes: Iterable[str]) -> None:
         """
         Adds multiple prefixes to the database and the cache.
@@ -122,6 +130,7 @@ class PrefixCache(BaseCache):
         await self.pull_for(guild_id)
         logger.debug("Extended prefixes %s to %s", prefixes, guild_id)
 
+    @benchmark(logger)
     async def remove(self, guild_id: int, prefix: str) -> None:
         """
         Removes a prefix from the database and the cache.
@@ -134,6 +143,7 @@ class PrefixCache(BaseCache):
         await self.pull_for(guild_id)
         logger.debug("Removed prefix %s from %s", prefix, guild_id)
 
+    @benchmark(logger)
     async def clear(self, guild_id: int) -> None:
         """
         Clears all the prefixes for a given guild.
@@ -145,6 +155,7 @@ class PrefixCache(BaseCache):
         await self.pull_for(guild_id)
         logger.debug("Cleared prefixes for %s", guild_id)
 
+    @benchmark(logger)
     async def get_prefix_for(self, guild_id: int) -> Iterable[str]:
         """
         Gets the prefixes for a given guild.
