@@ -92,22 +92,54 @@ class PrefixCache(BaseCache):
             self.__store[guild_id] = resp
 
     async def ensure_table_exists(self) -> None:
+        """
+        Execute the table create query on the pool
+        This should create the table if it doesn't exist already
+        This function is yielded when a instance of this class is awaited
+        """
         async with self.__lock__:
             await self.pool.execute(CREATE_PREFIX_TABLE)
 
     async def append(self, guild_id: int, prefix: str) -> None:
+        """
+        Adds a prefix to the database and the cache.
+
+        Args:
+            guild_id (int): The guild ID to add the prefix to
+            prefix (str): The prefix to add
+        """
         async with self.__lock__:
             await self.pool.execute(INSERT, guild_id, prefix)
 
     async def extend(self, guild_id: int, prefixes: Iterable[str]) -> None:
+        """
+        Adds multiple prefixes to the database and the cache.
+
+        Args:
+            guild_id (int): The guild ID to add the prefixes to
+            prefixes (Iterable[str]): An iterable of prefixes to add
+        """
         async with self.__lock__:
             await self.pool.executemany(INSERT, (repeat(guild_id), prefixes))
 
     async def remove(self, guild_id: int, prefix: str) -> None:
+        """
+        Removes a prefix from the database and the cache.
+
+        Args:
+            guild_id (int): The guild ID to remove the prefix from
+            prefix (str): The prefix itself to be removed
+        """
         async with self.__lock__:
             await self.pool.execute(REMOVE, guild_id, prefix)
 
     async def clear(self, guild_id: int) -> None:
+        """
+        Clears all the prefixes for a given guild.
+
+        Args:
+            guild_id (int): The guild ID to clear the record from
+        """
         async with self.__lock__:
             await self.pool.execute(REMOVE_ALL, guild_id)
 
