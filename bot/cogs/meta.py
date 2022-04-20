@@ -16,14 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # TODO: Complete the cog
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+# XXX Incomplete
 
 from discord.ext import commands
-
-if TYPE_CHECKING:
-    from core import EmojiBot
+from discord.ext.commands import Context
+from typeshack import EmojiBot
 
 
 class Meta(commands.Cog):
@@ -31,12 +28,18 @@ class Meta(commands.Cog):
         self.bot: EmojiBot = bot
 
     @commands.group()
-    async def prefix(self, ctx: commands.Context) -> None:
-        ...
+    async def prefix(self, ctx: Context) -> None:
+        """
+        Manage the prefixes for the guild.
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
 
     @prefix.command()
     async def set(self, ctx: commands.Context, prefix: str) -> None:
-        await ctx.send(f"TODO: Set the prefix, got `{prefix}`")
+        await ctx.send("Hey")
+        await self.bot.prefix.append(ctx.guild.id, prefix)
+        await ctx.send(f"Successfully set the prefix to `{prefix}`")
 
 
 async def setup(bot: commands.Bot) -> None:

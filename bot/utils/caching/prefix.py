@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
-from asyncio import Lock
+import logging
 from itertools import repeat
 from typing import Awaitable, ClassVar, Final, Generator, Hashable, Iterable
 
@@ -28,6 +28,8 @@ from .base import BaseCache
 from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL, SELECT
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
+
+logger = logging.getLogger(__name__)
 
 
 class PrefixCache(BaseCache):
@@ -41,7 +43,6 @@ class PrefixCache(BaseCache):
         "__key",
         "default",
         "pass_into",
-        "__lock",
         "__store",
     )
 
@@ -53,14 +54,12 @@ class PrefixCache(BaseCache):
         key: str,
         default: Iterable[str],
         pass_into: PassIntoBase = lambda *pfx: lambda bot, message: pfx,
-        lock: Lock | None = None,
     ) -> None:
         self.__pool: Pool = pool
         self.__fetch_query: str = fetch_query
         self.__key: str = key
         self.default: Iterable[str] = default
         self.pass_into: PassIntoBase = pass_into
-        self.__lock: Lock = lock or Lock()
         self.__store: dict[Hashable, Record] = {}
 
     def __await__(self) -> Generator[Awaitable[None], None, Self]:
@@ -68,11 +67,14 @@ class PrefixCache(BaseCache):
         yield from self.pull().__await__()
         return self
 
-    def __call__(self, bot, message) -> Iterable[str]:
-        ret: list[Record] = self[message.guild.id]
-        if ret is None:
+    async def __call__(self, bot, message) -> Iterable[str]:
+        try:
+            prefixes = await self.get_prefix_for(message.guild.id)
+            logger.debug("Found prefix for %s: %s", message.guild.id, prefixes)
+            return self.pass_into(*self.default, *prefixes)(bot, message)
+        except KeyError:
+            logger.debug("No prefix found for %s, using default", message.guild.id)
             return self.pass_into(*self.default)(bot, message)
-        return self.pass_into(*self.default, *ret)(bot, message)
 
     async def pull_for(self, guild_id: int) -> None:
         """
@@ -83,9 +85,9 @@ class PrefixCache(BaseCache):
         Args:
             guild_id (int): The guild ID to pull for.
         """
-        async with self.__lock__:
-            resp: list[Record] = await self.pool.fetch(SELECT, guild_id)
-            self.__store[guild_id] = resp
+        logger.debug("Pulling prefixes for %s", guild_id)
+        resp: list[Record] = await self.pool.fetch(SELECT, guild_id)
+        self.__store[guild_id] = resp
 
     async def ensure_table_exists(self) -> None:
         """
@@ -93,8 +95,8 @@ class PrefixCache(BaseCache):
         This should create the table if it doesn't exist already
         This function is yielded when a instance of this class is awaited
         """
-        async with self.__lock__:
-            await self.pool.execute(CREATE_PREFIX_TABLE)
+        logger.debug("Ensuring prefix table exists")
+        await self.pool.execute(CREATE_PREFIX_TABLE)
 
     async def append(self, guild_id: int, prefix: str) -> None:
         """
@@ -104,9 +106,9 @@ class PrefixCache(BaseCache):
             guild_id (int): The guild ID to add the prefix to
             prefix (str): The prefix to add
         """
-        async with self.__lock__:
-            await self.pool.execute(INSERT, guild_id, prefix)
-            await self.pull_for(guild_id)
+        await self.pool.execute(INSERT, guild_id, prefix)
+        await self.pull_for(guild_id)
+        logger.debug("Added prefix %s to %s", prefix, guild_id)
 
     async def extend(self, guild_id: int, prefixes: Iterable[str]) -> None:
         """
@@ -116,9 +118,9 @@ class PrefixCache(BaseCache):
             guild_id (int): The guild ID to add the prefixes to
             prefixes (Iterable[str]): An iterable of prefixes to add
         """
-        async with self.__lock__:
-            await self.pool.executemany(INSERT, (repeat(guild_id), prefixes))
-            await self.pull_for(guild_id)
+        await self.pool.executemany(INSERT, (repeat(guild_id), prefixes))
+        await self.pull_for(guild_id)
+        logger.debug("Extended prefixes %s to %s", prefixes, guild_id)
 
     async def remove(self, guild_id: int, prefix: str) -> None:
         """
@@ -128,9 +130,9 @@ class PrefixCache(BaseCache):
             guild_id (int): The guild ID to remove the prefix from
             prefix (str): The prefix itself to be removed
         """
-        async with self.__lock__:
-            await self.pool.execute(REMOVE, guild_id, prefix)
-            await self.pull_for(guild_id)
+        await self.pool.execute(REMOVE, guild_id, prefix)
+        await self.pull_for(guild_id)
+        logger.debug("Removed prefix %s from %s", prefix, guild_id)
 
     async def clear(self, guild_id: int) -> None:
         """
@@ -139,21 +141,38 @@ class PrefixCache(BaseCache):
         Args:
             guild_id (int): The guild ID to clear the record from
         """
-        async with self.__lock__:
-            await self.pool.execute(REMOVE_ALL, guild_id)
-            await self.pull_for(guild_id)
+        await self.pool.execute(REMOVE_ALL, guild_id)
+        await self.pull_for(guild_id)
+        logger.debug("Cleared prefixes for %s", guild_id)
+
+    async def get_prefix_for(self, guild_id: int) -> Iterable[str]:
+        """
+        Gets the prefixes for a given guild.
+
+        Args:
+            guild_id (int): The guild ID to get the prefixes for
+        Returns:
+            Iterable[str] An iterable of prefixes for the guild
+        Raises:
+            KeyError: If the guild ID is not in the cache
+        """
+        rec = self.__store__[guild_id]
+        logger.debug("Found prefixes for %s: %s", guild_id, rec)
+        ret = [pfx["guild_prefix"] for pfx in rec]
+        logger.debug("Returning prefixes for %s: %s", guild_id, ret)
+        return ret
 
     @property
     def pool(self) -> Pool:
         return self.__pool
 
     @property
-    def __store__(self) -> dict:
+    def __store__(self) -> dict[Hashable, Record]:
         return self.__store
 
-    @property
-    def __lock__(self) -> Lock:
-        return self.__lock
+    @__store__.setter
+    def __store__(self, value: dict[Hashable, Record]) -> None:
+        self.__store: dict[Hashable, Record] = value
 
     @property
     def query(self) -> str:

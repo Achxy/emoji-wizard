@@ -24,7 +24,7 @@ from core import EmojiBot
 from options import ALLOWED_MENTIONS, DEFAULT_PREFIX, INTENTS, LOGGING_FORMAT
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format=LOGGING_FORMAT,
 )
 

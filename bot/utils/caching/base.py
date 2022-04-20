@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from asyncio import Lock
 from collections.abc import Mapping
 from pprint import pformat
 from typing import Awaitable, ClassVar, Final, Generator, Hashable, Iterable
@@ -42,7 +41,6 @@ class BaseCache(Mapping, ABC):
         key (property)
         pool (property)
         __store__ (property)
-        __lock__ (property)
     Mixins methods:
         __str__
         pull
@@ -72,24 +70,22 @@ class BaseCache(Mapping, ABC):
         Pulls all the values from the database and stores them in the __store__
         mapping, the key is the value of the key property.
         """
-        async with self.__lock__:
-            clsname = self.__class__.__name__
-            logger.info("Pulling data for %s", clsname)
-            resp: list[Record] = await self.pool.fetch(self.query)
-            logger.debug("Pulled data for %s: %s", clsname, resp)
-            journal: dict[Hashable, list[Record]] = {}
+        clsname = self.__class__.__name__
+        logger.info("Pulling data for %s", clsname)
+        resp: list[Record] = await self.pool.fetch(self.query)
+        logger.debug("Pulled data for %s: %s", clsname, resp)
+        journal: dict[Hashable, list[Record]] = {}
 
-            for item in resp:
-                journal.setdefault(item[self.key], []).append(item)
+        for item in resp:
+            journal.setdefault(item[self.key], []).append(item)
 
-            self.__store__.clear()
-            self.__store__.update({**journal})
-            logger.info(
-                "Completed pulling data for %s, held %s records in memory (%s in store)",
-                clsname,
-                len(resp),
-                len(self.__store__),
-            )
+        self.__store__ = {**journal}
+        logger.info(
+            "Completed pulling data for %s, held %s records in memory (%s in store)",
+            clsname,
+            len(resp),
+            len(self.__store__),
+        )
 
     @property
     @abstractmethod
@@ -101,18 +97,18 @@ class BaseCache(Mapping, ABC):
 
     @property
     @abstractmethod
-    def __lock__(self) -> Lock:
-        """
-        Returns:
-            Lock: An instance of `asyncio.Lock`
-        """
-
-    @property
-    @abstractmethod
     def __store__(self) -> dict[Hashable, Record]:
         """
         Returns:
             dict[Hashable, Record]: A mapping of the key to the record
+        """
+
+    @__store__.setter
+    @abstractmethod
+    def __store__(self, value: dict[Hashable, Record]) -> None:
+        """
+        Args:
+            value: A mapping of the key to the record
         """
 
     @property
