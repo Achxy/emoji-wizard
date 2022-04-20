@@ -22,12 +22,12 @@ from abc import ABC, abstractmethod
 from asyncio import Lock
 from collections.abc import Mapping
 from pprint import pformat
-from typing import Awaitable, ClassVar, Generator, Hashable, Iterable
+from typing import Awaitable, ClassVar, Final, Generator, Hashable, Iterable
 
 from asyncpg import Pool, Record
 from typing_extensions import Self
 
-__all__: tuple[str] = ("BaseCache",)
+__all__: Final[tuple[str]] = ("BaseCache",)
 
 logger = logging.getLogger(__name__)
 
