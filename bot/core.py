@@ -53,7 +53,6 @@ class EmojiBot(commands.Bot):
             fetch_query=SELECT_ALL,
             key="guild_id",
             pass_into=commands.when_mentioned_or,
-            mix_with_default=True,
         )
         super().__init__(*args, **kwargs, command_prefix=self.prefix)
 
