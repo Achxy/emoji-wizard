@@ -20,7 +20,7 @@ from __future__ import annotations
 from asyncio import Lock
 from enum import Enum
 from itertools import repeat
-from typing import Awaitable, ClassVar, Final, Generator, Iterable
+from typing import Awaitable, Callable, ClassVar, Final, Generator, Hashable, Iterable
 
 from asyncpg import Pool, Record
 from typing_extensions import Self
@@ -53,16 +53,24 @@ class PrefixCache(BaseCache):
     )
 
     def __init__(
-        self, *, pool, fetch_query, key, default, pass_into, lock=None, mix_with_default=True
+        self,
+        *,
+        pool: Pool,
+        fetch_query: str,
+        key: str,
+        default: Iterable[str],
+        pass_into: Callable,
+        lock: Lock | None = None,
+        mix_with_default: bool = True,
     ) -> None:
-        self.__pool = pool
-        self.__fetch_query = fetch_query
-        self.__key = key
-        self.default = default
+        self.__pool: Pool = pool
+        self.__fetch_query: str = fetch_query
+        self.__key: str = key
+        self.default: Iterable[str] = default
         self.pass_into = pass_into
-        self.__lock = lock or Lock()
-        self.mix_with_default = mix_with_default
-        self.__store = {}
+        self.__lock: Lock = lock or Lock()
+        self.mix_with_default: bool = mix_with_default
+        self.__store: dict[Hashable, Record] = {}
 
     def __await__(self) -> Generator[Awaitable[None], None, Self]:
         yield from self.ensure_table_exists().__await__()
