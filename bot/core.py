@@ -66,6 +66,12 @@ class EmojiBot(commands.Bot):
         logger.info("Successfully logged in as %s", self.user)
 
     async def setup_hook(self) -> None:
+        """
+        To perform asynchronous setup after the bot is logged in but
+        before it has connected to the Websocket.
+        Here, this will be leveraged to ready up the prefix cache
+        and load extension from the `cogs` directory
+        """
         # Ready up prefix
         await self.prefix
         # Load extensions
