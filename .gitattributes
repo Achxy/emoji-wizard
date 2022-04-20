@@ -1,4 +1,3 @@
-*.sql linguist-detectable=true
-
 # Some SQL files may misleadingly appear as tsql, make it back to SQL
+*.sql linguist-detectable=true
 *.sql linguist-language=sql
