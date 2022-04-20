@@ -43,7 +43,7 @@ class EmojiBot(commands.Bot):
     def __init__(self, *args, pool: Pool, **kwargs) -> None:
         if "command_prefix" in kwargs:
             raise ValueError("command_prefix need not be set manually, provide default_prefix instead")
-        if (default_prefix := kwargs.pop("default_prefix", None)) is None:
+        if (default_prefix := kwargs.pop("default_prefix")) is None:
             raise ValueError("default_prefix must be set")
 
         self.pool: Pool = pool
