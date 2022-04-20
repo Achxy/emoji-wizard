@@ -18,26 +18,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from asyncio import Lock
-from enum import Enum
 from itertools import repeat
-from typing import Awaitable, Callable, ClassVar, Final, Generator, Hashable, Iterable
+from typing import Awaitable, ClassVar, Final, Generator, Hashable, Iterable
 
 from asyncpg import Pool, Record
+from typeshack import PassIntoBase
 from typing_extensions import Self
 
 from .base import BaseCache
 from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL, SELECT
 
 __all__: Final[tuple[str]] = ("PrefixCache",)
-
-
-class _Sentinel(Enum):
-    """
-    Single member enum for sentinel values
-    """
-
-    __slots__: ClassVar[tuple[()]] = ()
-    MISSING = object()
 
 
 class PrefixCache(BaseCache):
@@ -52,7 +43,6 @@ class PrefixCache(BaseCache):
         "default",
         "pass_into",
         "__lock",
-        "mix_with_default",
         "__store",
     )
 
@@ -63,17 +53,15 @@ class PrefixCache(BaseCache):
         fetch_query: str,
         key: str,
         default: Iterable[str],
-        pass_into: Callable,
+        pass_into: PassIntoBase = lambda *pfx: lambda bot, message: pfx,
         lock: Lock | None = None,
-        mix_with_default: bool = True,
     ) -> None:
         self.__pool: Pool = pool
         self.__fetch_query: str = fetch_query
         self.__key: str = key
         self.default: Iterable[str] = default
-        self.pass_into = pass_into
+        self.pass_into: PassIntoBase = pass_into
         self.__lock: Lock = lock or Lock()
-        self.mix_with_default: bool = mix_with_default
         self.__store: dict[Hashable, Record] = {}
 
     def __await__(self) -> Generator[Awaitable[None], None, Self]:
@@ -82,13 +70,10 @@ class PrefixCache(BaseCache):
         return self
 
     def __call__(self, bot, message) -> Iterable[str]:
-        ret = self.__store.get(message.guild.id, _Sentinel.MISSING)
-
-        if ret is _Sentinel.MISSING:
-            return self.default
-        if self.mix_with_default:
-            return self.pass_into(*ret, *self.default)
-        return self.pass_into(*ret)
+        ret: list[Record] = self[message.guild.id]
+        if ret is None:
+            return self.pass_into(*self.default)(bot, message)
+        return self.pass_into(*self.default, *ret)(bot, message)
 
     async def pull_for(self, guild_id: int) -> None:
         """
