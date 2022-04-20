@@ -22,8 +22,7 @@ from itertools import repeat
 from typing import Awaitable, ClassVar, Final, Generator, Hashable, Iterable
 
 from asyncpg import Pool, Record
-from typeshack import PassIntoBase
-from typing_extensions import Self
+from typeshack import PassIntoBase, Self
 
 from .base import BaseCache
 from .queries import CREATE_PREFIX_TABLE, INSERT, REMOVE, REMOVE_ALL, SELECT
