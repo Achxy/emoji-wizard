@@ -73,10 +73,12 @@ class BaseCache(Mapping, ABC):
         mapping, the key is the value of the key property.
         """
         async with self.__lock__:
-            logger.info("Pulling data for %s", self.__class__.__name__)
+            clsname = self.__class__.__name__
+            logger.info("Pulling data for %s", clsname)
             resp: list[Record] = await self.pool.fetch(self.query)
-            logger.debug("Pulled data for %s: %s", self.__class__.__name__, resp)
+            logger.debug("Pulled data for %s: %s", clsname, resp)
             journal: dict[Hashable, list[Record]] = {}
+
             for item in resp:
                 journal.setdefault(item[self.key], []).append(item)
 
@@ -84,7 +86,7 @@ class BaseCache(Mapping, ABC):
             self.__store__.update({**journal})
             logger.info(
                 "Completed pulling data for %s, held %s records in memory (%s in store)",
-                self.__class__.__name__,
+                clsname,
                 len(resp),
                 len(self.__store__),
             )
