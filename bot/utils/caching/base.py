@@ -33,6 +33,22 @@ logger = logging.getLogger(__name__)
 
 
 class BaseCache(Mapping, ABC):
+    """
+    BaseCache is a builder class for caching asyncpg records.
+    This implements `collections.abc.Mapping`
+
+    Abstract methods (or properties) are:
+        query (property)
+        key (property)
+        pool (property)
+        __store__ (property)
+        __lock__ (property)
+    Mixins methods:
+        __str__
+        pull
+
+    """
+
     __slots__: ClassVar[tuple[()]] = ()
 
     def __len__(self) -> int:
