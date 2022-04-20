@@ -32,6 +32,10 @@ __all__: Final[tuple[str]] = ("PrefixCache",)
 
 
 class _Sentinel(Enum):
+    """
+    Single member enum for sentinel values
+    """
+
     __slots__: ClassVar[tuple[()]] = ()
     MISSING = object()
 
